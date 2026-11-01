@@ -7,6 +7,6 @@
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/OWNER/ha-bom-warnings/issues",
-  "requirements": [],
+  "requirements": ["pyshp>=2.3"],
   "version": "0.0.1"
 }
