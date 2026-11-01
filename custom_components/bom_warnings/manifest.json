@@ -3,10 +3,10 @@
   "name": "BoM Warnings",
   "codeowners": [],
   "config_flow": true,
-  "documentation": "https://github.com/OWNER/ha-bom-warnings",
+  "documentation": "https://github.com/rhgof/ha-bom-warnings",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/OWNER/ha-bom-warnings/issues",
+  "issue_tracker": "https://github.com/rhgof/ha-bom-warnings/issues",
   "requirements": ["pyshp>=2.3"],
   "version": "0.0.1"
 }
