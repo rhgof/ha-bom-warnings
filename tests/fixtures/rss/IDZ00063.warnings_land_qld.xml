@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Weather Warnings for Queensland - land areas. Issued by the Australian Bureau of Meteorology</title>
+		<link>https://reg.bom.gov.au/fwo/IDZ00063.warnings_land_qld.xml</link>
+		<atom:link href="https://reg.bom.gov.au/fwo/IDZ00063.warnings_land_qld.xml" rel="self" type="application/rss+xml" />
+		<description>Current weather warnings for Queensland, Australia including tsunami; tropical cyclones; severe thunderstorms; severe weather; fire weather; flood; frost; driving; bushwalking; sheep graziers and other agricultural warnings.</description>
+		<language>en-au</language>
+		<copyright>Copyright: (C) Copyright Commonwealth of Australia 2010, Bureau of Meteorology (ABN 92637 533532), see https://reg.bom.gov.au/other/copyright.shtml for terms and conditions of reuse.</copyright>
+		<webMaster>webops@bom.gov.au (Help desk)</webMaster>
+		<pubDate>Sun, 01 Nov 2026 05:57:08 GMT</pubDate>
+		<lastBuildDate>Sun, 01 Nov 2026 05:57:08 GMT</lastBuildDate>
+		<generator>Australian Bureau of Meteorology</generator>
+		<ttl>10</ttl>
+		<image>
+			<url>https://reg.bom.gov.au/images/bom_logo_inline.gif</url>
+			<title>Weather Warnings for Queensland - land areas. Issued by the Australian Bureau of Meteorology</title>
+			<link>https://reg.bom.gov.au/fwo/IDZ00063.warnings_land_qld.xml</link>
+		</image>
+		<item>
+			<title>31/11:27 EST Final Flood Warning for the Upper Condamine River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/upper-condamine.shtml</link>
+			<pubDate>Sat, 31 Oct 2026 01:27:47 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/upper-condamine.shtml</guid>
+		</item>
+		<item>
+			<title>01/11:41 EST Moderate Flood Warning for the Lower Condamine River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/lower-condamine.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 01:41:53 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/lower-condamine.shtml</guid>
+		</item>
+		<item>
+			<title>31/10:26 EST Final Flood Warning for the Weir River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/border-rivers.shtml</link>
+			<pubDate>Sat, 31 Oct 2026 00:26:52 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/border-rivers.shtml</guid>
+		</item>
+		<item>
+			<title>01/09:47 EST Minor Flood Warning for the Moonie River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/moonie-river.shtml</link>
+			<pubDate>Sat, 31 Oct 2026 23:47:34 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/moonie-river.shtml</guid>
+		</item>
+		<item>
+			<title>01/10:36 EST Moderate Flood Warning for the Warrego River (QLD)</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/warrego-river-basin.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 00:36:40 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/warrego-river-basin.shtml</guid>
+		</item>
+		<item>
+			<title>01/13:02 EST Minor Flood Warning for the Paroo River (QLD)</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/paroo-river.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 03:02:45 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/paroo-river.shtml</guid>
+		</item>
+		<item>
+			<title>01/10:44 EST Moderate Flood Warning for the Bulloo River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/bulloo-river.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 00:44:41 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/bulloo-river.shtml</guid>
+		</item>
+		<item>
+			<title>01/12:04 EST Moderate Flood Warning for the Barcoo River</title>
+			<link>http://reg.bom.gov.au/qld/warnings/flood/thomson-barcoo-cooper.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 02:04:38 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/flood/thomson-barcoo-cooper.shtml</guid>
+		</item>
+		<item>
+			<title>01/14:14 EST Heatwave Warning (QLD)</title>
+			<link>http://reg.bom.gov.au/qld/warnings/heatwave.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 04:14:57 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/qld/warnings/heatwave.shtml</guid>
+		</item>
+		<item>
+			<title>01/15:33 EST 
+                Severe Thunderstorm Warning
+            
+for 
+                parts of Wide Bay and Burnett, Darling Downs and Granite Belt and Southeast Coast Forecast Districts.
+                
+            </title>
+			<link>http://reg.bom.gov.au/products/IDQ21033.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 05:33:41 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/products/IDQ21033.shtml</guid>
+		</item>
+		<item>
+			<title>01/15:25 EST 
+                Severe Thunderstorm Warning - Southeast Queensland
+            
+for 
+                parts of Somerset, Toowoomba, Lockyer Valley and Western Downs Council Areas.
+                
+            </title>
+			<link>http://reg.bom.gov.au/products/IDQ21035.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 05:25:59 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/products/IDQ21035.shtml</guid>
+		</item>
+	</channel>
+</rss>

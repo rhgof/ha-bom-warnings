@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21033-2026-11-01T05:59:35+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-01T05:59:35+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDQ21033-2026-11-01T04:24:44+00:00,2026-11-01T04:24:44+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-01T05:59:29+00:00</effective>
+        <expires>2026-11-01T10:59:29+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Thunderstorm Warning for Darling Downs and Granite Belt, Wide Bay and Burnett and Southeast Coast forecast districts</headline>
+        <description>
+          Severe thunderstorms are likely to produce large hailstones, damaging winds and heavy rainfall that may lead to flash flooding over the next several hours in parts of the Wide Bay and Burnett, Darling Downs and Granite Belt and Southeast Coast districts. Locations which may be affected include Warwick, Toowoomba, Dalby, Gatton, Kilcoy, Lowood, Tara, Inglewood, Yarraman, Chinchilla, Oakey and Laidley.  
+          
+          VERY DANGEROUS THUNDERSTORMS are likely to produce large, possibly giant hailstones, damaging, locally destructive winds and heavy rainfall that may lead to flash flooding over the next several hours in parts of the Darling Downs and Granite Belt and Wide Bay and Burnett districts. Locations which may be affected include Dalby, Oakey, Pittsworth and Millmerran.  
+        </description>
+        <instruction>Emergency services advise people to:
+* If you have children make sure they are with you or an adult you trust.
+* Pack away, secure or tie down outdoor furniture, toys and trampolines if it s safe to do so.
+* Stay away from windows if there is giant hail.
+* Park your car undercover away from trees.
+* Close doors and windows.
+* Keep asthma medications close by. Storms and wind can trigger asthma attacks.
+* Charge mobile phones and power banks in case the power goes out.
+* Put your pets somewhere safe and make sure they can be identified in case they get lost.
+* Do not drive now unless you have to because conditions are dangerous.
+* Tell friends, family and neighbours in the area.
+* Go inside a strong building now. Stay inside until the storm has passed.
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Wide Bay and Burnett, Darling Downs and Granite Belt and Southeast Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW013</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW014</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW015</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

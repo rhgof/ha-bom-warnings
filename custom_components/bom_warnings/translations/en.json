@@ -1,0 +1,10 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BoM Warnings",
+        "description": "TODO: location search and state selection."
+      }
+    }
+  }
+}

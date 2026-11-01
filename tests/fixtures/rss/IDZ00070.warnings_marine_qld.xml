@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Weather Warnings for Queensland - marine areas. Issued by the Australian Bureau of Meteorology</title>
+		<link>https://reg.bom.gov.au/fwo/IDZ00070.warnings_marine_qld.xml</link>
+		<atom:link href="https://reg.bom.gov.au/fwo/IDZ00070.warnings_marine_qld.xml" rel="self" type="application/rss+xml" />
+		<description>Current weather warnings for Queensland, Australia including strong wind, gale, storm force and hurricane force wind warnings; tsunami; damaging waves; abnormally high tides; and tropical cyclones.</description>
+		<language>en-au</language>
+		<copyright>Copyright: (C) Copyright Commonwealth of Australia 2010, Bureau of Meteorology (ABN 92637 533532), see https://reg.bom.gov.au/other/copyright.shtml for terms and conditions of reuse.</copyright>
+		<webMaster>webops@bom.gov.au (Help desk)</webMaster>
+		<pubDate>Sun, 01 Nov 2026 05:57:08 GMT</pubDate>
+		<lastBuildDate>Sun, 01 Nov 2026 05:57:08 GMT</lastBuildDate>
+		<generator>Australian Bureau of Meteorology</generator>
+		<ttl>10</ttl>
+		<image>
+			<url>https://reg.bom.gov.au/images/bom_logo_inline.gif</url>
+			<title>Weather Warnings for Queensland - marine areas. Issued by the Australian Bureau of Meteorology</title>
+			<link>https://reg.bom.gov.au/fwo/IDZ00070.warnings_marine_qld.xml</link>
+		</image>
+		<item>
+			<title>01/15:25 EST 
+                Severe Thunderstorm Warning - Southeast Queensland
+            
+for 
+                parts of Somerset, Toowoomba, Lockyer Valley and Western Downs Council Areas.
+                
+            </title>
+			<link>http://reg.bom.gov.au/products/IDQ21035.shtml</link>
+			<pubDate>Sun, 01 Nov 2026 05:25:59 GMT</pubDate>
+			<guid isPermaLink="false">http://reg.bom.gov.au/products/IDQ21035.shtml</guid>
+		</item>
+	</channel>
+</rss>

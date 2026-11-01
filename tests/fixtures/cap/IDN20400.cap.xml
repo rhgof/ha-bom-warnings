@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN20400-2026-11-01T00:11:05+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-01T00:11:05+00:00</sent>
+    <status>Actual</status>
+    <msgType>Cancel</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-30T17:00:05+00:00,2026-10-30T17:00:05+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-30T23:00:03+00:00,2026-10-30T23:00:03+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T00:22:07+00:00,2026-10-31T00:22:07+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T05:05:03+00:00,2026-10-31T05:05:03+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T11:00:04+00:00,2026-10-31T11:00:04+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T12:44:18+00:00,2026-10-31T12:44:18+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T17:00:02+00:00,2026-10-31T17:00:02+00:00 CAP.Message@bom.gov.au,AusBoM-IDN20400-2026-10-31T19:35:52+00:00,2026-10-31T19:35:52+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Wind</event>
+        <urgency>Unknown</urgency>
+        <severity>Minor</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>wind</value>
+        </eventCode>
+        <effective>2026-10-31T17:00:00+00:00</effective>
+        <expires>2026-11-01T13:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Wind Warning for coastal waters between Montague Island and Gabo Island for 01 November</headline>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Eden Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_MW001</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

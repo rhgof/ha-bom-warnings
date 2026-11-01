@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21013-2026-11-01T04:14:38+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-01T04:14:38+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>AusBoM,IDQ21013,2026-10-31T03:46:02+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Shelter</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Severe</severity>
+        <certainty>Observed</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-01T04:14:38+00:00</effective>
+        <expires>2026-11-02T10:14:38+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe heatwave warning for Queensland</headline>
+        <description>
+          Maximum temperatures in the high thirties to around forty and overnight minimum temperatures in the mid twenties. 
+
+Severe heatwave conditions persisting into next week.   Locations likely to be impacted include Kowanyama, Pormpuraaw and Weipa.
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Peninsula, Gulf Country and Northern Goldfields and Upper Flinders Districts.
+            </areaDesc>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW001</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW002</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW003</value>
+              </geocode>
+        </area>
+    </info>
+</alert>

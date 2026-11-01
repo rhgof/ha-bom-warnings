@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDW21013-2026-11-01T04:13:34+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-01T04:13:34+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>AusBoM,IDW21013,2026-10-31T03:58:23+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Prepare</responseType>
+        <urgency>Future</urgency>
+        <severity>Extreme</severity>
+        <certainty>Likely</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-01T04:13:34+00:00</effective>
+        <expires>2026-11-02T04:13:34+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Extreme heatwave warning for Western Australia</headline>
+        <description>
+        Maximum temperatures in the low to mid forties and overnight minimum temperatures in the mid to high twenties. 
+
+Severe heatwave conditions are expected to intensify through the early to middle part of this week.  
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Western Australia: Kimberley and North Interior Districts.
+            </areaDesc>
+            <geocode>
+                <valueName>http://www.iso.org/iso/country_codes.html</valueName>
+                <value>AU-WA</value>
+            </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>WA_PW001</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>WA_PW006</value>
+              </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Prepare</responseType>
+        <urgency>Future</urgency>
+        <severity>Severe</severity>
+        <certainty>Likely</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-01T04:13:34+00:00</effective>
+        <expires>2026-11-02T04:13:34+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe heatwave warning for Western Australia</headline>
+        <description>
+        Severe heatwave conditions are expected to affect Western Australia from Sunday 01 November 2026 to Wednesday 04 November 2026
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Western Australia: Pilbara District.
+            </areaDesc>
+            <geocode>
+                <valueName>http://www.iso.org/iso/country_codes.html</valueName>
+                <value>AU-WA</value>
+            </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>WA_PW002</value>
+              </geocode>
+        </area>
+    </info>
+</alert>
