@@ -74,9 +74,10 @@ def test_empty_or_invalid_input_returns_none(raw):
 
 def test_info_headline_cancellation_and_final_are_detected():
     xml = (FIXTURES / "IDQ20855.cap.xml").read_bytes()
-    final = xml.replace(b"Minor Flood Warning for Bulloo River downstream", b"Final Flood Warning for Bulloo River downstream")
+    minor = b"Minor Flood Warning for Bulloo River downstream"
+    final = xml.replace(minor, b"Final Flood Warning for Bulloo River downstream")
     w = parse_cap(final)
     assert [i.phase for i in w.infos] == [Phase.UPDATE, Phase.FINAL]
-    cancel = xml.replace(b"Minor Flood Warning for Bulloo River downstream", b"Cancellation of Flood Warning for Bulloo River downstream")
+    cancel = xml.replace(minor, b"Cancellation of Flood Warning for Bulloo River downstream")
     assert parse_cap(cancel).infos[1].phase is Phase.CANCELLED
     assert w.is_active(NOW)  # the Moderate block is still current

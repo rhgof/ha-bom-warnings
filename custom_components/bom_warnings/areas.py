@@ -7,8 +7,8 @@ ftp://ftp.bom.gov.au/anon/home/adfd/spatial/; the ``AAC`` field equals the CAP
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import warnings
+from collections.abc import Iterable
 from pathlib import Path
 
 import shapefile
