@@ -20,15 +20,18 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
-from .areas import state_of
+from .areas import is_marine, state_of
 from .cap import CapWarning, Info, Phase, Severity
 from .const import (
     CONF_AREA_CODES,
     CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
+    CONF_INCLUDE_MARINE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
+    CONF_RADIUS,
     CONF_STATE,
+    CONF_ZONE,
     DOMAIN,
     SPATIAL_CACHE_DIR,
 )
@@ -47,6 +50,7 @@ from .spatial import (
     refresh_layers,
     resolve_coordinate,
 )
+from .zone import ZoneFollower
 
 if TYPE_CHECKING:
     from . import BomWarningsConfigEntry
@@ -452,7 +456,14 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # Start at the feed's generation: layer changes before this entry existed are already
         # reflected in the codes it was created with, so reloading must not re-resolve.
         self._seen_generation = feed.layer_generation
-        self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
+        # Every code the location resolved to; coastal-water codes count only if the user opted in,
+        # so toggling the option never needs a re-resolve.
+        self._stored_codes = frozenset(config_entry.data[CONF_AREA_CODES])
+        self._include_marine: bool = config_entry.options.get(CONF_INCLUDE_MARINE, False)
+        self._area_codes = self._counted(self._stored_codes)
+        self._zone: ZoneFollower | None = None
+        # Set when the location itself changed, so the next derivation re-resolves it.
+        self._reresolve = False
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
         self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
         self._issue_id = no_area_issue_id(config_entry)
@@ -505,11 +516,27 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
     def consecutive_failures(self) -> int:
         return self._feed.consecutive_failures
 
+    def _counted(self, codes: frozenset[str]) -> frozenset[str]:
+        if self._include_marine:
+            return codes
+        return frozenset(code for code in codes if not is_marine(code))
+
     def attach(self) -> None:
-        """Follow the shared feed; this is also what keeps the feed polling."""
+        """Follow the shared feed (this is also what keeps the feed polling), and the zone."""
         self._unsubscribe = self._feed.async_add_listener(self._on_feed_update)
+        if CONF_ZONE in self.config_entry.data:
+            self._zone = ZoneFollower(self.hass, self.config_entry, self._on_location_changed)
+            self._zone.start()
+
+    @callback
+    def _on_location_changed(self) -> None:
+        self._reresolve = True
+        self._on_feed_update()
 
     def detach(self) -> None:
+        if self._zone:
+            self._zone.stop()
+            self._zone = None
         if self._unsubscribe:
             self._unsubscribe()
             self._unsubscribe = None
@@ -527,7 +554,11 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         try:
             with self._ftp.session():
                 return resolve_coordinate(
-                    self._ftp, cache_dir, lat=data[CONF_LATITUDE], lon=data[CONF_LONGITUDE]
+                    self._ftp,
+                    cache_dir,
+                    lat=data[CONF_LATITUDE],
+                    lon=data[CONF_LONGITUDE],
+                    radius_m=data.get(CONF_RADIUS, 0.0),
                 )
         except (BomFtpError, SpatialDataError, OSError) as err:
             _LOGGER.debug("Could not re-resolve the location after a layer change: %s", err)
@@ -546,9 +577,10 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             )
             return
         ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
-        if codes == self._area_codes:
+        if codes == self._stored_codes:
             return
-        self._area_codes = frozenset(codes)
+        self._stored_codes = frozenset(codes)
+        self._area_codes = self._counted(self._stored_codes)
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
@@ -587,11 +619,12 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         if not feed.last_update_success or feed.data is None:
             raise UpdateFailed("The shared BoM refresh is failing")
         snapshot = feed.data
-        if snapshot.layer_generation != self._seen_generation:
+        if snapshot.layer_generation != self._seen_generation or self._reresolve:
             new_codes = await self.hass.async_add_executor_job(self._re_resolve)
             # Only after success, so a failed attempt is retried on the next poll.
             if new_codes is not None:
                 self._seen_generation = snapshot.layer_generation
+                self._reresolve = False
                 self._apply_resolved(new_codes)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)

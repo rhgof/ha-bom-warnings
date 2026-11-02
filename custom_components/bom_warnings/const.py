@@ -5,11 +5,20 @@ CONF_LATITUDE = "latitude"
 CONF_LONGITUDE = "longitude"
 CONF_STATE = "state"
 CONF_AREA_CODES = "area_codes"
+# Set only on entries that follow a Home Assistant zone: its entity id, and its radius in metres.
+CONF_ZONE = "zone"
+CONF_RADIUS = "radius"
+# A circle larger than this would list a whole state's warnings and make matching slow, so a
+# bigger zone is clamped and the user is told.
+MAX_RADIUS_M = 50_000.0
 SPATIAL_CACHE_DIR = "bom_warnings/spatial"
 
 # Options. Defaults keep today's behaviour: ended warnings hidden, every warning type shown.
 CONF_HIDE_FINAL = "hide_final_cancelled"
 CONF_EVENT_TYPES = "event_types"
+# Count warnings for coastal waters inside a zone's circle. Off by default: the circle reaches
+# the water only when it is large enough, and surf and wind warnings are noise inland.
+CONF_INCLUDE_MARINE = "include_marine"
 # Every `<event>` seen in recorded BoM CAP files (tests/fixtures/cap and cap_samples), sorted; the
 # options field also accepts any other name. "Weather" covers both severe weather and coastal
 # hazard warnings, so it cannot tell them apart.

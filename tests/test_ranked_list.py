@@ -16,6 +16,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
+    CONF_INCLUDE_MARINE,
     DEFAULT_EVENT_ICON,
     EVENT_ICONS,
     KNOWN_EVENT_TYPES,
@@ -58,12 +59,13 @@ def all_types(fake_bom: FakeBom) -> None:
     scenarios.apply("all_types", fake_bom.root)
 
 
-def entry_with(codes: list[str]) -> MockConfigEntry:
+def entry_with(codes: list[str], **options: Any) -> MockConfigEntry:
     entry = entry_at(codes[0])
     return MockConfigEntry(
         domain=entry.domain,
         unique_id=entry.unique_id,
         title=entry.title,
+        options=options,
         data={**entry.data, CONF_AREA_CODES: codes},
     )
 
@@ -178,11 +180,11 @@ async def test_ended_warnings_follow_the_current_ones_when_not_hidden(
     freezer: Any,
 ) -> None:
     codes = ["NSW_MW001", "NSW_RC031"]
-    entry = entry_with(codes)
+    entry = entry_with(codes, **{CONF_INCLUDE_MARINE: True})
     await setup_entry(hass, entry)
     scenarios.apply("warning_cancelled", fake_bom.root)
     await poll(hass, freezer)
-    await set_options(hass, entry, **{CONF_HIDE_FINAL: False})
+    await set_options(hass, entry, **{CONF_HIDE_FINAL: False, CONF_INCLUDE_MARINE: True})
 
     items = state_of(hass, COUNT).attributes["warnings"]
     assert [(i["product_id"], i["phase"]) for i in items] == [

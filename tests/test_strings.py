@@ -39,6 +39,8 @@ def test_translations_match_strings() -> None:
     [
         ("issues", "refresh_failing"),
         ("issues", "no_area"),
+        ("issues", "zone_removed"),
+        ("issues", "radius_clamped"),
         ("entity.binary_sensor", "warning"),
         ("entity.event", "warning_event"),
         ("entity.sensor", "warning_count"),
@@ -62,6 +64,8 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
     assert used == {
         "refresh_failing",
         "no_area",
+        "zone_removed",
+        "radius_clamped",
         "warning",
         "warning_event",
         "warning_count",

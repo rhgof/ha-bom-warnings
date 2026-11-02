@@ -61,6 +61,19 @@ def test_later_use_makes_no_network_calls(ftp: FakeFtp, tmp_path: Path) -> None:
     assert ftp.downloads == []
 
 
+def test_marine_layer_is_one_of_the_layers() -> None:
+    assert "IDM00003" in LAYERS
+
+
+def test_radius_reaches_areas_beside_the_point(ftp: FakeFtp, tmp_path: Path) -> None:
+    cache = tmp_path / "cache"
+    assert resolve_coordinate(ftp, cache, lat=5, lon=11) == set()
+    # One degree east of the square is about 111 km.
+    assert resolve_coordinate(ftp, cache, lat=5, lon=11, radius_m=120_000) == {
+        f"T_{layer}" for layer in LAYERS
+    }
+
+
 def test_point_outside_returns_nothing(ftp: FakeFtp, tmp_path: Path) -> None:
     assert resolve_coordinate(ftp, tmp_path / "cache", lat=50, lon=50) == set()
 

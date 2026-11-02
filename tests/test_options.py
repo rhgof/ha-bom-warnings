@@ -22,6 +22,7 @@ from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
+    CONF_INCLUDE_MARINE,
     CONF_STATE,
     DOMAIN,
 )
@@ -103,6 +104,7 @@ async def test_event_type_choice_applies_without_a_restart(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
+@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -120,7 +122,9 @@ async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     top = hass.states.get("sensor.home_most_severe_warning")
     assert top is not None
 
-    await set_options(hass, mock_config_entry, **{CONF_HIDE_FINAL: False})
+    await set_options(
+        hass, mock_config_entry, **{CONF_HIDE_FINAL: False, CONF_INCLUDE_MARINE: True}
+    )
 
     # An ended warning is listed for reference, but is not a current one.
     assert sensor_state(hass).state == STATE_OFF
@@ -141,7 +145,11 @@ async def test_options_form_defaults_hide_final_and_all_types(
     result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
     result = await hass.config_entries.options.async_configure(result["flow_id"], {})
 
-    assert result["data"] == {CONF_HIDE_FINAL: True, CONF_EVENT_TYPES: []}
+    assert result["data"] == {
+        CONF_HIDE_FINAL: True,
+        CONF_EVENT_TYPES: [],
+        CONF_INCLUDE_MARINE: False,
+    }
 
 
 async def test_changed_layer_re_resolves_stored_codes(
@@ -163,7 +171,7 @@ async def test_changed_layer_re_resolves_stored_codes(
 
     assert mock_config_entry.data[CONF_AREA_CODES] == ["NSW_PW002", "QLD_ME008"]
     assert mock_config_entry.data[CONF_STATE] == "NSW"
-    assert resolve.call_args.kwargs == {"lat": -27.47, "lon": 153.021}
+    assert resolve.call_args.kwargs == {"lat": -27.47, "lon": 153.021, "radius_m": 0.0}
     assert sensor_state(hass).state == STATE_ON
 
 

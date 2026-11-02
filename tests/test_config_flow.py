@@ -20,8 +20,11 @@ from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
+    CONF_RADIUS,
     CONF_STATE,
+    CONF_ZONE,
     DOMAIN,
+    MAX_RADIUS_M,
 )
 from custom_components.bom_warnings.ftp import BomFtpError
 from custom_components.bom_warnings.spatial import SpatialDataError
@@ -83,7 +86,7 @@ async def test_home_location(hass: HomeAssistant, resolve: MagicMock) -> None:
         CONF_STATE: "QLD",
         CONF_AREA_CODES: ["QLD_ME008", "QLD_PW011", "QLD_RC167"],
     }
-    assert resolve.call_args.kwargs == {"lat": -27.4698, "lon": 153.0251}
+    assert resolve.call_args.kwargs == {"lat": -27.4698, "lon": 153.0251, "radius_m": 0.0}
     # The cache lives under the config directory, so it survives restarts.
     assert Path(resolve.call_args.args[1]).is_relative_to(hass.config.path())
 
@@ -176,3 +179,155 @@ async def test_state_comes_from_the_forecast_district(
     result = await start_manual(hass, BRISBANE)
 
     assert result["data"][CONF_STATE] == state
+
+
+def set_zone(
+    hass: HomeAssistant, entity_id: str = "zone.holiday", name: str = "Holiday house", **extra: Any
+) -> None:
+    attributes = {
+        "friendly_name": name,
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "radius": 2000.0,
+        "passive": False,
+        **extra,
+    }
+    hass.states.async_set(entity_id, "0", attributes)
+
+
+async def start_zone(hass: HomeAssistant, entity_id: str = "zone.holiday") -> Any:
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": "zone"}
+    )
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "zone"
+    return await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ZONE: entity_id})
+
+
+async def test_menu_offers_zones_only_when_there_are_some(hass: HomeAssistant) -> None:
+    set_zone(hass)
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    assert "zone" in result["menu_options"]
+    assert {"home", "manual"} <= set(result["menu_options"])
+
+    for entity_id in hass.states.async_entity_ids("zone"):
+        hass.states.async_remove(entity_id)
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    assert result["menu_options"] == ["home", "manual"]
+
+
+async def test_zone_creates_an_entry_that_follows_it(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    set_zone(hass)
+
+    result = await start_zone(hass)
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Holiday house"
+    assert result["result"].unique_id == "zone.holiday"
+    assert result["data"] == {
+        CONF_ZONE: "zone.holiday",
+        CONF_LATITUDE: -33.8688,
+        CONF_LONGITUDE: 151.2093,
+        CONF_RADIUS: 2000.0,
+        CONF_STATE: "QLD",
+        CONF_AREA_CODES: ["QLD_ME008", "QLD_PW011", "QLD_RC167"],
+    }
+    assert resolve.call_args.kwargs == {"lat": -33.8688, "lon": 151.2093, "radius_m": 2000.0}
+
+
+@pytest.mark.parametrize(
+    ("radius", "stored"),
+    [
+        (100, 100),
+        (MAX_RADIUS_M, MAX_RADIUS_M),
+        (MAX_RADIUS_M + 1, MAX_RADIUS_M),
+        (900_000, MAX_RADIUS_M),
+    ],
+)
+async def test_radius_is_capped(
+    hass: HomeAssistant, resolve: MagicMock, radius: float, stored: float
+) -> None:
+    set_zone(hass, radius=radius)
+
+    result = await start_zone(hass)
+
+    assert result["data"][CONF_RADIUS] == stored
+    assert resolve.call_args.kwargs["radius_m"] == stored
+
+
+async def test_the_same_zone_cannot_be_added_twice(hass: HomeAssistant, resolve: MagicMock) -> None:
+    set_zone(hass)
+    assert (await start_zone(hass))["type"] is FlowResultType.CREATE_ENTRY
+
+    result = await start_zone(hass)
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+
+
+async def test_two_zones_at_the_same_place_are_allowed(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    set_zone(hass, "zone.holiday", "Holiday house")
+    set_zone(hass, "zone.beach", "Beach")
+
+    first = await start_zone(hass, "zone.holiday")
+    second = await start_zone(hass, "zone.beach")
+
+    assert first["type"] is second["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_zone_beside_a_home_entry_at_the_same_place_is_allowed(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    MockConfigEntry(domain=DOMAIN, unique_id="-33.869,151.209", data={}).add_to_hass(hass)
+    set_zone(hass)
+
+    assert (await start_zone(hass))["type"] is FlowResultType.CREATE_ENTRY
+
+
+@pytest.mark.parametrize("resolved_codes", [set()])
+async def test_zone_with_no_area_shows_an_error(hass: HomeAssistant, resolve: MagicMock) -> None:
+    set_zone(hass)
+
+    result = await start_zone(hass)
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "no_area"}
+
+
+async def test_zone_that_disappeared_shows_an_error(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    set_zone(hass)
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {"next_step_id": "zone"}
+    )
+    hass.states.async_remove("zone.holiday")
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_ZONE: "zone.holiday"}
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "zone_not_found"}
+    resolve.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("error", "key"),
+    [(BomFtpError("down"), "cannot_connect"), (RuntimeError("boom"), "unknown")],
+)
+async def test_zone_errors_use_the_standard_keys(
+    hass: HomeAssistant, resolve: MagicMock, error: Exception, key: str
+) -> None:
+    resolve.side_effect = error
+    set_zone(hass)
+
+    result = await start_zone(hass)
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": key}

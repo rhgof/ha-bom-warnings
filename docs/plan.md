@@ -87,6 +87,41 @@ A custom Home Assistant integration (HACS-style, `custom_components/`) that expo
 8. **Wildcard FTP listing works (verified 2026-11-02).** `LIST *.cap.xml` (and `NLST`) in `/anon/gen/fwo/` returns only the CAP files: about 1 KB and 0.18 s, against about 400 KB and 0.6 s for the full 5,152-entry listing. Each line carries size and modification time (month, day, time, no year), so key change detection on the whole line. `MDTM <file>` works and gives a full timestamp; `MLSD` is not supported (501). Count varies with the weather: 17 CAP files on 2026-11-01, 14 on 2026-11-02, about 55 KB in total. Do not filter by state in the request: product codes encode only the issuing state, and warnings like `IDQ20850` span states, so list all and use the area codes inside. Wildcard support is server behaviour, so fall back to the full listing if the glob errors. Refresh cycle: glob listing, fetch new or changed, drop unlisted, cache parsed area codes.
 9. **Throttling (JSON API only; now moot).** A rapid burst of about 8 calls returned empty bodies; 1 s pauses were fine. The client must back off and tolerate empty or non-JSON responses.
 
+## Decisions (2026-11-02): zones as locations (#27) and marine warnings (#26)
+
+Owner answers, recorded with the reason.
+
+1. **A location can be a Home Assistant zone.** The zone is the thing users already manage (Home,
+   Work, a holiday house), it has a radius, and changing it should not mean deleting and re-adding
+   an entry. One entry per zone, titled with the zone name, `unique_id` is the zone entity id, so
+   two zones at one place are allowed and one zone cannot be added twice. The entry mirrors the
+   zone's centre and radius and re-resolves its areas when they change.
+2. **Radius means distance to the area.** An area counts if the circle's centre is inside it or the
+   distance from the centre to its boundary is at most the radius. A radius of 0 is the old
+   point-in-polygon test, so Home and manual entries are unchanged. Chosen over "area centroid in
+   circle" because a district can be huge and its centroid far away, which would miss a warning
+   that applies right next to the user.
+3. **Cap of 50 km, clamped with a notice.** A larger circle lists most of a state. A zone above the
+   cap is clamped and a non-fixable `radius_clamped` repair issue says why and how to clear it
+   (shrink the zone). Measured worst case at the cap: about 0.6 s on real shapefiles, against 0.33 s
+   for a point, because reading the shapefiles dominates (see `docs/architecture.md`).
+4. **Marine through the radius, not a separate mapping.** `IDM00003` (coastal waters, `MW` codes) is
+   a sixth layer. A land point is never inside a water zone, but a circle can touch one, so the user
+   controls how far out to look with the zone's radius. Chosen over a district-to-coast table or a
+   nearest-zone distance because it needs no extra data, is explainable ("everything within X km of
+   here"), and reuses the circle test. Local zones (harbours, bays, e.g. `NSW_MW009` Sydney Enclosed
+   Waters) match along with Coastal ones; high seas are not added.
+5. **Marine is opt-in, in the existing entities.** The option `include_marine` (default off) counts
+   marine wind and hazardous surf warnings in the binary sensor, ranked list and event entity. All
+   resolved codes, marine included, are stored, so toggling the option reloads the entry but never
+   re-resolves. The option is offered to every entry, because a typed location can sit on the water
+   (a mooring). Marine severity does not gate anything: a gale warning (Moderate) alerts like a storm
+   warning (Severe).
+6. **Deleting a zone does not break the entry.** It keeps working on its last areas and raises a
+   `zone_removed` repair issue, which clears if a zone with the same entity id is created again.
+7. **Still out of scope.** `PT` cyclone place codes and `TW` tsunami zones have no layer (#25, #14);
+   cyclones keep matching through their `PW` codes.
+
 ## Open questions to verify first
 
 4. Public or private. RSS terms allow personal non-commercial use; republishing publicly still needs BoM's copyright page read, and the JSON API remains "must not use".

@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.bom_warnings.const import DOMAIN
+from custom_components.bom_warnings.const import CONF_INCLUDE_MARINE, DOMAIN
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -96,6 +96,7 @@ async def test_removed_warning_stops_counting(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
+@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_cancelled_warning_does_not_count(
     hass: HomeAssistant,
     fake_bom: FakeBom,

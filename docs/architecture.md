@@ -2,16 +2,18 @@
 
 What is built and how it fits together. Start here; `interfaces.md` has the decisions and BoM
 source facts, `plan.md` has the history, `ha-apis.md` has the Home Assistant APIs in use.
-Written from the code on `main` after epic #3 (PR #23); if they disagree, the code wins.
+Written from the code on `main` after epic #3 (PR #23) plus the zone branch (#27); if they disagree,
+the code wins.
 
 ## What it does
 
-For each location a user adds, the integration shows whether a Bureau of Meteorology warning is
-current there. Data comes only from BoM's anonymous FTP: CAP warning files for what is current,
+For each location a user adds (Home, a typed latitude/longitude, or a Home Assistant zone), the
+integration shows whether a Bureau of Meteorology warning is current there. Data comes only from BoM's anonymous FTP: CAP warning files for what is current,
 and static shapefiles for turning a latitude/longitude into BoM area codes. The unofficial JSON
 API is banned.
 
-Entities per location (all on one device, `unique_id` is `"lat,lon"` at 3 decimals):
+Entities per location (all on one device; `unique_id` is `"lat,lon"` at 3 decimals, or the zone
+entity id for a zone entry):
 
 | Entity | State | Reads |
 | --- | --- | --- |
@@ -64,11 +66,11 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | File | Role |
 | --- | --- |
 | `cap.py` | `parse_cap(bytes) -> CapWarning \| None`. `Phase` and `Severity` enums. Rejects DOCTYPE/entities, treats offset-less times as UTC. |
-| `areas.py` | `resolve_area_codes(layer paths, lat, lon)` point-in-polygon over shapefiles (cp1252 forced); `state_of(codes)`. |
+| `areas.py` | `resolve_area_codes(layer paths, lat, lon, radius_m=0)`: point-in-polygon, plus any area whose boundary is within `radius_m` (bbox prefilter, flat-plane distance); shapefiles read as cp1252. `state_of(codes)`, `is_marine(code)`. |
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh), `read_current_warnings`, and `FireDangerReader` (optional fire danger step). |
 | `fire_danger.py` | `parse_fire_danger(bytes) -> FireDangerProduct \| None`, the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. Reuses `cap._safe_parse`. |
-| `spatial.py` | Layer cache: `resolve_coordinate` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
+| `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 
 Home Assistant layer:
 
@@ -76,9 +78,10 @@ Home Assistant layer:
 | --- | --- |
 | `__init__.py` | Entry setup/unload/remove. `PLATFORMS = [BINARY_SENSOR, EVENT, SENSOR]`. `runtime_data = BomWarningsData(coordinator)`. |
 | `coordinator.py` | `SharedFeed`, `BomWarningsCoordinator`, feed lifecycle helpers, `ActiveWarning`, `WarningState`. |
-| `config_flow.py` | Menu: home zone or manual lat/lon. Resolves the location, stores `latitude`, `longitude`, `state`, `area_codes`. Options flow. |
+| `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
+| `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
 | `binary_sensor.py`, `sensor.py`, `event.py` | The entities above. |
-| `diagnostics.py` | Download with coordinates, name, title and `unique_id` redacted. |
+| `diagnostics.py` | Download with coordinates, name, title, zone entity id and `unique_id` redacted (the radius stays). |
 | `const.py`, `strings.json`, `translations/en.json` | Constants and text. The two JSON files must match (`tests/test_strings.py`). |
 
 `api.py` is an empty leftover with a stale docstring and can be deleted.
@@ -136,10 +139,34 @@ Home Assistant layer:
 - **Reliability.** Three consecutive failed feed refreshes (each already retried inside `BomFtp`) create one shared, non-fixable repair
   issue `refresh_failing`; the next success or the last entry leaving clears it. All entities go
   unavailable together on a failed refresh.
-- **Options (no restart):** hide final/cancelled warnings (default on), and filter by event type
-  (default all). The options flow reloads the entry. Polling intervals are not configurable.
-- **Identity.** `unique_id` and title come from the rounded coordinates (title is the home zone
-  name, or `lat, lon`). Users cannot name entries; a second entry for the same place is rejected.
+- **Options (no restart):** hide final/cancelled warnings (default on), filter by event type
+  (default all), and include coastal waters (default off). The options flow reloads the entry.
+  Polling intervals are not configurable.
+- **Identity.** For Home and typed locations `unique_id` is the rounded coordinates and the title
+  is the home location name, or `lat, lon`; a second entry for the same place is rejected. For a
+  zone, `unique_id` is the zone entity id and the title is the zone's name. Users cannot name
+  entries.
+- **Zones.** `coordinator.attach()` starts a `ZoneFollower` for entries with a `zone` key. It
+  compares the zone state with the stored centre and radius at start and on every state change of
+  that entity (a person entering the zone changes the state but not the shape, so nothing happens).
+  A difference updates the entry data and sets `_reresolve`, so the next derivation re-resolves the
+  circle on the entry's own FTP client and updates the stored codes; a failed attempt keeps the flag
+  and retries on the next poll. A circle that resolves to nothing keeps the old codes and raises
+  `no_area`. A deleted zone raises `zone_removed` and leaves the entry on its last circle.
+  `dependencies: ["zone"]` in the manifest makes sure zone states exist before setup.
+- **Radius and cost.** `radius_m` is capped at `MAX_RADIUS_M` (50 km). Each shape is skipped if its
+  bounding box, widened by the radius, cannot contain the centre. Otherwise the centre is tested
+  inside the shape, then every edge is tested for distance on a flat plane scaled by cos(latitude)
+  (error well under 1% at these distances), with a cheap reject for edges wholly beyond the radius
+  on one side. Measured on the real layers, a 50 km circle resolves in 0.33 to 0.37 s in the
+  capital cities and 0.56 s at the least favourable place tried (central Australia, huge polygons),
+  against about 0.33 s for a point: reading the shapefile records dominates. It runs in an
+  executor.
+- **Marine.** `IDM00003` is resolved with the other layers, so a circle that touches a coastal or
+  local water zone stores its `*_MW###` code with the rest. The coordinator counts those codes only
+  when the `include_marine` option is on (`_counted`), so toggling it reloads without re-resolving.
+  A point is never inside a water zone, so Home and typed entries get marine codes only if the
+  typed point is on the water. Nothing about severity gates marine warnings.
 
 ## Testing
 
@@ -214,10 +241,12 @@ has been run against the dev instance.
   fails if a fixture uses one that is missing). It is still only what the samples show.
 - The tsunami sample is named `IDY68027_cap.xml` (underscore), so `LIST *.cap.xml` does not list it
   and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
-- Area codes of kind MW (coastal water: surf, marine wind), TW (tsunami) and PT (cyclone zone) are
-  never matched to a location, because the shapefile layers cover only PW, ME, FW, RC and FL. The
-  binary sensor, count and most-severe sensors all ignore them. Cyclones match only through
-  their PW codes.
+- Area codes of kind TW (tsunami) and PT (cyclone place) are never matched to a location, because
+  no shapefile layer produces them (#25, #14). Cyclones match only through their PW codes. MW
+  (coastal water) codes now match, but only for an entry that has `include_marine` on and whose
+  circle (or typed point) reaches the water; high seas zones are not in the layer used.
+- A zone entry does not rename itself when the zone is renamed, and the device keeps its first name.
+- The `zone_removed` and `radius_clamped` repair issues are informational; there is no fix flow.
 - Severity grades inside headlines (Catastrophic, Extreme, Minor or Moderate flood) are not parsed; only the CAP `severity` ranks. Severe Weather and Severe Thunderstorm arrive as `unknown` and rank by the unknown rule, between moderate and severe.
 - A headline over 255 characters is cut for the `most_severe_warning` state (HA would otherwise show `unknown`); the attributes keep it whole.
 - The CAP event `Weather` is ambiguous: it is used for both severe weather and coastal hazard

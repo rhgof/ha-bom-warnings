@@ -3,6 +3,7 @@
   "name": "BoM Warnings",
   "codeowners": [],
   "config_flow": true,
+  "dependencies": ["zone"],
   "documentation": "https://github.com/rhgof/ha-bom-warnings",
   "integration_type": "service",
   "iot_class": "cloud_polling",

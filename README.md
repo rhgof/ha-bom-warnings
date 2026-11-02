@@ -2,6 +2,28 @@
 
 Bureau of Meteorology warnings as Home Assistant entities and events (domain `bom_warnings`).
 
+## Locations
+
+Add a location from Settings > Devices & services. There are three kinds:
+
+- **Home Assistant home location**, or **typed latitude/longitude**: warnings for the areas the
+  point is inside.
+- **A Home Assistant zone** (Settings > Areas, labels & zones > Zones; Home, Work, a holiday
+  house): warnings for every forecast district, metro area, flood catchment and fire weather
+  district that the zone's circle touches. The entry follows the zone, so moving or resizing it
+  needs no delete and re-add. The radius is used up to 50 km; a larger one is clamped and a repair
+  notice says so. Deleting the zone leaves the entry on its last areas and raises a repair notice.
+
+Each zone is its own entry, so Home, Work and a holiday house each get their own entities.
+
+### Coastal waters
+
+Marine wind and hazardous surf warnings apply to coastal water zones, which a point on land is
+never inside. Turn on **Include coastal waters** in the entry's options and a zone whose circle
+reaches the sea (a few kilometres out from the coast is enough for a Sydney zone; a harbour is
+closer) also counts those warnings in the binary sensor, list sensor and event entity. It is off by
+default. Tsunami and tropical cyclone place warnings are not matched yet.
+
 ## Dev instance
 
 A throwaway Home Assistant (2026.10.4, the live version) that loads this integration straight

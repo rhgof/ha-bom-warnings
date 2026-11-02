@@ -6,7 +6,15 @@
         "description": "Which location should warnings be watched for?",
         "menu_options": {
           "home": "Use my Home Assistant home location",
+          "zone": "Use a Home Assistant zone",
           "manual": "Enter latitude and longitude"
+        }
+      },
+      "zone": {
+        "title": "Zone",
+        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters; turn on coastal waters in the options to count their warnings.",
+        "data": {
+          "zone": "Zone"
         }
       },
       "manual": {
@@ -20,7 +28,8 @@
     "error": {
       "no_area": "The Bureau of Meteorology has no warning areas at this location. Check that it is in Australia.",
       "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later.",
-      "unknown": "Unexpected error"
+      "unknown": "Unexpected error",
+      "zone_not_found": "That zone no longer exists. Pick another one."
     },
     "abort": {
       "already_configured": "This location is already configured.",
@@ -36,6 +45,14 @@
     "no_area": {
       "title": "No warning area for {title}",
       "description": "After the Bureau of Meteorology updated its area boundaries, {title} is no longer inside any warning area, so its saved areas are being kept. Remove this location and add it again with coordinates inside Australia."
+    },
+    "zone_removed": {
+      "title": "Zone for {title} was deleted",
+      "description": "The zone {zone} that {title} follows no longer exists, so {title} is staying on the warning areas it last had and will not follow any further changes.\n\nTo fix it, either:\n- Create a zone with the same name again in Settings > Areas, labels & zones > Zones. This location picks it up and this notice clears by itself.\n- Remove this location and add it again, choosing another zone."
+    },
+    "radius_clamped": {
+      "title": "Zone radius for {title} is too large",
+      "description": "The zone behind {title} has a radius of {radius} km. BoM Warnings only looks {max} km around the centre, because a larger circle would list warnings for most of a state. Warnings beyond {max} km are not shown.\n\nTo clear this notice, reduce the zone's radius to {max} km or less in Settings > Areas, labels & zones > Zones."
     }
   },
   "entity": {
@@ -94,10 +111,12 @@
         "title": "Warning filters",
         "data": {
           "hide_final_cancelled": "Hide final and cancelled warnings",
-          "event_types": "Warning types"
+          "event_types": "Warning types",
+          "include_marine": "Include coastal waters"
         },
         "data_description": {
-          "event_types": "Leave empty to show every type. Type a name to add one that is not listed."
+          "event_types": "Leave empty to show every type. Type a name to add one that is not listed.",
+          "include_marine": "Also count marine wind and hazardous surf warnings for coastal waters that this location reaches. For a zone that means its circle, so make the radius large enough to touch the sea."
         }
       }
     }

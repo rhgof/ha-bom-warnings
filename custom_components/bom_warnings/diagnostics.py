@@ -10,11 +10,12 @@ from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from . import BomWarningsConfigEntry
-from .const import CONF_LATITUDE, CONF_LONGITUDE
+from .const import CONF_LATITUDE, CONF_LONGITUDE, CONF_ZONE
 from .coordinator import FireDangerView
 
-# The unique id is the rounded coordinates and the title is the zone name or the coordinates.
-TO_REDACT = {CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME, "title", "unique_id"}
+# The unique id is the rounded coordinates or the zone's entity id, and the title is the zone name
+# or the coordinates. The radius alone says nothing about where the location is.
+TO_REDACT = {CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME, CONF_ZONE, "title", "unique_id"}
 
 
 def _fire_danger(view: FireDangerView | None) -> dict[str, Any] | None:

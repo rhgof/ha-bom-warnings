@@ -24,6 +24,7 @@ from .coordinator import (
     no_area_issue_id,
 )
 from .ftp import BomFtpError, client_from_env
+from .zone import delete_zone_issues
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
 
@@ -66,8 +67,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
-    """Drop the entry's repair issue and remembered ratings, which would otherwise outlive it."""
+    """Drop the entry's repair issues and remembered ratings, which would otherwise outlive it."""
     ir.async_delete_issue(hass, DOMAIN, no_area_issue_id(entry))
+    delete_zone_issues(hass, entry)
     await Store(hass, FIRE_STORE_VERSION, fire_store_key(entry)).async_remove()
     await async_release_removed_entry(hass, entry)
 

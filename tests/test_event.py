@@ -9,7 +9,7 @@ from homeassistant.const import EVENT_STATE_CHANGED, STATE_UNAVAILABLE
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import CONF_EVENT_TYPES
+from custom_components.bom_warnings.const import CONF_EVENT_TYPES, CONF_INCLUDE_MARINE
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -154,6 +154,7 @@ async def test_rewritten_file_with_same_content_fires_nothing(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
+@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_cancellation_fires_once_and_not_again_after_a_reload(
     hass: HomeAssistant,
     fake_bom: FakeBom,

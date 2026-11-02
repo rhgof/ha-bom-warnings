@@ -18,8 +18,9 @@ from .areas import resolve_area_codes
 from .ftp import BomFtpClient, BomFtpError
 
 SPATIAL_DIR = "/anon/home/adfd/spatial/"
-# Forecast districts, metro areas, flood warning catchments, flood watch catchments, fire weather.
-LAYERS = ("IDM00001", "IDM00014", "IDM00017", "IDM00020", "IDM00007")
+# Forecast districts, metro areas, flood warning catchments, flood watch catchments, fire weather,
+# and coastal waters (a land point is never inside one, so only a radius reaches them).
+LAYERS = ("IDM00001", "IDM00014", "IDM00017", "IDM00020", "IDM00007", "IDM00003")
 _MTIME_FILE = ".server_mtime"
 _REQUIRED_SUFFIXES = (".shp", ".shx", ".dbf")
 
@@ -129,9 +130,11 @@ def refresh_layers(ftp: BomFtpClient, cache_dir: Path) -> RefreshResult:
     return result
 
 
-def resolve_coordinate(ftp: BomFtpClient, cache_dir: Path, *, lat: float, lon: float) -> set[str]:
-    """Return the area codes covering the point, downloading any layer not yet cached."""
+def resolve_coordinate(
+    ftp: BomFtpClient, cache_dir: Path, *, lat: float, lon: float, radius_m: float = 0.0
+) -> set[str]:
+    """Return the area codes within `radius_m` of the point, downloading any layer not cached."""
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
     layers = [_ensure_layer(ftp, cache_dir, layer) for layer in LAYERS]
-    return resolve_area_codes(layers, lat=lat, lon=lon)
+    return resolve_area_codes(layers, lat=lat, lon=lon, radius_m=radius_m)

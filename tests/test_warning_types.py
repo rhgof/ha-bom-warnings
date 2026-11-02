@@ -87,7 +87,8 @@ async def test_location_in_the_warned_area_turns_the_binary_sensor_on(
 
 # Warnings in coastal-water (MW) or tsunami (TW) zones are never matched to a land location, so
 # the binary sensor and the location-only sensors all stay empty (the tsunami file is also not
-# listed by `*.cap.xml`, a known gap).
+# listed by `*.cap.xml`, a known gap). A zone whose circle reaches coastal waters does match
+# marine warnings once the user opts in: see test_zones.py. Tsunami zones stay out of scope (#25).
 WATER_ONLY = [
     ("IDN28522", "Large Coastal Surf", "NSW_PW999"),
     ("IDD20105", "Wind", "NT_PW999"),

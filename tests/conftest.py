@@ -2,6 +2,7 @@
 
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -59,12 +60,19 @@ def area_codes() -> list[str]:
 
 
 @pytest.fixture
-def mock_config_entry(area_codes: list[str]) -> MockConfigEntry:
+def entry_options() -> dict[str, Any]:
+    """Options stored on the entry; parametrize this fixture to change them."""
+    return {}
+
+
+@pytest.fixture
+def mock_config_entry(area_codes: list[str], entry_options: dict[str, Any]) -> MockConfigEntry:
     """A location in a QLD forecast district that no baseline warning covers."""
     return MockConfigEntry(
         domain=DOMAIN,
         unique_id="-27.470,153.021",
         title="Home",
+        options=entry_options,
         data={
             CONF_LATITUDE: -27.47,
             CONF_LONGITUDE: 153.021,
