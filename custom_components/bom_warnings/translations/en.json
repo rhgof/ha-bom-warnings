@@ -29,6 +29,14 @@
     }
   },
   "entity": {
+    "sensor": {
+      "warning_count": {
+        "name": "Warning count"
+      },
+      "most_severe_warning": {
+        "name": "Most severe warning"
+      }
+    },
     "binary_sensor": {
       "warning": {
         "name": "Warning"
