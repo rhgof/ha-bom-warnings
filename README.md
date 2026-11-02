@@ -99,6 +99,15 @@ winds on land arrive as the Severe weather warning. The Marine wind sensor's `no
 so. Both marine sensors rate a warning only when the location's circle reaches a coastal or local water
 zone, so a land point never turns them on. Tsunami comes with #25.
 
+**Marine wind strength.** CAP severity has only two levels for marine wind (a gale and a strong wind
+are both Moderate), so the sensor state cannot tell them apart. The class is in the headline, and
+the Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
+`gale`, `storm` or `hurricane` (none when the state is `none` or the warning is a cancellation).
+Each Wind entry in a `warnings` list carries the same `strength` field; no other event has it. A
+class this code does not know is shown as BoM wrote it. BoM publishes no speed per warning. Its
+warning products guide says marine wind warnings are issued for winds of 26 knots or stronger, and
+the strength is the class (strong wind, gale, storm force, hurricane force), not a measured speed.
+
 ## Dev instance
 
 A throwaway Home Assistant (2026.10.4, the live version) that loads this integration straight

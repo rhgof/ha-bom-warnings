@@ -49,6 +49,7 @@ from .spatial import (
     refresh_layers,
     resolve_coordinate,
 )
+from .strength import wind_strength
 from .warning_types import enabled_keys, event_is_on
 from .zone import ZoneFollower
 
@@ -99,13 +100,18 @@ class ActiveWarning:
         """False for a cancelled or final warning, which `hide_final=False` lists for reference."""
         return self.phase not in _ENDED
 
+    @property
+    def strength(self) -> str | None:
+        """The class of a marine wind warning (strong, gale, storm), read from its headline."""
+        return wind_strength(self.event, self.headline)
+
 
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
 
 
 def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
     """One warning as the list attributes of the binary sensors and the type sensors show it."""
-    return {
+    attributes: dict[str, Any] = {
         "product_id": warning.product_id,
         "event": warning.event,
         "headline": warning.headline,
@@ -114,6 +120,10 @@ def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
         "effective": warning.effective.isoformat() if warning.effective else None,
         "expires": warning.expires.isoformat() if warning.expires else None,
     }
+    # Only marine wind has one, so no other event gains the field.
+    if (strength := warning.strength) is not None:
+        attributes["strength"] = strength
+    return attributes
 
 
 def _shown(info: Info, now: datetime, hide_final: bool) -> bool:

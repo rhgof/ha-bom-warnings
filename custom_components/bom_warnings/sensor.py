@@ -35,6 +35,7 @@ from .coordinator import (
     warning_attributes,
 )
 from .fire_danger import LEVEL_KEYS, FireDangerPeriod
+from .strength import WIND_EVENT
 
 PARALLEL_UPDATES = 0
 
@@ -89,7 +90,7 @@ def _current_then_ended(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning
 
 def _item(warning: ActiveWarning) -> dict[str, Any]:
     level = _level(warning)
-    return {
+    item = {
         "product_id": warning.product_id,
         "event": warning.event,
         "severity": str(warning.severity),
@@ -102,6 +103,9 @@ def _item(warning: ActiveWarning) -> dict[str, Any]:
         "effective": warning.effective.isoformat() if warning.effective else None,
         "expires": warning.expires.isoformat() if warning.expires else None,
     }
+    if (strength := warning.strength) is not None:
+        item["strength"] = strength
+    return item
 
 
 async def async_setup_entry(
@@ -274,6 +278,8 @@ class WarningTypeSensor(_WarningSensor):
             "event": top.event if top else None,
             "warnings": [warning_attributes(w) for w in self._warnings],
         }
+        if self._event == WIND_EVENT:
+            attributes["strength"] = top.strength if top else None
         if note := WARNING_TYPE_NOTES.get(self._event):
             attributes["note"] = note
         return attributes

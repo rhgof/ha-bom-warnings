@@ -236,6 +236,30 @@ as the fire danger sensors already do. This **replaces "severity as an attribute
 6. **Consequence:** a sensor the user had disabled themselves is not carried over; the new sensor is
    created enabled.
 
+## Decisions (3 Nov 2026): marine wind strength (#33, C13)
+
+1. **The class comes from the headline.** CAP severity has two levels for marine wind (Storm Force is
+   Severe; Gale Force and Strong Wind are both Moderate), so only the headline ("Strong Wind
+   Warning", "Gale Force Wind Warning", "Storm Force Wind Warning") says which class. Hurricane
+   Force is recognised by the class name in BoM's guides; its exact headline wording is not in a
+   recorded file.
+2. **Research: BoM publishes no speed per warning.** Checked on 3 Nov 2026: the recorded Wind CAP files
+   (IDD20105, IDT20100, IDW20100, IDN20400) and the live NSW product (IDN20400 `.xml` and `.txt`,
+   fetched 2 Nov) contain no knots, Beaufort number or gust. The warning products user guide says
+   marine wind warnings are issued "whenever strong winds, gales, storm force or hurricane force
+   winds are expected (i.e. winds 26 knots or stronger)" and gives no knot range per class. The
+   spatial data user guide lists the Marine Wind Warning severity codes: CAN, SMCRFT (small craft
+   alert), STR (strong wind), GALE, STO (storm force wind), HURR (hurricane force wind); the live
+   product XML carries `severity="STR"`. So no numeric attribute is added, and the class is
+   the class definition, not a measured speed. The unofficial JSON API stays banned.
+3. **Exposure.** A top-level `strength` on the Marine wind level sensor (for its top current
+   warning, `None` when the state is `none`), and an optional `strength` field on each Wind entry of
+   every `warnings` list. Other events never have the field. Known classes are lowercase and stable
+   (`strong`, `gale`, `storm`, `hurricane`); wording the code does not know keeps the class text as
+   written (so a new class is shown, not lost); a cancellation or a headline with no class has none.
+4. **Not done here.** The product XML severity code (`STR`, and the gale and storm codes still
+   unconfirmed) as a second source is #36 step 5; the headline stays the source until then.
+
 ## Open questions to verify first
 
 4. Public or private. RSS terms allow personal non-commercial use; republishing publicly still needs BoM's copyright page read, and the JSON API remains "must not use".
