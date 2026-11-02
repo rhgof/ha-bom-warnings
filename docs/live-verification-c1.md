@@ -1,6 +1,6 @@
-# Live verification checklist for ticket #13 (not yet done)
+# Live verification checklist for ticket #13 (done, see Result at the end)
 
-Needs a human: onboarding and token creation in the throwaway instance. Not run by the agent.
+Needs a human for onboarding and token creation in the throwaway instance. The run is recorded at the end.
 
 1. Start the fake server on the empty baseline: `.venv/bin/python -m scripts.fake_bom serve baseline --port 2121`.
    Shapefile zips are not in the repo, so also pass `--spatial-dir <dir of IDM000NN.zip>`, or the
