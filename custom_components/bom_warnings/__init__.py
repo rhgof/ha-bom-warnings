@@ -9,11 +9,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
+from homeassistant.helpers import issue_registry as ir
 
-from .coordinator import BomWarningsCoordinator
+from .const import DOMAIN
+from .coordinator import BomWarningsCoordinator, refresh_issue_id
 from .ftp import BomFtpError, client_from_env
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
 
 
 @dataclass(slots=True)
@@ -40,6 +42,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
+    """Drop the repair issue, which would otherwise outlive the entry that raised it."""
+    ir.async_delete_issue(hass, DOMAIN, refresh_issue_id(entry))
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> bool:
