@@ -2,12 +2,37 @@
   "config": {
     "step": {
       "user": {
-        "title": "BoM Warnings",
-        "description": "TODO: location search and state selection."
+        "title": "Location",
+        "description": "Which location should warnings be watched for?",
+        "menu_options": {
+          "home": "Use my Home Assistant home location",
+          "manual": "Enter latitude and longitude"
+        }
+      },
+      "manual": {
+        "title": "Location",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude"
+        }
       }
     },
+    "error": {
+      "no_area": "The Bureau of Meteorology has no warning areas at this location. Check that it is in Australia.",
+      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later.",
+      "unknown": "Unexpected error"
+    },
     "abort": {
-      "not_implemented": "Setup is not available yet."
+      "already_configured": "This location is already configured.",
+      "no_area": "The Bureau of Meteorology has no warning areas at your home location. Enter a location in Australia instead.",
+      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "warning": {
+        "name": "Warning"
+      }
     }
   }
 }

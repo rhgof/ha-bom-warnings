@@ -1,15 +1,113 @@
-"""Config flow for BoM Warnings. Minimal placeholder until the location steps land."""
+"""Config flow for BoM Warnings: one location per entry."""
 
+from __future__ import annotations
+
+import logging
+import os
+from pathlib import Path
+from typing import Any
+
+import probatio
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN
+from .const import (
+    CONF_AREA_CODES,
+    CONF_LATITUDE,
+    CONF_LONGITUDE,
+    CONF_STATE,
+    DOMAIN,
+    SPATIAL_CACHE_DIR,
+)
+from .ftp import BomFtpError, client_from_env
+from .spatial import SpatialDataError, resolve_coordinate
+
+_LOGGER = logging.getLogger(__name__)
+
+_DISTRICT_MARKER = "_PW"
+
+
+def _state_of(area_codes: set[str]) -> str:
+    """The state prefix of the forecast district code, e.g. `QLD_PW011` gives `QLD`."""
+    districts = sorted(code for code in area_codes if _DISTRICT_MARKER in code)
+    return (districts or sorted(area_codes))[0].split("_")[0]
+
+
+def _resolve(cache_dir: Path, lat: float, lon: float) -> set[str]:
+    """Blocking: runs in an executor."""
+    ftp = client_from_env(os.environ)
+    with ftp.session():
+        return resolve_coordinate(ftp, cache_dir, lat=lat, lon=lon)
+
+
+class _LocationError(Exception):
+    def __init__(self, key: str) -> None:
+        super().__init__(key)
+        self.key = key
 
 
 class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
-    """Handle the config flow."""
+    """Pick the Home Assistant home location, or type coordinates."""
 
     VERSION = 1
 
-    async def async_step_user(self, user_input: dict[str, str] | None = None) -> ConfigFlowResult:
-        """Show the (not yet implemented) user step."""
-        return self.async_abort(reason="not_implemented")
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        return self.async_show_menu(step_id="user", menu_options=["home", "manual"])
+
+    async def async_step_home(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        config = self.hass.config
+        try:
+            return await self._async_create(config.latitude, config.longitude, config.location_name)
+        except _LocationError as err:
+            # There is no form to show again, so a failure ends the flow.
+            return self.async_abort(reason=err.key)
+
+    async def async_step_manual(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            lat, lon = user_input[CONF_LATITUDE], user_input[CONF_LONGITUDE]
+            try:
+                return await self._async_create(lat, lon, f"{lat:.3f}, {lon:.3f}")
+            except _LocationError as err:
+                errors["base"] = err.key
+        return self.async_show_form(
+            step_id="manual",
+            data_schema=self.add_suggested_values_to_schema(
+                probatio.Schema(
+                    {
+                        probatio.Required(CONF_LATITUDE): cv.latitude,
+                        probatio.Required(CONF_LONGITUDE): cv.longitude,
+                    }
+                ),
+                user_input
+                or {
+                    CONF_LATITUDE: self.hass.config.latitude,
+                    CONF_LONGITUDE: self.hass.config.longitude,
+                },
+            ),
+            errors=errors,
+        )
+
+    async def _async_create(self, lat: float, lon: float, title: str) -> ConfigFlowResult:
+        """Create the entry; raises _LocationError with the error key on failure."""
+        await self.async_set_unique_id(f"{lat:.3f},{lon:.3f}")
+        self._abort_if_unique_id_configured()
+        cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
+        try:
+            codes = await self.hass.async_add_executor_job(_resolve, cache_dir, lat, lon)
+        except (BomFtpError, SpatialDataError, OSError) as err:
+            raise _LocationError("cannot_connect") from err
+        except Exception as err:
+            _LOGGER.exception("Unexpected error resolving a location")
+            raise _LocationError("unknown") from err
+        if not codes:
+            raise _LocationError("no_area")
+        return self.async_create_entry(
+            title=title,
+            data={
+                CONF_LATITUDE: lat,
+                CONF_LONGITUDE: lon,
+                CONF_STATE: _state_of(codes),
+                CONF_AREA_CODES: sorted(codes),
+            },
+        )
