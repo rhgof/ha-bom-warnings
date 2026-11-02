@@ -22,6 +22,8 @@ class FakeFtp:
         self.vanished = vanished or set()
         self.error = error
         self.mtimes = mtimes or {}
+        # Raise only from MDTM, so a refresh check can fail while downloads still work.
+        self.modified_error: BomFtpError | None = None
         self.downloads: list[tuple[str, str]] = []
         self.fetches: list[str] = []
         # Raise only for the wildcard listing, like a server that rejects `LIST *.cap.xml`.
@@ -61,6 +63,8 @@ class FakeFtp:
         return self.files.get(name) or None
 
     def modified(self, name: str) -> datetime | None:
+        if self.modified_error:
+            raise self.modified_error
         return self.mtimes.get(name)
 
     def download(self, remote_path: str, local_path: str) -> None:
