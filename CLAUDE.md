@@ -10,6 +10,7 @@ Private custom component, official sources only. General HA rules are in `../CLA
 
 ## Architecture
 
+- Start with `docs/architecture.md`: what is built, the data flow, module map and known gaps.
 - Warnings come from anonymous FTP: `LIST *.cap.xml` in `/anon/gen/fwo/`, then fetch only new or
   changed files. Location matching uses the static shapefiles in `/anon/home/adfd/spatial/`;
   the `AAC` field equals the CAP `AMOC-AreaCode`.

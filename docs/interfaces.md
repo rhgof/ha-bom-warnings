@@ -22,6 +22,8 @@ and a ticket disagree, ask; where this file and the plan disagree, this file win
 
 ## Existing code (pure Python, no Home Assistant imports)
 
+Written before the Home Assistant layer existed. `architecture.md` describes the system as built.
+
 - `custom_components/bom_warnings/cap.py`: `parse_cap(bytes) -> CapWarning | None`.
   `CapWarning` has `product_id`, `identifier`, `sent`, `phase`, `infos`, `area_codes`,
   `is_active(now)`. `Info` has `event`, `headline`, `severity`, `effective`, `expires`,
