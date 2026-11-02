@@ -67,7 +67,7 @@ MATCHABLE = [
     ("IDQ21033", "Thunderstorm", "QLD_PW001"),
     ("IDN21037", "Weather", "NSW_PW006"),
     ("IDT29000", "Sheep Grazier Warning", "TAS_PW010"),
-    ("IDDIDD24500", "Tropical Cyclone", "NT_PW002"),
+    ("IDD24500", "Tropical Cyclone", "NT_PW002"),
 ]
 
 

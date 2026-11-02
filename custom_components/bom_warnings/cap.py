@@ -6,6 +6,7 @@ See bom-docs/Bureau_of_Meteorology_warning_products_user_guide.pdf, Appendix A.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -14,6 +15,9 @@ from xml.parsers import expat
 
 _NS = {"c": "urn:oasis:names:tc:emergency:cap:1.2"}
 _AREA_CODE = "AMOC-AreaCode"
+# A product code is "ID", a letter and digits. Tropical cyclone identifiers repeat the prefix
+# ("AusBoM-IDDIDD24500-..."), so anchoring at the end of the segment keeps the last full code.
+_PRODUCT_CODE = re.compile(r"ID[A-Z]\d+$")
 
 
 class Phase(StrEnum):
@@ -154,7 +158,10 @@ def parse_cap(data: bytes) -> CapWarning | None:
     identifier = _text(root, "identifier")
     # identifier looks like "AusBoM-IDQ21013-2026-11-01T04:14:38+00:00"
     parts = identifier.split("-")
-    product_id = parts[1] if len(parts) > 2 and parts[0] == "AusBoM" else identifier
+    product_id = identifier
+    if len(parts) > 2 and parts[0] == "AusBoM":
+        match = _PRODUCT_CODE.search(parts[1])
+        product_id = match.group() if match else parts[1]
     phase = _MSG_PHASE.get(_text(root, "msgType").lower(), Phase.UNKNOWN)
     infos = tuple(_parse_info(i, phase) for i in root.findall("c:info", _NS))
     return CapWarning(

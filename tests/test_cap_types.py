@@ -70,10 +70,9 @@ SAMPLE_FACTS = [
         (Severity.MODERATE,),
         {"PW"},
     ),
-    # BoM's own identifier is "AusBoM-IDDIDD24500-...", so the product id repeats the prefix.
     (
         "IDD24500.cap.xml",
-        "IDDIDD24500",
+        "IDD24500",
         "Tropical Cyclone",
         Phase.UPDATE,
         (Severity.SEVERE, Severity.SEVERE),
