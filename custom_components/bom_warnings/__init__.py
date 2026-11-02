@@ -15,7 +15,7 @@ from .const import DOMAIN
 from .coordinator import BomWarningsCoordinator, refresh_issue_id
 from .ftp import BomFtpError, client_from_env
 
-PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
 
 
 @dataclass(slots=True)

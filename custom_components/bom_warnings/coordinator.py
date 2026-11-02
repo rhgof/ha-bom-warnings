@@ -131,6 +131,50 @@ def _in_state(
     )
 
 
+@dataclass(frozen=True, slots=True)
+class WarningState:
+    """What the event entity compares between refreshes: one product, whatever its phase.
+
+    `data` only holds active warnings, so a cancelled or final one vanishes from it. This keeps
+    those too, so the transition can be seen.
+    """
+
+    product_id: str
+    identifier: str
+    phase: Phase
+    event: str
+    headline: str
+    severity: Severity
+
+
+def _states(
+    warnings: list[CapWarning], area_codes: frozenset[str], now: datetime
+) -> dict[str, WarningState]:
+    states: dict[str, WarningState] = {}
+    for warning in warnings:
+        # Finished blocks stay in; a block that merely expired without a cancel is not news.
+        covering: list[Info] = [
+            info
+            for info in warning.infos
+            if info.area_codes & area_codes
+            and (info.phase in (Phase.CANCELLED, Phase.FINAL) or info.is_active(now))
+        ]
+        if not covering:
+            continue
+        # One file can hold several blocks (e.g. extreme and severe heatwave); the most severe
+        # one stands for the product, so a product raises one event per transition.
+        info = max(covering, key=lambda i: list(Severity).index(i.severity))
+        states[warning.product_id] = WarningState(
+            product_id=warning.product_id,
+            identifier=warning.identifier,
+            phase=info.phase,
+            event=info.event,
+            headline=info.headline,
+            severity=info.severity,
+        )
+    return states
+
+
 class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
     """One coordinator, one FTP reader and one location per config entry.
 
@@ -163,6 +207,8 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
         self._issue_id = f"no_area_{config_entry.entry_id}"
         self._next_layer_check = dt_util.utcnow()
+        # Latest state of every covering product in any phase, keyed by product id.
+        self.states: dict[str, WarningState] = {}
 
     def _refresh(self, check_layers: bool) -> tuple[list[CapWarning], set[str] | None]:
         """Blocking. Returns the warnings, and new area codes when a layer change moved them."""
@@ -243,5 +289,6 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             "hide_final": self._hide_final,
             "event_types": self._event_types,
         }
+        self.states = _states(warnings, self._area_codes, now)
         self.state_warnings = _in_state(warnings, self._state, self._area_codes, now, **filters)
         return _covering(warnings, self._area_codes, now, **filters)
