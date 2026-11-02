@@ -34,5 +34,25 @@
         "name": "Warning"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Warning filters",
+        "data": {
+          "hide_final_cancelled": "Hide final and cancelled warnings",
+          "event_types": "Warning types"
+        },
+        "data_description": {
+          "event_types": "Leave empty to show every type. Type a name to add one that is not listed."
+        }
+      }
+    }
+  },
+  "issues": {
+    "no_area": {
+      "title": "No warning area for {title}",
+      "description": "After the Bureau of Meteorology updated its area boundaries, {title} is no longer inside any warning area, so its saved areas are being kept. Remove this location and add it again with coordinates inside Australia."
+    }
   }
 }

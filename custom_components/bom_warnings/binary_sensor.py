@@ -32,6 +32,7 @@ def _attributes(warning: ActiveWarning) -> dict[str, Any]:
         "event": warning.event,
         "headline": warning.headline,
         "severity": str(warning.severity),
+        "phase": str(warning.phase),
         "effective": warning.effective.isoformat() if warning.effective else None,
         "expires": warning.expires.isoformat() if warning.expires else None,
     }
