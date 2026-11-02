@@ -7,9 +7,10 @@ See bom-docs/Bureau_of_Meteorology_warning_products_user_guide.pdf, Appendix A.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import StrEnum
 from xml.etree import ElementTree as ET
+from xml.parsers import expat
 
 _NS = {"c": "urn:oasis:names:tc:emergency:cap:1.2"}
 _AREA_CODE = "AMOC-AreaCode"
@@ -72,9 +73,32 @@ def _text(el: ET.Element, tag: str) -> str:
 
 def _time(value: str) -> datetime | None:
     try:
-        return datetime.fromisoformat(value)
+        parsed = datetime.fromisoformat(value)
     except ValueError:
         return None
+    # A naive value would raise TypeError when compared with an aware "now".
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
+class _DoctypeError(Exception):
+    pass
+
+
+def _reject_doctype(*_args: object) -> None:
+    raise _DoctypeError
+
+
+def _safe_parse(data: bytes) -> ET.Element:
+    """Parse XML, refusing any DOCTYPE so entity tricks (billion laughs) cannot run."""
+    # ElementTree's C parser hides its expat handlers, so a throwaway expat pass checks for a
+    # DOCTYPE first. Hooking expat also covers non-UTF-8 encodings, which a byte scan would miss.
+    scanner = expat.ParserCreate()
+    scanner.StartDoctypeDeclHandler = _reject_doctype
+    try:
+        scanner.Parse(data, True)
+    except expat.ExpatError as err:
+        raise ET.ParseError(str(err)) from err
+    return ET.fromstring(data)
 
 
 def _severity(value: str) -> Severity:
@@ -122,8 +146,8 @@ def parse_cap(data: bytes) -> CapWarning | None:
     if not data.strip():
         return None
     try:
-        root = ET.fromstring(data)
-    except ET.ParseError:
+        root = _safe_parse(data)
+    except ET.ParseError, _DoctypeError:
         return None
     if root.tag != f"{{{_NS['c']}}}alert":
         return None
