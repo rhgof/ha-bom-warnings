@@ -5,6 +5,9 @@
         "title": "BoM Warnings",
         "description": "TODO: location search and state selection."
       }
+    },
+    "abort": {
+      "not_implemented": "Setup is not available yet."
     }
   }
 }
