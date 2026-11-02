@@ -10,19 +10,8 @@ CAP_PATTERN = f"*{CAP_SUFFIX}"
 
 
 def read_current_warnings(ftp: BomFtpClient) -> list[CapWarning]:
-    """List, fetch and parse every CAP file; blocking, so run it in an executor.
-
-    Empty, vanished and unparseable files are skipped: warning files exist only while the
-    hazard is current, so they come and go between the listing and the fetch.
-    """
-    warnings: list[CapWarning] = []
-    for entry in ftp.list_files(CAP_PATTERN):
-        data = ftp.fetch(entry.name)
-        if data is None:
-            continue
-        if (warning := parse_cap(data)) is not None:
-            warnings.append(warning)
-    return warnings
+    """One-shot read of every current warning; blocking, so run it in an executor."""
+    return WarningReader(ftp).refresh()
 
 
 class WarningReader:
@@ -48,12 +37,16 @@ class WarningReader:
         """Blocking, so run it in an executor. Raises BomFtpError if both listings fail."""
         current: dict[str, tuple[str, CapWarning]] = {}
         for entry in self._list():
-            if (known := self._seen.get(entry.name)) and known[0] == entry.raw:
+            known = self._seen.get(entry.name)
+            if known and known[0] == entry.raw:
                 current[entry.name] = known
                 continue
             data = self._ftp.fetch(entry.name)
-            # Empty or unparseable files are not remembered, so the next refresh retries them.
             if data is not None and (warning := parse_cap(data)) is not None:
                 current[entry.name] = (entry.raw, warning)
+            elif known:
+                # Keep the old warning under its old line, so the next refresh retries the
+                # file instead of dropping a warning that may still be current.
+                current[entry.name] = known
         self._seen = current
         return [warning for _, warning in current.values()]

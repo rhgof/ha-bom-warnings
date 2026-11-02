@@ -81,3 +81,23 @@ def test_info_headline_cancellation_and_final_are_detected():
     cancel = xml.replace(minor, b"Cancellation of Flood Warning for Bulloo River downstream")
     assert parse_cap(cancel).infos[1].phase is Phase.CANCELLED
     assert w.is_active(NOW)  # the Moderate block is still current
+
+
+def test_timestamps_without_offset_are_utc():
+    raw = (FIXTURES / "IDQ21013.cap.xml").read_bytes().replace(b"+00:00</", b"</")
+    w = parse_cap(raw)
+    assert w.infos[0].expires.tzinfo is UTC
+    assert w.is_active(NOW)
+
+
+@pytest.mark.parametrize(
+    "prolog",
+    [
+        b'<!DOCTYPE alert [<!ENTITY a "x">]>',
+        b'<!DOCTYPE alert SYSTEM "http://example.invalid/x.dtd">',
+    ],
+)
+def test_doctype_is_rejected(prolog: bytes):
+    raw = (FIXTURES / "IDQ21013.cap.xml").read_bytes()
+    head, _, body = raw.partition(b"?>")
+    assert parse_cap(head + b"?>" + prolog + body) is None

@@ -135,3 +135,39 @@ def test_vanished_file_is_retried_next_refresh():
     assert "IDQ21013" not in ids(reader.refresh())
     ftp.vanished.clear()
     assert "IDQ21013" in ids(reader.refresh())
+
+
+def test_changed_file_that_fails_refetch_keeps_previous_warning():
+    files = recorded()
+    ftp = FakeFtp(files)
+    reader = WarningReader(ftp)
+    reader.refresh()
+    ftp.put("IDQ21013.cap.xml", files["IDQ21013.cap.xml"])
+    ftp.vanished.add("IDQ21013.cap.xml")
+    assert "IDQ21013" in ids(reader.refresh())
+
+
+def test_changed_file_that_becomes_unparseable_keeps_previous_warning():
+    ftp = FakeFtp(recorded())
+    reader = WarningReader(ftp)
+    reader.refresh()
+    ftp.put("IDQ21013.cap.xml", b"<not-cap")
+    assert "IDQ21013" in ids(reader.refresh())
+
+
+def test_failed_changed_file_is_retried_next_refresh():
+    files = recorded()
+    ftp = FakeFtp(files)
+    reader = WarningReader(ftp)
+    reader.refresh()
+    ftp.put("IDQ21013.cap.xml", files["IDQ21033.cap.xml"])
+    ftp.vanished.add("IDQ21013.cap.xml")
+    reader.refresh()
+    ftp.vanished.clear()
+    assert "IDQ21013" not in ids(reader.refresh())
+
+
+def test_read_current_warnings_uses_wildcard_fallback():
+    ftp = FakeFtp(recorded())
+    ftp.wildcard_error = BomFtpError("550 no match")
+    assert len(read_current_warnings(ftp)) == len(recorded())

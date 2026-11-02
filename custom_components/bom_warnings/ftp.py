@@ -6,6 +6,8 @@ No Home Assistant imports. Every method blocks, so callers run them in an execut
 from __future__ import annotations
 
 import ftplib
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Protocol
@@ -44,15 +46,33 @@ def parse_listing_line(line: str) -> FileEntry | None:
 
 
 def parse_host(value: str | None) -> tuple[str, int]:
-    """Split a `host` or `host:port` override, defaulting to the BoM server."""
+    """Split a `host`, `host:port` or `[ipv6]:port` override; raises BomFtpError if invalid.
+
+    A bare IPv6 literal such as `::1` is a host on the default port.
+    """
     if not value:
         return DEFAULT_HOST, DEFAULT_PORT
-    host, _, port = value.partition(":")
-    return host, int(port) if port else DEFAULT_PORT
+    if value.startswith("["):
+        host, bracket, rest = value[1:].partition("]")
+        if not bracket or (rest and not rest.startswith(":")):
+            raise BomFtpError(f"invalid host: {value}")
+        port = rest[1:]
+    elif value.count(":") == 1:
+        host, _, port = value.partition(":")
+    else:
+        host, port = value, ""
+    if not port:
+        return host, DEFAULT_PORT
+    if not port.isdecimal() or not 0 < int(port) < 65536:
+        raise BomFtpError(f"invalid port in host: {value}")
+    return host, int(port)
 
 
 class BomFtp:
-    """Anonymous, passive-mode FTP client. One short-lived connection per call."""
+    """Anonymous, passive-mode FTP client.
+
+    Each call opens its own connection, unless run inside `session()`, which shares one.
+    """
 
     def __init__(
         self,
@@ -63,6 +83,7 @@ class BomFtp:
         self._host = host
         self._port = port
         self._directory = directory
+        self._shared: ftplib.FTP | None = None
 
     def _connect(self) -> ftplib.FTP:
         ftp = ftplib.FTP(timeout=TIMEOUT)  # noqa: S321
@@ -76,48 +97,68 @@ class BomFtp:
             raise BomFtpError(str(err)) from err
         return ftp
 
-    def list_files(self, pattern: str) -> list[FileEntry]:
-        ftp = self._connect()
-        lines: list[str] = []
+    @contextmanager
+    def session(self) -> Iterator[BomFtp]:
+        """Share one connection across calls, e.g. one refresh instead of N+1 logins."""
+        self._shared = self._connect()
         try:
-            ftp.retrlines(f"LIST {pattern}", lines.append)
-        except ftplib.error_perm as err:
-            # Some servers answer 550 when a wildcard matches nothing.
-            if not str(err).startswith("550"):
-                raise BomFtpError(str(err)) from err
-        except (OSError, ftplib.Error) as err:
-            raise BomFtpError(str(err)) from err
+            yield self
         finally:
+            if self._shared:
+                self._shared.close()
+            self._shared = None
+
+    @contextmanager
+    def _conn(self) -> Iterator[ftplib.FTP]:
+        ftp = self._shared or self._connect()
+        try:
+            yield ftp
+        except BaseException:
+            # The control channel may be out of sync after a failure, so never reuse it.
             ftp.close()
+            if ftp is self._shared:
+                self._shared = None
+            raise
+        if ftp is not self._shared:
+            ftp.close()
+
+    def list_files(self, pattern: str) -> list[FileEntry]:
+        lines: list[str] = []
+        with self._conn() as ftp:
+            try:
+                ftp.retrlines(f"LIST {pattern}", lines.append)
+            except ftplib.error_perm as err:
+                # A plain `*` that matches nothing is an empty directory. Any other 550 is a
+                # server rejecting the wildcard form, which the caller handles by falling back.
+                if pattern != "*" or not str(err).startswith("550"):
+                    raise BomFtpError(str(err)) from err
+            except (OSError, ftplib.Error) as err:
+                raise BomFtpError(str(err)) from err
         return [entry for line in lines if (entry := parse_listing_line(line))]
 
     def fetch(self, name: str) -> bytes | None:
-        ftp = self._connect()
         chunks: list[bytes] = []
-        try:
-            ftp.retrbinary(f"RETR {name}", chunks.append)
-        except ftplib.error_perm as err:
-            if str(err).startswith("550"):
-                return None
-            raise BomFtpError(str(err)) from err
-        except (OSError, ftplib.Error) as err:
-            raise BomFtpError(str(err)) from err
-        finally:
-            ftp.close()
+        with self._conn() as ftp:
+            try:
+                ftp.retrbinary(f"RETR {name}", chunks.append)
+            except ftplib.error_perm as err:
+                if str(err).startswith("550"):
+                    return None
+                raise BomFtpError(str(err)) from err
+            except (OSError, ftplib.Error) as err:
+                raise BomFtpError(str(err)) from err
         return b"".join(chunks) or None
 
     def modified(self, name: str) -> datetime | None:
-        ftp = self._connect()
-        try:
-            reply = ftp.voidcmd(f"MDTM {name}")
-        except ftplib.error_perm as err:
-            if str(err).startswith("550"):
-                return None
-            raise BomFtpError(str(err)) from err
-        except (OSError, ftplib.Error) as err:
-            raise BomFtpError(str(err)) from err
-        finally:
-            ftp.close()
+        with self._conn() as ftp:
+            try:
+                reply = ftp.voidcmd(f"MDTM {name}")
+            except ftplib.error_perm as err:
+                if str(err).startswith("550"):
+                    return None
+                raise BomFtpError(str(err)) from err
+            except (OSError, ftplib.Error) as err:
+                raise BomFtpError(str(err)) from err
         # Reply is "213 YYYYMMDDHHMMSS[.sss]" in UTC.
         try:
             stamp = reply.split()[1].split(".")[0]
@@ -126,11 +167,9 @@ class BomFtp:
             raise BomFtpError(f"bad MDTM reply: {reply}") from err
 
     def download(self, remote_path: str, local_path: str) -> None:
-        ftp = self._connect()
-        try:
-            with open(local_path, "wb") as handle:
-                ftp.retrbinary(f"RETR {remote_path}", handle.write)
-        except (OSError, ftplib.Error) as err:
-            raise BomFtpError(str(err)) from err
-        finally:
-            ftp.close()
+        with self._conn() as ftp:
+            try:
+                with open(local_path, "wb") as handle:
+                    ftp.retrbinary(f"RETR {remote_path}", handle.write)
+            except (OSError, ftplib.Error) as err:
+                raise BomFtpError(str(err)) from err
