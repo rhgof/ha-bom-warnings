@@ -122,6 +122,28 @@ Owner answers, recorded with the reason.
 7. **Still out of scope.** `PT` cyclone place codes and `TW` tsunami zones have no layer (#25, #14);
    cyclones keep matching through their `PW` codes.
 
+## Decisions (2 Nov 2026): one sensor per warning type (#30, C10)
+
+Automations need to name the hazard they care about ("close the blinds on a severe thunderstorm
+warning") and a position in a ranked list cannot do that, so slot sensors were rejected.
+
+1. **A table of rows, one binary sensor each.** `WARNING_TYPE_SENSORS` in `const.py` holds
+   (CAP event, translation key); the icon comes from `EVENT_ICONS`, which is already the single
+   place an event gets one. #31 and #32 add rows and names, nothing else. Only Thunderstorm ships
+   in #30.
+2. **Disabled by default.** A user enables the types an automation needs, which keeps the entity
+   list short. Enabling reloads the entry (Home Assistant does this after a registry change), so no
+   restart is needed.
+3. **The event-type filter does not apply.** That option narrows the dashboard list and the count.
+   Applying it here would silently quiet an automation sensor because someone tidied a card.
+   Hide-final and `include_marine` do apply, as for every other entity.
+4. **Same matching, one pass.** The coordinator filters the entry's covering warnings once
+   (`by_event`), before the event-type filter narrows the list that `data` holds, so no matching
+   logic is duplicated.
+5. **Severity is an attribute only.** The highest level among warnings still in force, using the
+   list's ranking (so BoM's `unknown`, sent for Severe Thunderstorm, ranks above moderate). A
+   cancelled or final warning listed for reference never sets it. No "severe or above" variants.
+
 ## Open questions to verify first
 
 4. Public or private. RSS terms allow personal non-commercial use; republishing publicly still needs BoM's copyright page read, and the JSON API remains "must not use".

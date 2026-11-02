@@ -20,6 +20,7 @@ entity id for a zone entry):
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
+| `binary_sensor.<title>_thunderstorm_warning` (one per type in `WARNING_TYPE_SENSORS`) | on while a current warning of that CAP event covers the location. Disabled by default; enabling it in the entity registry reloads the entry. Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Ignores the event-type filter; honours hide-final and `include_marine`. | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 | `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 

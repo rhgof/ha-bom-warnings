@@ -34,6 +34,7 @@ from .const import (
     CONF_ZONE,
     DOMAIN,
     SPATIAL_CACHE_DIR,
+    WARNING_TYPE_SENSORS,
 )
 from .feed import FireDangerReader, WarningReader
 from .fire_danger import (
@@ -469,6 +470,9 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self._issue_id = no_area_issue_id(config_entry)
         # Latest state of every covering product in any phase, keyed by product id.
         self.states: dict[str, WarningState] = {}
+        # Covering warnings by CAP event for the per-type sensors. Unlike `data` it ignores the
+        # event-type filter, so a filter set for the dashboard cannot silence an automation.
+        self.by_event: dict[str, tuple[ActiveWarning, ...]] = {}
         # This entry's fire district, or None when no stored code is in a fetched product.
         self.fire_danger: FireDangerView | None = None
         # Periods seen in earlier issues, so the afternoon issue (which starts tomorrow) does not
@@ -628,13 +632,14 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
                 self._apply_resolved(new_codes)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
-        filters: dict[str, Any] = {
-            "hide_final": self._hide_final,
-            "event_types": self._event_types,
+        covering = _covering(warnings, self._area_codes, now, hide_final=self._hide_final)
+        self.by_event = {
+            event: tuple(w for w in covering if w.event == event)
+            for event, _ in WARNING_TYPE_SENSORS
         }
         self.states = _states(warnings, self._area_codes, now, self._event_types)
         before = self._remembered
         self.fire_danger = self._derive_fire_danger(snapshot, now)
         if self._remembered != before:
             await self._async_save_remembered()
-        return _covering(warnings, self._area_codes, now, **filters)
+        return tuple(w for w in covering if not self._event_types or w.event in self._event_types)

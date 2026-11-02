@@ -91,6 +91,9 @@
     "binary_sensor": {
       "warning": {
         "name": "Warning"
+      },
+      "thunderstorm_warning": {
+        "name": "Thunderstorm warning"
       }
     },
     "event": {

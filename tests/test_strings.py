@@ -94,3 +94,12 @@ def test_the_coastal_waters_choice_is_labelled_where_it_is_offered(path: tuple[s
     for part in path:
         node = node[part]
     assert node
+
+
+def test_every_warning_type_sensor_has_a_name() -> None:
+    from custom_components.bom_warnings.const import EVENT_ICONS, WARNING_TYPE_SENSORS
+
+    names = load(STRINGS)["entity"]["binary_sensor"]
+    for event, key in WARNING_TYPE_SENSORS:
+        assert names[key]["name"], key
+        assert event in EVENT_ICONS, event

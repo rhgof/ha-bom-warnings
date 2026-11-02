@@ -66,6 +66,11 @@ EVENT_ICONS = {
     "Wind": "mdi:weather-windy",
 }
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
+
+# One binary sensor per warning type, each disabled by default so a user enables only the types an
+# automation needs: (CAP event, translation key). The icon comes from EVENT_ICONS, the single place
+# an event gets one. A new type is a new row here, plus its name in strings.json.
+WARNING_TYPE_SENSORS = (("Thunderstorm", "thunderstorm_warning"),)
 NO_WARNING_ICON = "mdi:check-circle-outline"
 
 # Fire danger rating levels, lowest first (the keys the parser stores), with the colours BoM's own
