@@ -181,6 +181,37 @@ warning") and a position in a ranked list cannot do that, so slot sensors were r
    exactly when the any-warning list holds that event, at the location of each land sample, so a
    row cannot be wired to the wrong event.
 
+## Decisions (3 Nov 2026): one checklist of warning types (#37, C17)
+
+Owner feedback: the settings had two overlapping mechanisms (the Warning types filter and the
+per-sensor Enabled switch) plus a coastal waters switch, and it was unclear whether each was about
+visibility or enablement. Replaced by one idea, relevance.
+
+1. **One checklist, `warning_types`.** One switch per row of `WARNING_TYPE_SENSORS`, plus
+   `other_warnings`. On: the type counts in the any-warning sensor, count, most severe, list and
+   event entity, and has its own sensor, created enabled. Off: ignored everywhere, sensor removed.
+2. **Supersedes** three earlier decisions: the event-type filter does not apply to per-type sensors
+   (#30), per-type sensors are disabled by default (#30, #31, #32), and the separate
+   `include_marine` option (#26). Why: a type's sensor and its place in the list are the same
+   question, and a filter that left the sensors alone, next to a per-entity Enabled switch, was the
+   confusion. The earlier worry (a tidy-up silencing an automation) is met by the switch being
+   explicit and by the sensor being removed rather than quietly off.
+3. **Marine is folded in.** Marine wind and Hazardous surf are ordinary toggles. Area codes,
+   marine ones included, are stored and always count; a marine warning shows only while its type is
+   on, so toggling never re-resolves.
+4. **Every type on by default**, nothing asked at setup (the zone step lost its coastal waters
+   switch). Hide final stays a separate option: it is about phase, not type.
+5. **Other warnings** (default on) covers an event with no row (tsunami, and anything BoM adds), so
+   a new type is neither dropped nor impossible to switch off.
+6. **Sensors of off types are removed**, not disabled, when the entry loads; turning the type on
+   recreates the sensor with the same unique id, so its entity id and history return. A dashboard row
+   for a removed sensor shows "entity not available" until it is deleted.
+7. **Migration (config entry version 1 to 2).** An empty filter turns every land type and Other on;
+   a filter with names turns only those on; a name with no row means Other; Marine wind and surf
+   are on only if `include_marine` was on (and named, if the filter had names). Sensors that were
+   disabled by default and never touched are enabled for types that are on; a sensor the user
+   disabled themselves stays disabled.
+
 ## Open questions to verify first
 
 4. Public or private. RSS terms allow personal non-commercial use; republishing publicly still needs BoM's copyright page read, and the JSON API remains "must not use".

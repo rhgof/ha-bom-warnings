@@ -20,7 +20,7 @@ entity id for a zone entry):
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
-| `binary_sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | on while a current warning of that CAP event covers the location. Disabled by default; enabling it in the entity registry reloads the entry. Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Ignores the event-type filter; honours hide-final and `include_marine`. The severe weather one adds a `note` that it is for display (the Weather event is also the Coastal Hazard Warning). | `coordinator.by_event` |
+| `binary_sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | on while a current warning of that CAP event covers the location. Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather one adds a `note` that it is for display (the Weather event is also the Coastal Hazard Warning). | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 | `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 
@@ -111,8 +111,8 @@ Home Assistant layer:
   attribute lists; they never turn the binary sensor on or count (`ActiveWarning.is_current`).
 - **Event entity.** Diffs `coordinator.states` (every covering product in any phase, one per
   product, represented by its most severe block) against the previous refresh. Baseline is taken
-  when the entity is added, so startup and reload fire nothing. The `event_types` option filters
-  events; `hide_final` deliberately does not, because final/cancelled are the events. A product that
+  when the entity is added, so startup and reload fire nothing. A type that is off in the
+  checklist raises no events; `hide_final` deliberately does not, because final/cancelled are the events. A product that
   vanishes from the feed or expires without a cancel fires nothing. Chosen over bus events because
   HA guidance models momentary occurrences as `event` entities.
 - **Ranking.** Both sensors read only warnings covering the location (never the whole state, which
@@ -140,9 +140,14 @@ Home Assistant layer:
 - **Reliability.** Three consecutive failed feed refreshes (each already retried inside `BomFtp`) create one shared, non-fixable repair
   issue `refresh_failing`; the next success or the last entry leaving clears it. All entities go
   unavailable together on a failed refresh.
-- **Options (no restart):** hide final/cancelled warnings (default on), filter by event type
-  (default all), and include coastal waters (default off). The options flow reloads the entry. A zone entry is also
-  asked about coastal waters in the config flow's zone step, which stores it as an option.
+- **Options (no restart):** hide final/cancelled warnings (default on) and the warning types
+  checklist (`warning_types`, a list of the keys that are on; absent means all). The keys are the
+  second column of `WARNING_TYPE_SENSORS` plus `other_warnings` (any event with no row). One helper,
+  `warning_types.event_is_on`, answers "is this event on" for the list, count, most severe, event
+  entity, any-warning sensor and the per-type sensors. The options flow reloads the entry. Config
+  entry version 2: `async_migrate_entry` turns the version 1 `event_types` filter and
+  `include_marine` switch into the checklist (`warning_types.keys_from_legacy_options`) and enables
+  the old default-disabled sensors of types that are on.
   Polling intervals are not configurable.
 - **Identity.** For Home and typed locations `unique_id` is the rounded coordinates and the title
   is the home location name, or `lat, lon`; a second entry for the same place is rejected. For a
@@ -165,11 +170,11 @@ Home Assistant layer:
   against about 0.33 s for a point: reading the shapefile records dominates. It runs in an
   executor.
 - **Marine.** `IDM00003` is resolved with the other layers, so a circle that touches a coastal or
-  local water zone stores its `*_MW###` code with the rest. The coordinator counts those codes only
-  when the `include_marine` option is on (`_counted`), so toggling it reloads without re-resolving.
-  A point is never inside a water zone, so Home and typed entries get marine codes only if the
-  typed point is on the water. Nothing about severity gates marine warnings. The marine per-type sensors (marine wind, hazardous
-  surf) read the same counted codes, so they follow the option with no extra logic.
+  local water zone stores its `*_MW###` code with the rest, and every stored code always counts.
+  Whether a marine warning shows is the Marine wind and Hazardous surf toggles' business, like any
+  other type, so toggling them reloads without re-resolving. A point is never inside a water zone,
+  so Home and typed entries only match marine warnings if the typed point is on the water. Nothing
+  about severity gates marine warnings.
 
 ## Testing
 
@@ -192,7 +197,8 @@ Home Assistant layer:
     about 0.6 s in central Australia (huge polygons) at the 50 km cap. To re-measure, time
     `resolve_area_codes` on the real layers at `-25.0, 135.0` with `radius_m=50_000`.
   - The config flow tests patch `resolve_coordinate`, so they never need shapefiles. Zone edits,
-    deletion and `include_marine` are tested through Home Assistant in `tests/test_zones.py`.
+    deletion and the marine toggles are tested through Home Assistant in `tests/test_zones.py`, and the
+    checklist and its migration in `tests/test_type_checklist.py`.
 - Recorded CAP files live in `tests/fixtures/cap/`. Add new ones by capturing real BoM output.
 - `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and listings
   and can change, remove and fail files (a rejected or timed-out wildcard listing).
@@ -256,20 +262,21 @@ has been run against the dev instance.
   `BomFtp`'s own retries, so a brief stall no longer adds to it.
 - A warning that expires between polls stays on for up to 10 minutes.
 - The `no_area` repair issue is informational; there is no fix flow.
-- `KNOWN_EVENT_TYPES` now lists every `<event>` in the recorded CAP files (`tests/test_cap_types.py`
-  fails if a fixture uses one that is missing). It is still only what the samples show.
+- `KNOWN_EVENT_TYPES` lists every `<event>` in the recorded CAP files (`tests/test_cap_types.py`
+  fails if a fixture uses one that is missing). It is only what the samples show, and the options
+  checklist no longer reads it: the toggles come from `WARNING_TYPE_SENSORS`.
 - The tsunami sample is named `IDY68027_cap.xml` (underscore), so `LIST *.cap.xml` does not list it
   and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
 - Area codes of kind TW (tsunami) and PT (cyclone place) are never matched to a location, because
   no shapefile layer produces them (#25, #14). Cyclones match only through their PW codes. MW
-  (coastal water) codes now match, but only for an entry that has `include_marine` on and whose
-  circle (or typed point) reaches the water; high seas zones are not in the layer used.
+  (coastal water) codes now match, for an entry whose circle (or typed point) reaches the water
+  while the Marine wind or Hazardous surf type is on; high seas zones are not in the layer used.
 - A zone entry does not rename itself when the zone is renamed, and the device keeps its first name.
 - The `zone_removed` and `radius_clamped` repair issues are informational; there is no fix flow.
 - Severity grades inside headlines (Catastrophic, Extreme, Minor or Moderate flood) are not parsed; only the CAP `severity` ranks. Severe Weather and Severe Thunderstorm arrive as `unknown` and rank by the unknown rule, between moderate and severe.
 - A headline over 255 characters is cut for the `most_severe_warning` state (HA would otherwise show `unknown`); the attributes keep it whole.
 - The CAP event `Weather` is ambiguous: it is used for both severe weather and coastal hazard
-  warnings, so filtering on it keeps both.
+  warnings, so its toggle and sensor cover both.
 - `areas.py` does not guard against null or non-polygon shapes in a shapefile.
 - The `warning_updated` scenario does not reissue a new identifier, so it cannot produce an
   `update` event live.

@@ -11,7 +11,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
-    CONF_EVENT_TYPES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_STATE,
@@ -39,6 +38,7 @@ def entry_at(code: str) -> MockConfigEntry:
     """A location whose only area code is `code`; the state comes from its prefix."""
     return MockConfigEntry(
         domain=DOMAIN,
+        version=2,
         unique_id="-27.470,153.021",
         title="Home",
         data={
@@ -111,7 +111,7 @@ async def test_water_zone_warning_is_not_seen_at_a_land_location(
     assert hass.states.get("sensor.home_warning_count").state == "0"  # type: ignore[union-attr]
 
 
-async def test_event_type_filter_keeps_a_thunderstorm_warning(
+async def test_turning_the_other_type_off_keeps_the_thunderstorm_warning(
     hass: HomeAssistant,
     layers: object,  # noqa: F811
 ) -> None:
@@ -119,7 +119,7 @@ async def test_event_type_filter_keeps_a_thunderstorm_warning(
     await setup_entry(hass, entry)
     assert {event for _, event in pairs(hass, ENTITY_ID)} == {"Extreme Heat", "Thunderstorm"}
 
-    await set_options(hass, entry, **{CONF_EVENT_TYPES: ["Thunderstorm"]})
+    await set_options(hass, entry, extreme_heat_warning=False)
 
     assert {event for _, event in pairs(hass, ENTITY_ID)} == {"Thunderstorm"}
 

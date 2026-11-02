@@ -13,11 +13,17 @@ CONF_RADIUS = "radius"
 MAX_RADIUS_M = 50_000.0
 SPATIAL_CACHE_DIR = "bom_warnings/spatial"
 
-# Options. Defaults keep today's behaviour: ended warnings hidden, every warning type shown.
+# Options. Defaults keep today's behaviour: ended warnings hidden, every warning type on.
 CONF_HIDE_FINAL = "hide_final_cancelled"
+# The checklist: the keys of the warning types the location cares about (the second column of
+# WARNING_TYPE_SENSORS, plus OTHER_WARNINGS). Absent means every type is on.
+CONF_WARNING_TYPES = "warning_types"
+# Covers a warning whose CAP event has no row in WARNING_TYPE_SENSORS (tsunami, and any type BoM
+# adds later), so a new type is neither silently dropped nor impossible to turn off.
+OTHER_WARNINGS = "other_warnings"
+# The options of entries from before the checklist (config entry version 1). Only the migration
+# reads them: an event-type filter, and whether coastal waters counted.
 CONF_EVENT_TYPES = "event_types"
-# Count warnings for coastal waters inside a zone's circle. Off by default: the circle reaches
-# the water only when it is large enough, and surf and wind warnings are noise inland.
 CONF_INCLUDE_MARINE = "include_marine"
 # Every `<event>` seen in recorded BoM CAP files (tests/fixtures/cap and cap_samples), sorted; the
 # options field also accepts any other name. "Weather" covers both severe weather and coastal
@@ -67,11 +73,12 @@ EVENT_ICONS = {
 }
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
 
-# One binary sensor per warning type, each disabled by default so a user enables only the types an
-# automation needs: (CAP event, translation key). The icon comes from EVENT_ICONS, the single place
-# an event gets one. A new type is a new row here, plus its name in strings.json. Tsunami has no
-# zones yet (#25). The marine rows (Wind, Large Coastal Surf) follow the entry's `include_marine`
-# option like every other entity, because their codes are only counted while it is on.
+# One binary sensor per warning type: (CAP event, translation key). The key is also the name of the
+# type's toggle in the options checklist, so a type is switched on or off in one place and its
+# sensor exists only while it is on. The icon comes from EVENT_ICONS, the single place an event gets
+# one. A new type is a new row here, plus its name in strings.json. Tsunami has no zones yet (#25).
+# The marine rows (Wind, Large Coastal Surf) only ever match a location whose area codes reach a
+# coastal water zone.
 WARNING_TYPE_SENSORS = (
     ("Thunderstorm", "thunderstorm_warning"),
     ("Fire Weather", "fire_weather_warning"),

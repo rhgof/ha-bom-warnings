@@ -19,11 +19,11 @@ Each zone is its own entry, so Home, Work and a holiday house each get their own
 ### Coastal waters
 
 Marine wind and hazardous surf warnings apply to coastal water zones, which a point on land is
-never inside. Turn on **Include coastal waters** when adding a zone, or later under the entry's
-**Configure** (three-dot menu), and a zone whose circle
-reaches the sea (a few kilometres out from the coast is enough for a Sydney zone; a harbour is
-closer) also counts those warnings in the binary sensor, list sensor and event entity. It is off by
-default. Tsunami and tropical cyclone place warnings are not matched yet.
+never inside. A zone whose circle reaches the sea (a few kilometres out from the coast is enough
+for a Sydney zone; a harbour is closer) counts those warnings like any other, provided Marine wind
+and Hazardous surf are on in the entry's warning types (they are by default). A Home or typed
+point only sees them if it sits on the water. Tsunami and tropical cyclone place warnings are not
+matched yet.
 
 ## Entities
 
@@ -31,7 +31,26 @@ Each location gets a warning binary sensor (on while any current warning covers 
 count, a most severe warning sensor and an event entity that fires when a warning appears or
 changes. Locations in NSW and the ACT also get today's and tomorrow's fire danger rating.
 
-### Per-warning-type sensors (disabled by default)
+### Choosing the warnings that matter
+
+Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about",
+with one switch per warning type, plus one for hiding final and cancelled warnings.
+
+- **On** (the default for every type): the type counts everywhere (the warning sensor, the count,
+  the most severe warning, the warning list and the events) and has its own sensor, already
+  enabled.
+- **Off**: the type is ignored everywhere and its sensor is removed from the entity list. Turn it
+  on again and the sensor comes back. A dashboard row for a type that is off shows "entity not
+  available" until you remove the row.
+- **Other warnings** covers any type with no switch of its own, such as tsunami, and any type BoM
+  adds later.
+- **Hide final and cancelled warnings** is separate: it is about a warning's phase, not its type.
+
+Saving reloads the entry, with no restart. Entries from before the checklist are converted when
+they load: an empty type filter becomes every type on, and a filter with names becomes just those
+types; Marine wind and Hazardous surf are on only if coastal waters were on.
+
+### Per-warning-type sensors
 
 A binary sensor per warning type is on while a current warning of that type covers the location.
 Use these in automations, for example to close the blinds on a severe thunderstorm warning. The
@@ -50,8 +69,8 @@ warnings, which ranks between moderate and severe.
 | Exposure warning | Exposure warnings |
 | Tropical cyclone warning | Tropical Cyclone Watch and Warning |
 | Severe weather warning | Severe Weather Warning (**for display**, see below) |
-| Marine wind warning | Strong, Gale Force and Storm Force Wind Warnings for coastal waters (**marine only**, needs coastal waters) |
-| Hazardous surf warning | Hazardous Surf Warning (needs coastal waters) |
+| Marine wind warning | Strong, Gale Force and Storm Force Wind Warnings for coastal waters (**marine only**) |
+| Hazardous surf warning | Hazardous Surf Warning |
 
 **Severe weather warning is for display, not for automations.** BoM uses one event, Weather, for both
 Severe Weather Warnings and Coastal Hazard Warnings, so the sensor cannot tell which a warning is.
@@ -59,15 +78,8 @@ Its `note` attribute says so. It is still a good thing to show on a dashboard.
 
 **Marine wind is not wind at your house.** BoM's Wind event is for coastal and local waters; damaging
 winds on land arrive as the Severe weather warning. The Marine wind sensor's `note` attribute says
-so. Both marine sensors follow **Include coastal waters** (see Coastal waters above): with it off they
-stay off, and with it on they turn on only when the location's circle reaches a coastal or local
-water zone, so a land point never turns them on. Tsunami comes with #25.
-
-These sensors are **disabled when the entry is created**, so a location does not gain a long list of
-entities it never uses. To turn one on, open Settings, Devices & services, BoM Warnings, then the
-entry's entities (listed as disabled), pick the sensor, open its settings and switch on **Enabled**.
-It appears after about 30 seconds, with no restart. The warning type filter in the entry's options
-does not affect these sensors.
+so. Both marine sensors turn on only when the location's circle reaches a coastal or local water
+zone, so a land point never turns them on. Tsunami comes with #25.
 
 ## Dev instance
 

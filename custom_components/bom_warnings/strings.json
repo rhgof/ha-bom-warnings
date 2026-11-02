@@ -12,13 +12,9 @@
       },
       "zone": {
         "title": "Zone",
-        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters.",
+        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters, so marine wind and surf warnings can apply.",
         "data": {
-          "zone": "Zone",
-          "include_marine": "Include coastal waters"
-        },
-        "data_description": {
-          "include_marine": "Also count marine wind and hazardous surf warnings for the coastal waters the zone's circle reaches. You can change this later under Configure."
+          "zone": "Zone"
         }
       },
       "manual": {
@@ -148,17 +144,31 @@
   "options": {
     "step": {
       "init": {
-        "title": "Options: warning types and coastal waters",
+        "title": "Warnings I care about",
         "data": {
           "hide_final_cancelled": "Hide final and cancelled warnings",
-          "event_types": "Warning types",
-          "include_marine": "Include coastal waters"
+          "thunderstorm_warning": "Thunderstorm",
+          "fire_weather_warning": "Fire weather",
+          "extreme_heat_warning": "Extreme heat",
+          "frost_warning": "Frost",
+          "hazardous_road_conditions_warning": "Hazardous road conditions",
+          "flood_warning": "Flood",
+          "sheep_grazier_warning": "Sheep grazier",
+          "exposure_warning": "Exposure",
+          "tropical_cyclone_warning": "Tropical cyclone",
+          "severe_weather_warning": "Severe weather",
+          "marine_wind_warning": "Marine wind",
+          "hazardous_surf_warning": "Hazardous surf",
+          "other_warnings": "Other warnings"
         },
         "data_description": {
-          "event_types": "Leave empty to show every type. Type a name to add one that is not listed.",
-          "include_marine": "Also count marine wind and hazardous surf warnings for coastal waters that this location reaches. For a zone that means its circle, so make the radius large enough to touch the sea."
+          "hide_final_cancelled": "Hide a warning once it has ended or been cancelled. This is about a warning's phase, not its type.",
+          "severe_weather_warning": "Also covers Coastal Hazard Warnings, so it suits a dashboard better than an automation.",
+          "marine_wind_warning": "Wind warnings for coastal and local waters, not wind at your house.",
+          "hazardous_surf_warning": "Hazardous surf warnings for the coast the location reaches.",
+          "other_warnings": "Any warning type without its own switch, such as tsunami, and any type BoM adds later."
         },
-        "description": "Choose which warnings count for this location. Turn on coastal waters to include marine wind and hazardous surf warnings for the sea this location reaches."
+        "description": "Choose the warning types that matter for this location. A type that is on counts everywhere (the warning sensor, the count, the most severe warning and the events) and has its own sensor. A type that is off is ignored everywhere and its sensor is removed. Marine wind and Hazardous surf only apply when the location reaches the sea, so use a zone with a large enough radius."
       }
     }
   }

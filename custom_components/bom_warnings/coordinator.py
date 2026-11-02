@@ -20,13 +20,11 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
-from .areas import is_marine, state_of
+from .areas import state_of
 from .cap import CapWarning, Info, Phase, Severity
 from .const import (
     CONF_AREA_CODES,
-    CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
-    CONF_INCLUDE_MARINE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
@@ -51,6 +49,7 @@ from .spatial import (
     refresh_layers,
     resolve_coordinate,
 )
+from .warning_types import enabled_keys, event_is_on
 from .zone import ZoneFollower
 
 if TYPE_CHECKING:
@@ -117,7 +116,7 @@ def _active(
     matches: Callable[[Info], bool],
     *,
     hide_final: bool = True,
-    event_types: frozenset[str] = frozenset(),
+    type_on: Callable[[str], bool] = lambda event: True,
 ) -> tuple[ActiveWarning, ...]:
     # Match per info block: one file can mix areas, so a warning-level match could report an
     # inactive block that happens to share the file with a matching one.
@@ -134,9 +133,7 @@ def _active(
         )
         for warning in warnings
         for info in warning.infos
-        if _shown(info, now, hide_final)
-        and matches(info)
-        and (not event_types or info.event in event_types)
+        if _shown(info, now, hide_final) and matches(info) and type_on(info.event)
     )
 
 
@@ -169,7 +166,7 @@ def _states(
     warnings: list[CapWarning],
     area_codes: frozenset[str],
     now: datetime,
-    event_types: frozenset[str] = frozenset(),
+    type_on: Callable[[str], bool] = lambda event: True,
 ) -> dict[str, WarningState]:
     states: dict[str, WarningState] = {}
     for warning in warnings:
@@ -179,9 +176,9 @@ def _states(
             for info in warning.infos
             if info.area_codes & area_codes
             and (info.phase in _ENDED or info.is_active(now))
-            # The event_types filter applies; hide_final deliberately does not, because a final
+            # A type that is off applies; hide_final deliberately does not, because a final
             # or cancelled transition is exactly what the event entity reports.
-            and (not event_types or info.event in event_types)
+            and type_on(info.event)
         ]
         if not covering:
             continue
@@ -457,21 +454,20 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # Start at the feed's generation: layer changes before this entry existed are already
         # reflected in the codes it was created with, so reloading must not re-resolve.
         self._seen_generation = feed.layer_generation
-        # Every code the location resolved to; coastal-water codes count only if the user opted in,
-        # so toggling the option never needs a re-resolve.
-        self._stored_codes = frozenset(config_entry.data[CONF_AREA_CODES])
-        self._include_marine: bool = config_entry.options.get(CONF_INCLUDE_MARINE, False)
-        self._area_codes = self._counted(self._stored_codes)
+        # Every code the location resolved to, coastal-water codes included. Whether a marine
+        # warning counts is the Marine wind and Hazardous surf toggles' business, so toggling them
+        # never needs a re-resolve.
+        self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
         self._zone: ZoneFollower | None = None
         # Set when the location itself changed, so the next derivation re-resolves it.
         self._reresolve = False
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
-        self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
+        # The checklist: the warning types that are on.
+        self.enabled_types = enabled_keys(config_entry.options)
         self._issue_id = no_area_issue_id(config_entry)
         # Latest state of every covering product in any phase, keyed by product id.
         self.states: dict[str, WarningState] = {}
-        # Covering warnings by CAP event for the per-type sensors. Unlike `data` it ignores the
-        # event-type filter, so a filter set for the dashboard cannot silence an automation.
+        # Covering warnings by CAP event for the per-type sensors.
         self.by_event: dict[str, tuple[ActiveWarning, ...]] = {}
         # This entry's fire district, or None when no stored code is in a fetched product.
         self.fire_danger: FireDangerView | None = None
@@ -520,10 +516,8 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
     def consecutive_failures(self) -> int:
         return self._feed.consecutive_failures
 
-    def _counted(self, codes: frozenset[str]) -> frozenset[str]:
-        if self._include_marine:
-            return codes
-        return frozenset(code for code in codes if not is_marine(code))
+    def _type_on(self, event: str) -> bool:
+        return event_is_on(event, self.enabled_types)
 
     def attach(self) -> None:
         """Follow the shared feed (this is also what keeps the feed polling), and the zone."""
@@ -581,10 +575,9 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             )
             return
         ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
-        if codes == self._stored_codes:
+        if codes == self._area_codes:
             return
-        self._stored_codes = frozenset(codes)
-        self._area_codes = self._counted(self._stored_codes)
+        self._area_codes = frozenset(codes)
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
@@ -632,14 +625,16 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
                 self._apply_resolved(new_codes)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
-        covering = _covering(warnings, self._area_codes, now, hide_final=self._hide_final)
+        covering = _covering(
+            warnings, self._area_codes, now, hide_final=self._hide_final, type_on=self._type_on
+        )
         self.by_event = {
             event: tuple(w for w in covering if w.event == event)
             for event, _ in WARNING_TYPE_SENSORS
         }
-        self.states = _states(warnings, self._area_codes, now, self._event_types)
+        self.states = _states(warnings, self._area_codes, now, self._type_on)
         before = self._remembered
         self.fire_danger = self._derive_fire_danger(snapshot, now)
         if self._remembered != before:
             await self._async_save_remembered()
-        return tuple(w for w in covering if not self._event_types or w.event in self._event_types)
+        return covering

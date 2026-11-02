@@ -4,18 +4,15 @@ The `all_types` scenario serves one real sample of every type with its dates shi
 of the baseline (which holds a recorded flood warning). Each type is matched by a code in its file.
 """
 
-from datetime import timedelta
 from typing import Any
 
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
-    CONF_INCLUDE_MARINE,
     EVENT_ICONS,
     WARNING_TYPE_SENSORS,
 )
@@ -26,7 +23,6 @@ from .conftest import NOW
 from .test_binary_sensor import ENTITY_ID as ANY_WARNING
 from .test_binary_sensor import poll, setup_entry
 from .test_strings import STRINGS, load
-from .test_type_sensors import RELOAD_DELAY
 from .test_warning_types import entry_at
 
 pytestmark = pytest.mark.freeze_time(NOW)
@@ -78,18 +74,6 @@ def table_entity_ids() -> list[str]:
     return [sensor_id(key) for _, key in WARNING_TYPE_SENSORS]
 
 
-async def enable_all(
-    hass: HomeAssistant, freezer: Any, entity_ids: list[str] | None = None
-) -> None:
-    """Enable every per-type sensor at once, as a user might, then let the entry reload."""
-    registry = er.async_get(hass)
-    for entity_id in entity_ids or table_entity_ids():
-        registry.async_update_entity(entity_id, disabled_by=None)
-    freezer.tick(RELOAD_DELAY + timedelta(seconds=1))
-    async_fire_time_changed(hass, dt_util.utcnow())
-    await hass.async_block_till_done(wait_background_tasks=True)
-
-
 def test_the_table_has_a_row_for_every_land_and_marine_type_and_thunderstorm() -> None:
     events = {event for event, _ in WARNING_TYPE_SENSORS}
     assert events == {*LAND_IDS, "Thunderstorm", "Wind", "Large Coastal Surf"}
@@ -117,7 +101,7 @@ def test_each_land_type_is_named_for_what_it_is(event: str, key: str, name: str)
     assert load(STRINGS)["entity"]["binary_sensor"][key]["name"] == name
 
 
-async def test_every_sensor_is_registered_disabled_and_costs_no_state(
+async def test_every_sensor_is_created_enabled_and_the_state_count_is_bounded(
     hass: HomeAssistant, mock_config_entry: MockConfigEntry
 ) -> None:
     before = len(hass.states.async_all())
@@ -127,12 +111,12 @@ async def test_every_sensor_is_registered_disabled_and_costs_no_state(
     for entity_id in table_entity_ids():
         entry = registry.async_get(entity_id)
         assert entry is not None, entity_id
-        assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
-        assert hass.states.get(entity_id) is None
-    # Twelve disabled rows add registry rows only. The entry's own states are the warning, count,
-    # most severe and event entities (the fire danger sensors need a state in the NSW product).
+        assert entry.disabled_by is None
+        assert hass.states.get(entity_id) is not None
+    # Twelve type sensors, plus the warning, count, most severe and event entities (the fire
+    # danger sensors need a state in the NSW product).
     assert len(WARNING_TYPE_SENSORS) == 12
-    assert len(hass.states.async_all()) - before <= 6
+    assert len(hass.states.async_all()) - before <= 12 + 6
 
 
 @pytest.mark.parametrize(
@@ -140,17 +124,10 @@ async def test_every_sensor_is_registered_disabled_and_costs_no_state(
     [(event, key, product, code) for event, key, _, product, code in LAND_TYPES],
     ids=LAND_IDS,
 )
-async def test_enabling_one_type_works_without_a_restart(
-    hass: HomeAssistant, freezer: Any, event: str, key: str, product_id: str, code: str
+async def test_each_type_turns_on_for_a_warning_of_its_type(
+    hass: HomeAssistant, event: str, key: str, product_id: str, code: str
 ) -> None:
     await setup_entry(hass, entry_at(code))
-    assert hass.states.get(sensor_id(key)) is None
-
-    registry = er.async_get(hass)
-    registry.async_update_entity(sensor_id(key), disabled_by=None)
-    freezer.tick(RELOAD_DELAY)
-    async_fire_time_changed(hass, dt_util.utcnow())
-    await hass.async_block_till_done(wait_background_tasks=True)
 
     state = hass.states.get(sensor_id(key))
     assert state is not None
@@ -172,7 +149,6 @@ async def test_a_sensor_is_on_exactly_when_a_warning_of_its_type_covers_the_loca
 ) -> None:
     """The sensors agree with the list: a warning of another type never turns one on."""
     await setup_entry(hass, entry_at(code))
-    await enable_all(hass, freezer)
 
     listed = hass.states.get(ANY_WARNING)
     assert listed is not None
@@ -188,7 +164,6 @@ async def test_all_sensors_are_off_where_nothing_is_warned(
     hass: HomeAssistant, freezer: Any
 ) -> None:
     await setup_entry(hass, entry_at("NSW_PW999"))
-    await enable_all(hass, freezer)
 
     for entity_id in table_entity_ids():
         state = hass.states.get(entity_id)
@@ -204,7 +179,6 @@ async def test_only_weather_and_marine_wind_carry_a_note(hass: HomeAssistant, fr
     Marine wind has its own note (tests/test_type_sensors_marine.py): Wind is not wind at the house.
     """
     await setup_entry(hass, entry_at("NSW_PW006"))
-    await enable_all(hass, freezer)
 
     notes = {
         key: hass.states.get(sensor_id(key)).attributes.get("note")  # type: ignore[union-attr]
@@ -220,7 +194,6 @@ async def test_only_weather_and_marine_wind_carry_a_note(hass: HomeAssistant, fr
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_PW999", "NSW_MW008"]])
-@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -238,7 +211,6 @@ async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
     )
     scenarios.apply("baseline", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
-    await enable_all(hass, freezer, [sensor_id(key) for _, key in without_surf])
 
     # The event entity fires on a change, so the surf warning arrives after the entry has loaded.
     scenarios.apply("all_types", fake_bom.root)

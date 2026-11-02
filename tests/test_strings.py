@@ -7,6 +7,7 @@ from typing import Any
 
 import pytest
 
+from custom_components.bom_warnings.const import OTHER_WARNINGS, WARNING_TYPE_SENSORS
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
 
 COMPONENT = Path(__file__).parent.parent / "custom_components" / "bom_warnings"
@@ -79,27 +80,26 @@ def test_fire_danger_translates_every_enum_option(key: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "path",
-    [
-        ("options", "step", "init", "title"),
-        ("options", "step", "init", "description"),
-        ("options", "step", "init", "data", "include_marine"),
-        ("config", "step", "zone", "data", "include_marine"),
-        ("config", "step", "zone", "data_description", "include_marine"),
-    ],
-    ids=".".join,
+    "key",
+    ["hide_final_cancelled", *[key for _, key in WARNING_TYPE_SENSORS], OTHER_WARNINGS],
 )
-def test_the_coastal_waters_choice_is_labelled_where_it_is_offered(path: tuple[str, ...]) -> None:
-    node: Any = load(STRINGS)
-    for part in path:
-        node = node[part]
-    assert node
+def test_every_toggle_on_the_options_form_has_a_label(key: str) -> None:
+    assert load(STRINGS)["options"]["step"]["init"]["data"][key].strip()
 
 
-def test_every_warning_type_sensor_has_a_name() -> None:
-    from custom_components.bom_warnings.const import EVENT_ICONS, WARNING_TYPE_SENSORS
+@pytest.mark.parametrize("field", ["title", "description"])
+def test_the_options_form_explains_what_on_and_off_mean(field: str) -> None:
+    text = load(STRINGS)["options"]["step"]["init"][field]
+    assert text.strip()
+    if field == "description":
+        assert "on" in text and "off" in text
 
-    names = load(STRINGS)["entity"]["binary_sensor"]
-    for event, key in WARNING_TYPE_SENSORS:
-        assert names[key]["name"], key
-        assert event in EVENT_ICONS, event
+
+def test_the_old_filter_and_coastal_waters_switch_are_gone_from_the_forms() -> None:
+    strings = load(STRINGS)
+    assert set(strings["options"]["step"]["init"]["data"]) == {
+        "hide_final_cancelled",
+        *[key for _, key in WARNING_TYPE_SENSORS],
+        OTHER_WARNINGS,
+    }
+    assert "include_marine" not in strings["config"]["step"]["zone"]["data"]

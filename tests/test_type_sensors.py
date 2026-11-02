@@ -1,25 +1,23 @@
 """One binary sensor per warning type, driven through Home Assistant against the fake BoM server.
 
-The sensors are disabled by default, so most tests enable the entity first, the way a user would,
-and the entry reloads. Thunderstorm is the one type shipped here; the table in const.py gets a row
-per type for the others.
+A type's sensor exists while the type is on in the options checklist, and a new entry has every
+type on. Thunderstorm is the type most of these tests use; the table in const.py has a row per type.
 """
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
-from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.binary_sensor import highest_severity
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import (
-    CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
+    CONF_WARNING_TYPES,
     WARNING_TYPE_SENSORS,
 )
 from custom_components.bom_warnings.coordinator import ActiveWarning
@@ -33,23 +31,10 @@ from .test_binary_sensor import poll, setup_entry
 pytestmark = pytest.mark.freeze_time(NOW)
 
 THUNDERSTORM = "binary_sensor.home_thunderstorm_warning"
-# Home Assistant reloads an entry half a minute after one of its entities is enabled.
-RELOAD_DELAY = timedelta(seconds=31)
 
 
-async def enable(hass: HomeAssistant, freezer: Any, entity_id: str = THUNDERSTORM) -> None:
-    registry = er.async_get(hass)
-    registry.async_update_entity(entity_id, disabled_by=None)
-    freezer.tick(RELOAD_DELAY)
-    async_fire_time_changed(hass, dt_util.utcnow())
-    await hass.async_block_till_done(wait_background_tasks=True)
-
-
-async def start_enabled(
-    hass: HomeAssistant, entry: MockConfigEntry, freezer: Any, entity_id: str = THUNDERSTORM
-) -> Any:
+async def start(hass: HomeAssistant, entry: MockConfigEntry, entity_id: str = THUNDERSTORM) -> Any:
     await setup_entry(hass, entry)
-    await enable(hass, freezer, entity_id)
     state = hass.states.get(entity_id)
     assert state is not None
     return state
@@ -68,22 +53,22 @@ def warning(severity: Severity, **overrides: Any) -> ActiveWarning:
     return ActiveWarning(**{**fields, **overrides})
 
 
-async def test_the_sensor_is_disabled_until_the_user_enables_it(
+async def test_the_sensor_is_enabled_from_the_start(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry
 ) -> None:
     await setup_entry(hass, mock_config_entry)
 
     entry = er.async_get(hass).async_get(THUNDERSTORM)
     assert entry is not None
-    assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
-    assert hass.states.get(THUNDERSTORM) is None
+    assert entry.disabled_by is None
+    assert hass.states.get(THUNDERSTORM) is not None
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008"]])
-async def test_enabling_the_sensor_works_without_a_restart(
+async def test_the_sensor_turns_on_for_a_covering_warning(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    state = await start_enabled(hass, mock_config_entry, freezer)
+    state = await start(hass, mock_config_entry)
 
     assert state.state == STATE_ON
     assert state.attributes["friendly_name"] == "Home Thunderstorm warning"
@@ -105,7 +90,7 @@ async def test_on_only_while_a_thunderstorm_warning_covers_the_location(
     freezer: Any,
     expected: str,
 ) -> None:
-    state = await start_enabled(hass, mock_config_entry, freezer)
+    state = await start(hass, mock_config_entry)
 
     assert state.state == expected
 
@@ -113,7 +98,7 @@ async def test_on_only_while_a_thunderstorm_warning_covers_the_location(
 async def test_off_state_has_no_severity_and_an_empty_list(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    state = await start_enabled(hass, mock_config_entry, freezer)
+    state = await start(hass, mock_config_entry)
 
     assert state.attributes["severity"] is None
     assert state.attributes["warnings"] == []
@@ -123,7 +108,7 @@ async def test_off_state_has_no_severity_and_an_empty_list(
 async def test_attributes_list_each_warning_of_the_type_with_the_highest_severity(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    state = await start_enabled(hass, mock_config_entry, freezer)
+    state = await start(hass, mock_config_entry)
 
     assert state.state == STATE_ON
     assert state.attributes["severity"] == "unknown"  # what BoM sends for these recorded files
@@ -172,7 +157,7 @@ def test_a_finished_warning_does_not_set_the_severity() -> None:
 async def test_off_when_the_warning_file_is_removed(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    await start_enabled(hass, mock_config_entry, freezer)
+    await start(hass, mock_config_entry)
     assert hass.states.get(THUNDERSTORM).state == STATE_ON  # type: ignore[union-attr]
 
     scenarios.apply("warning_removed", fake_bom.root)
@@ -185,7 +170,7 @@ async def test_off_when_the_warning_file_is_removed(
 async def test_a_warning_of_another_type_does_not_turn_it_on(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    await start_enabled(hass, mock_config_entry, freezer)
+    await start(hass, mock_config_entry)
     assert hass.states.get(THUNDERSTORM).state == STATE_OFF  # type: ignore[union-attr]
 
     scenarios.apply("warning_appears", fake_bom.root)
@@ -199,7 +184,7 @@ async def test_a_warning_of_another_type_does_not_turn_it_on(
 async def test_off_once_the_warning_has_expired(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    await start_enabled(hass, mock_config_entry, freezer)
+    await start(hass, mock_config_entry)
     assert hass.states.get(THUNDERSTORM).state == STATE_ON  # type: ignore[union-attr]
 
     await poll(hass, freezer, minutes=70)  # the recorded warning expires at 09:03
@@ -221,7 +206,7 @@ def cancel_the_darling_downs_warning(fake_bom: FakeBom) -> None:
 async def test_a_cancelled_warning_is_not_current(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    await start_enabled(hass, mock_config_entry, freezer)
+    await start(hass, mock_config_entry)
     assert hass.states.get(THUNDERSTORM).state == STATE_ON  # type: ignore[union-attr]
 
     cancel_the_darling_downs_warning(fake_bom)
@@ -235,7 +220,7 @@ async def test_a_cancelled_warning_is_not_current(
 async def test_a_cancelled_warning_is_listed_for_reference_when_not_hidden(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
-    await start_enabled(hass, mock_config_entry, freezer)
+    await start(hass, mock_config_entry)
 
     cancel_the_darling_downs_warning(fake_bom)
     await poll(hass, freezer)
@@ -249,36 +234,18 @@ async def test_a_cancelled_warning_is_listed_for_reference_when_not_hidden(
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008"]])
-@pytest.mark.parametrize("entry_options", [{CONF_EVENT_TYPES: ["Frost"]}])
-async def test_the_event_type_filter_does_not_silence_the_type_sensor(
-    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
+@pytest.mark.parametrize("entry_options", [{CONF_WARNING_TYPES: ["frost_warning"]}])
+async def test_a_type_that_is_off_has_no_sensor_and_is_not_counted(
+    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry
 ) -> None:
-    """The filter narrows the list and the count; an automation sensor must not go quiet."""
-    state = await start_enabled(hass, mock_config_entry, freezer)
+    """Only Frost is on, so the thunderstorm warning at this location is ignored everywhere."""
+    await setup_entry(hass, mock_config_entry)
 
-    assert state.state == STATE_ON
+    assert er.async_get(hass).async_get(THUNDERSTORM) is None
+    assert hass.states.get(THUNDERSTORM) is None
+    assert hass.states.get("binary_sensor.home_frost_warning").state == STATE_OFF  # type: ignore[union-attr]
     assert hass.states.get(ANY_WARNING).state == STATE_OFF  # type: ignore[union-attr]
     assert hass.states.get("sensor.home_warning_count").state == "0"  # type: ignore[union-attr]
-
-
-@pytest.mark.parametrize("area_codes", [["QLD_ME008"]])
-async def test_existing_entities_are_unchanged_by_enabling_a_type_sensor(
-    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
-) -> None:
-    await setup_entry(hass, mock_config_entry)
-    existing = (ANY_WARNING, "sensor.home_warning_count", "sensor.home_most_severe_warning")
-    before = {}
-    for entity_id in existing:
-        state = hass.states.get(entity_id)
-        assert state is not None
-        before[entity_id] = (state.state, dict(state.attributes))
-
-    await enable(hass, freezer)
-
-    for entity_id, (state, attributes) in before.items():
-        now = hass.states.get(entity_id)
-        assert now is not None
-        assert (now.state, dict(now.attributes)) == (state, attributes), entity_id
 
 
 async def test_every_row_of_the_table_has_a_distinct_key_and_event() -> None:

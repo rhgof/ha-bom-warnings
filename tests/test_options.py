@@ -20,13 +20,13 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
-    CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
-    CONF_INCLUDE_MARINE,
     CONF_STATE,
+    CONF_WARNING_TYPES,
     DOMAIN,
 )
 from custom_components.bom_warnings.spatial import RefreshResult, SpatialDataError
+from custom_components.bom_warnings.warning_types import type_keys
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -85,7 +85,7 @@ async def set_options(hass: HomeAssistant, entry: MockConfigEntry, **options: An
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008", "QLD_PW001"]])
-async def test_event_type_choice_applies_without_a_restart(
+async def test_turning_a_type_off_applies_without_a_restart(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
@@ -96,15 +96,14 @@ async def test_event_type_choice_applies_without_a_restart(
     events = [w["event"] for w in sensor_state(hass).attributes["warnings"]]
     assert sorted(events) == ["Extreme Heat", "Thunderstorm"]
 
-    await set_options(hass, mock_config_entry, **{CONF_EVENT_TYPES: ["Extreme Heat"]})
+    await set_options(hass, mock_config_entry, thunderstorm_warning=False)
 
     events = [w["event"] for w in sensor_state(hass).attributes["warnings"]]
     assert events == ["Extreme Heat"]
-    assert mock_config_entry.options[CONF_EVENT_TYPES] == ["Extreme Heat"]
+    assert "thunderstorm_warning" not in mock_config_entry.options[CONF_WARNING_TYPES]
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
-@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -122,9 +121,7 @@ async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     top = hass.states.get("sensor.home_most_severe_warning")
     assert top is not None
 
-    await set_options(
-        hass, mock_config_entry, **{CONF_HIDE_FINAL: False, CONF_INCLUDE_MARINE: True}
-    )
+    await set_options(hass, mock_config_entry, **{CONF_HIDE_FINAL: False})
 
     # An ended warning is listed for reference, but is not a current one.
     assert sensor_state(hass).state == STATE_OFF
@@ -134,7 +131,7 @@ async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     assert warning["phase"] == "cancelled"
 
 
-async def test_options_form_defaults_hide_final_and_all_types(
+async def test_options_form_defaults_to_hide_final_and_every_type_on(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
@@ -147,8 +144,7 @@ async def test_options_form_defaults_hide_final_and_all_types(
 
     assert result["data"] == {
         CONF_HIDE_FINAL: True,
-        CONF_EVENT_TYPES: [],
-        CONF_INCLUDE_MARINE: False,
+        CONF_WARNING_TYPES: list(type_keys()),
     }
 
 

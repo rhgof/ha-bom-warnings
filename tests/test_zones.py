@@ -16,7 +16,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
-    CONF_INCLUDE_MARINE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
@@ -72,6 +71,7 @@ def zone_options() -> dict[str, Any]:
 def zone_entry(zone_codes: list[str], zone_options: dict[str, Any]) -> MockConfigEntry:
     return MockConfigEntry(
         domain=DOMAIN,
+        version=2,
         unique_id=ZONE,
         title="Holiday house",
         options=zone_options,
@@ -388,12 +388,15 @@ def warnings_of(hass: HomeAssistant, entity_id: str = SENSOR) -> list[dict[str, 
     return list(state.attributes["warnings"])
 
 
+MARINE_TOGGLE = {"Wind": "marine_wind_warning", "Large Coastal Surf": "hazardous_surf_warning"}
+
+
 @pytest.mark.parametrize(
     ("zone_codes", "product_id", "event", "severity"),
     MARINE,
     ids=[f"{codes[1]}-{event}" for codes, _, event, _ in MARINE],
 )
-async def test_coastal_waters_in_the_circle_alert_only_when_opted_in(
+async def test_coastal_waters_in_the_circle_alert_while_their_type_is_on(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
@@ -406,10 +409,6 @@ async def test_coastal_waters_in_the_circle_alert_only_when_opted_in(
     scenarios.apply("all_types", fake_bom.root)
     set_zone(hass)
     await setup_entry(hass, zone_entry)
-    assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
-    assert hass.states.get("sensor.holiday_house_warning_count").state == "0"  # type: ignore[union-attr]
-
-    await set_options(hass, zone_entry, **{CONF_INCLUDE_MARINE: True})
 
     assert hass.states.get(SENSOR).state == STATE_ON  # type: ignore[union-attr]
     listed = [w for w in warnings_of(hass) if w["product_id"] == product_id]
@@ -417,15 +416,16 @@ async def test_coastal_waters_in_the_circle_alert_only_when_opted_in(
     assert {w["event"] for w in listed} == {event}
     assert severity in {w["severity"] for w in listed}
     assert hass.states.get("sensor.holiday_house_warning_count").state != "0"  # type: ignore[union-attr]
+
+    await set_options(hass, zone_entry, **{MARINE_TOGGLE[event]: False})
+
+    assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
+    assert hass.states.get("sensor.holiday_house_warning_count").state == "0"  # type: ignore[union-attr]
     # Toggling is a reload, not a new look at the shapefiles.
     resolve.assert_not_called()
 
-    await set_options(hass, zone_entry, **{CONF_INCLUDE_MARINE: False})
-    assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
-
 
 @pytest.mark.parametrize("zone_codes", [["NT_PW999", "NT_MW004"]])
-@pytest.mark.parametrize("zone_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_marine_warning_reaches_the_event_entity_and_ranking(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -461,26 +461,6 @@ async def test_cyclone_codes_match_by_code_though_no_layer_produces_them(
     await setup_entry(hass, zone_entry)
 
     assert {w["event"] for w in warnings_of(hass)} == {"Tropical Cyclone"}
-
-
-@pytest.mark.parametrize("use_zone", [True, False], ids=["zone", "typed-location"])
-async def test_every_entry_is_offered_the_marine_choice_off_by_default(
-    hass: HomeAssistant,
-    fake_bom: FakeBom,
-    zone_entry: MockConfigEntry,
-    mock_config_entry: MockConfigEntry,
-    layers: MagicMock,  # noqa: F811
-    use_zone: bool,
-) -> None:
-    """A typed location can sit on the water (a mooring), so the choice is not zone-only."""
-    set_zone(hass)
-    entry = zone_entry if use_zone else mock_config_entry
-    await setup_entry(hass, entry)
-
-    result = await hass.config_entries.options.async_init(entry.entry_id)
-    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
-
-    assert result["data"][CONF_INCLUDE_MARINE] is False
 
 
 async def test_entry_stored_before_marine_existed_keeps_working(

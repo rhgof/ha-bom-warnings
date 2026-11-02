@@ -9,10 +9,17 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.storage import Store
 
-from .const import DOMAIN
+from .const import (
+    CONF_EVENT_TYPES,
+    CONF_INCLUDE_MARINE,
+    CONF_WARNING_TYPES,
+    DOMAIN,
+    WARNING_TYPE_SENSORS,
+)
 from .coordinator import (
     FIRE_STORE_VERSION,
     BomWarningsCoordinator,
@@ -24,6 +31,7 @@ from .coordinator import (
     no_area_issue_id,
 )
 from .ftp import BomFtpError, client_from_env
+from .warning_types import keys_from_legacy_options
 from .zone import delete_zone_issues
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
@@ -81,3 +89,39 @@ async def async_unload_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry)
     entry.runtime_data.coordinator.detach()
     await async_release_feed(hass, entry)
     return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> bool:
+    """Version 1 had an event-type filter and a coastal-waters switch; version 2 has a checklist."""
+    if entry.version > 2:
+        return False
+    if entry.version == 1:
+        on = keys_from_legacy_options(entry.options)
+        options = {
+            key: value
+            for key, value in entry.options.items()
+            if key not in (CONF_EVENT_TYPES, CONF_INCLUDE_MARINE)
+        }
+        options[CONF_WARNING_TYPES] = on
+        _enable_old_default_disabled_sensors(hass, entry, set(on))
+        hass.config_entries.async_update_entry(entry, options=options, version=2)
+    return True
+
+
+def _enable_old_default_disabled_sensors(
+    hass: HomeAssistant, entry: BomWarningsConfigEntry, on: set[str]
+) -> None:
+    """Per-type sensors used to be disabled by default; one the user never touched must not stay so.
+
+    A sensor the user disabled themselves is left alone. Sensors of types that are off are removed
+    when the entry loads.
+    """
+    registry = er.async_get(hass)
+    unique_id = entry.unique_id or entry.entry_id
+    for _, key in WARNING_TYPE_SENSORS:
+        entity_id = registry.async_get_entity_id("binary_sensor", DOMAIN, f"{unique_id}_{key}")
+        if not entity_id or key not in on:
+            continue
+        registered = registry.async_get(entity_id)
+        if registered and registered.disabled_by is er.RegistryEntryDisabler.INTEGRATION:
+            registry.async_update_entity(entity_id, disabled_by=None)

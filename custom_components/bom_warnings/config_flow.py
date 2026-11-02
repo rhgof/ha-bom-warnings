@@ -19,28 +19,25 @@ from homeassistant.helpers.selector import (
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
-    SelectSelector,
-    SelectSelectorConfig,
 )
 
 from .areas import state_of
 from .const import (
     CONF_AREA_CODES,
-    CONF_EVENT_TYPES,
     CONF_HIDE_FINAL,
-    CONF_INCLUDE_MARINE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_STATE,
+    CONF_WARNING_TYPES,
     CONF_ZONE,
     DOMAIN,
-    KNOWN_EVENT_TYPES,
     MAX_RADIUS_M,
     SPATIAL_CACHE_DIR,
 )
 from .ftp import BomFtpError, client_from_env
 from .spatial import SpatialDataError, resolve_coordinate
+from .warning_types import enabled_keys, type_keys
 
 
 def _resolve(cache_dir: Path, lat: float, lon: float, radius_m: float) -> set[str]:
@@ -59,7 +56,7 @@ class _LocationError(Exception):
 class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Pick the Home Assistant home location, a zone, or type coordinates."""
 
-    VERSION = 1
+    VERSION = 2
 
     @staticmethod
     @callback
@@ -129,20 +126,13 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         state.attributes["longitude"],
                         radius_m=min(float(state.attributes.get("radius", 0)), MAX_RADIUS_M),
                         extra={CONF_ZONE: zone_id},
-                        include_marine=user_input.get(CONF_INCLUDE_MARINE, False),
                     )
                 except _LocationError as err:
                     errors["base"] = err.key
         return self.async_show_form(
             step_id="zone",
             data_schema=probatio.Schema(
-                {
-                    probatio.Required(CONF_ZONE): EntitySelector(
-                        EntitySelectorConfig(domain="zone")
-                    ),
-                    # Asked here as well as under Configure, so it is found when the zone is added.
-                    probatio.Optional(CONF_INCLUDE_MARINE, default=False): BooleanSelector(),
-                }
+                {probatio.Required(CONF_ZONE): EntitySelector(EntitySelectorConfig(domain="zone"))}
             ),
             errors=errors,
         )
@@ -156,7 +146,6 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         *,
         radius_m: float = 0.0,
         extra: dict[str, Any] | None = None,
-        include_marine: bool = False,
     ) -> ConfigFlowResult:
         """Create the entry; raises _LocationError with the error key on failure."""
         await self.async_set_unique_id(unique_id)
@@ -179,33 +168,29 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         }
         if CONF_ZONE in data:
             data[CONF_RADIUS] = radius_m
-        options = {CONF_INCLUDE_MARINE: include_marine} if CONF_ZONE in data else {}
-        return self.async_create_entry(title=title, data=data, options=options)
+        return self.async_create_entry(title=title, data=data)
 
 
 class BomWarningsOptionsFlow(OptionsFlowWithReload):
-    """Which warnings to show. Saving reloads the entry, so no restart is needed."""
+    """Which warning types matter here. Saving reloads the entry, so no restart is needed."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        enabled = enabled_keys(self.config_entry.options)
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
-        return self.async_show_form(
-            step_id="init",
-            data_schema=self.add_suggested_values_to_schema(
-                probatio.Schema(
-                    {
-                        probatio.Optional(CONF_HIDE_FINAL, default=True): BooleanSelector(),
-                        probatio.Optional(CONF_EVENT_TYPES, default=[]): SelectSelector(
-                            SelectSelectorConfig(
-                                options=list(KNOWN_EVENT_TYPES),
-                                multiple=True,
-                                custom_value=True,
-                            )
-                        ),
-                        # Offered to every entry: a typed location can be on the water too.
-                        probatio.Optional(CONF_INCLUDE_MARINE, default=False): BooleanSelector(),
-                    }
-                ),
-                self.config_entry.options,
-            ),
-        )
+            return self.async_create_entry(
+                data={
+                    CONF_HIDE_FINAL: user_input[CONF_HIDE_FINAL],
+                    CONF_WARNING_TYPES: [
+                        key for key in type_keys() if user_input.get(key, key in enabled)
+                    ],
+                }
+            )
+        # Every field defaults to the stored choice, so a submit that leaves one out keeps it.
+        fields: dict[Any, Any] = {
+            probatio.Optional(
+                CONF_HIDE_FINAL, default=self.config_entry.options.get(CONF_HIDE_FINAL, True)
+            ): BooleanSelector()
+        }
+        for key in type_keys():
+            fields[probatio.Optional(key, default=key in enabled)] = BooleanSelector()
+        return self.async_show_form(step_id="init", data_schema=probatio.Schema(fields))

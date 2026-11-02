@@ -9,7 +9,7 @@ from homeassistant.const import EVENT_STATE_CHANGED, STATE_UNAVAILABLE
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import CONF_EVENT_TYPES, CONF_INCLUDE_MARINE
+from custom_components.bom_warnings.const import CONF_WARNING_TYPES
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -154,7 +154,6 @@ async def test_rewritten_file_with_same_content_fires_nothing(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
-@pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_cancellation_fires_once_and_not_again_after_a_reload(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -195,26 +194,28 @@ async def test_warning_that_disappears_fires_nothing(
 
 
 @pytest.mark.parametrize(
-    ("event_types", "expected"),
+    ("warning_types", "expected"),
     [
         # hide_final defaults to on, yet final and cancelled are the events themselves.
-        (["Thunderstorm"], ["final", "cancelled"]),
-        ([], ["final", "cancelled"]),
-        (["Extreme Heat"], []),
+        (["thunderstorm_warning"], ["final", "cancelled"]),
+        (None, ["final", "cancelled"]),
+        (["extreme_heat_warning"], []),
     ],
+    ids=["type-on", "every-type-on", "other-type-only"],
 )
-async def test_event_type_option_filters_events(
+async def test_the_type_checklist_decides_which_events_fire(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     fired: list[dict[str, Any]],
     freezer: Any,
-    event_types: list[str],
+    warning_types: list[str] | None,
     expected: list[str],
 ) -> None:
     mock_config_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
-        mock_config_entry, options={CONF_EVENT_TYPES: event_types}
+        mock_config_entry,
+        options={} if warning_types is None else {CONF_WARNING_TYPES: warning_types},
     )
     await setup_entry(hass, mock_config_entry)
 

@@ -18,7 +18,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
-    CONF_INCLUDE_MARINE,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
@@ -203,9 +202,7 @@ async def start_zone(hass: HomeAssistant, entity_id: str = "zone.holiday", **cho
     )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "zone"
-    return await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_ZONE: entity_id, **choices}
-    )
+    return await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ZONE: entity_id})
 
 
 async def test_menu_offers_zones_only_when_there_are_some(hass: HomeAssistant) -> None:
@@ -334,31 +331,3 @@ async def test_zone_errors_use_the_standard_keys(
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": key}
-
-
-@pytest.mark.parametrize(
-    ("choices", "stored"),
-    [({}, False), ({CONF_INCLUDE_MARINE: False}, False), ({CONF_INCLUDE_MARINE: True}, True)],
-    ids=["unanswered", "off", "on"],
-)
-async def test_zone_step_asks_about_coastal_waters(
-    hass: HomeAssistant, resolve: MagicMock, choices: dict[str, bool], stored: bool
-) -> None:
-    """Asked once at setup, so it is not only found later under Configure."""
-    set_zone(hass)
-
-    result = await start_zone(hass, **choices)
-
-    assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["options"] == {CONF_INCLUDE_MARINE: stored}
-    assert CONF_INCLUDE_MARINE not in result["data"]
-
-
-async def test_zone_form_offers_the_coastal_waters_switch(hass: HomeAssistant) -> None:
-    set_zone(hass)
-    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {"next_step_id": "zone"}
-    )
-
-    assert {str(key) for key in result["data_schema"].schema} == {CONF_ZONE, CONF_INCLUDE_MARINE}

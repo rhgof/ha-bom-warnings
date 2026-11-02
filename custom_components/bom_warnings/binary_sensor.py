@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -32,12 +33,22 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data.coordinator
+    registry = er.async_get(hass)
+    unique_id = entry.unique_id or entry.entry_id
+    for _, key in WARNING_TYPE_SENSORS:
+        if key not in coordinator.enabled_types and (
+            entity_id := registry.async_get_entity_id("binary_sensor", DOMAIN, f"{unique_id}_{key}")
+        ):
+            # A type that is off has no sensor at all, not a disabled one, so the entity list
+            # only shows what the location cares about. Turning it on again recreates it.
+            registry.async_remove(entity_id)
     async_add_entities(
         [
             WarningActiveBinarySensor(coordinator, entry),
             *(
                 WarningTypeBinarySensor(coordinator, entry, event, key)
                 for event, key in WARNING_TYPE_SENSORS
+                if key in coordinator.enabled_types
             ),
         ]
     )
@@ -81,10 +92,8 @@ class _DeviceBinarySensor(CoordinatorEntity[BomWarningsCoordinator], BinarySenso
 class WarningTypeBinarySensor(_DeviceBinarySensor):
     """On while a current warning of one CAP event covers the location.
 
-    Off by default: an automation enables the types it names, and the list of entities stays short.
+    Only created for a type that is on in the options checklist.
     """
-
-    _attr_entity_registry_enabled_default = False
 
     def __init__(
         self,
