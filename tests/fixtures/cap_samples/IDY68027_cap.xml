@@ -1,0 +1,44 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+ <identifier>AusBoM-IDY68027-3004-12-26T01:32:36-00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender> 
+  <sent>3004-12-26T01:32:36-00:00</sent> 
+  <status>Actual</status> 
+  <msgType>Update</msgType> 
+  <source>Australia: JATWC</source> 
+  <scope>Public</scope> 
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code> 
+  <references>CAP.Message@bom.gov.au,AusBoM-IDY68027-3004-12-26T01:00:23-00:00,3004-12-26T01:00:23-00:00</references>
+
+  <info> 
+    <language>en-AU</language> 
+    <category>Geo</category> 
+    <event>Tsunami</event>
+	<responseType>Avoid</responseType>
+    <urgency>Immediate</urgency> 
+    <severity>Severe</severity> 
+    <certainty>Likely</certainty> 
+    <eventCode> 
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName> 
+      <value>tsunami</value> 
+    </eventCode> 
+    <effective>3004-12-26T01:32:36-00:00</effective> 
+    <expires>3004-12-26T03:32:35-00:00</expires> 
+    <senderName>Australian Government Bureau of Meteorology</senderName> 
+    <headline>Tsunami Marine Warning for Queensland - Tsunami Confirmed</headline> 
+    <description>
+      For the marine environment from Cape Moreton to Point Danger including Gold Coast Waters there is the possibility of DANGEROUS RIPS, WAVES AND STRONG OCEAN CURRENTS, AND SOME LOCALISED OVERFLOW ONTO THE IMMEDIATE FORESHORE commencing after 12:00 am (AEST) Thursday and persisting for several hours.
+	</description>
+    <instruction>
+	  While evacuations are not necessary for Marine Threat areas, people in these areas are advised to get out of the water and move away from the immediate water's edge. 
+    </instruction>
+    <web>http://www.bom.gov.au/tsunami/</web>
+    <area>
+      <areaDesc>Queensland: Gold Coast Waters</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_TW014</value>
+      </geocode>
+    </area>
+  </info> 
+</alert>

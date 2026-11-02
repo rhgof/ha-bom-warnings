@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21013-2025-11-20T03:44:01+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-20T03:44:01+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>AusBoM,IDQ21013,2025-11-19T02:38:22+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Prepare</responseType>
+        <urgency>Future</urgency>
+        <severity>Severe</severity>
+        <certainty>Likely</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2025-11-20T03:44:01+00:00</effective>
+        <expires>2025-11-21T09:44:01+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe heatwave warning for Queensland</headline>
+        <description>
+          Maximum temperatures in the high thirties to mid forties, and overnight minimum temperatures in the low to high twenties. 
+
+Severe heatwave conditions are expected to intensify and expand to the north and east over coming days, to cover the majority of the state by early next week.  Locations likely to be impacted include Boulia, Croydon and Mount Isa.
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Gulf Country, Northern Goldfields and Upper Flinders, Central West, North West and Channel Country Districts.
+            </areaDesc>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW002</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW003</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW009</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW010</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW011</value>
+              </geocode>
+        </area>
+    </info>
+</alert>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDV23000-2025-11-11T07:14:22+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-11T07:14:22+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDV23000-2025-11-10T23:22:06+00:00,2025-11-10T23:22:06+00:00 CAP.Message@bom.gov.au,AusBoM-IDV23000-2025-11-11T05:36:35+00:00,2025-11-11T05:36:35+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Frost</event>
+        <urgency>Unknown</urgency>
+        <severity>Moderate</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>frost</value>
+        </eventCode>
+        <effective>2025-11-11T04:00:00+00:00</effective>
+        <expires>2025-11-12T04:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Frost Warning for North East and East Gippsland forecast districts</headline>
+        <description>Frosts with temperatures down to -1 degrees are forecast for Wednesday morning in parts of the North East and East Gippsland forecast districts.</description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Victoria: North East and East Gippsland forecast districts</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW004</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW005</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Frost</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>frost</value>
+        </eventCode>
+        <effective>2025-11-11T04:00:00+00:00</effective>
+        <expires>2025-11-12T04:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Frost Warning for Mallee, North Central, Northern Country and Wimmera forecast districts</headline>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Victoria: Mallee, North Central, Northern Country and Wimmera forecast districts</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW001</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW003</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>VIC_PW002</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

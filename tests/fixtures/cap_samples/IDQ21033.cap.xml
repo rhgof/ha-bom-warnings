@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21033-2025-11-27T06:37:00+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-27T06:37:00+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDQ21033-2025-11-27T03:31:00+00:00,2025-11-27T03:31:00+00:00 CAP.Message@bom.gov.au,AusBoM-IDQ21033-2025-11-27T05:08:51+00:00,2025-11-27T05:08:51+00:00 CAP.Message@bom.gov.au,AusBoM-IDQ21033-2025-11-27T05:43:02+00:00,2025-11-27T05:43:02+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2025-11-27T06:36:57+00:00</effective>
+        <expires>2025-11-27T11:36:57+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Thunderstorm Warning for Peninsula, Gulf Country, Northern Goldfields and Upper Flinders, North Tropical Coast and Tablelands, Herbert and Lower Burdekin, Central Coast and Whitsundays, Capricornia, Central Highlands and Coalfields, Wide Bay and Burnett and Southeast Coast forecast districts</headline>
+        <description>
+          VERY DANGEROUS THUNDERSTORMS are likely to produce damaging, locally destructive winds, large, possibly giant hailstones and heavy rainfall that may lead to flash flooding over the next several hours in parts of the Southeast Coast district. Locations which may be affected include Springbrook.  
+          
+          Severe thunderstorms are likely to produce damaging winds, large hailstones and heavy rainfall that may lead to flash flooding over the next several hours in the Southeast Coast and parts of the Wide Bay and Burnett districts. Locations which may be affected include Gold Coast, Brisbane, Maroochydore, Gympie, Kingaroy, Coolangatta and Ipswich.  
+          
+          Severe thunderstorms are likely to produce damaging winds and heavy rainfall that may lead to flash flooding over the next several hours in parts of the Peninsula, North Tropical Coast and Tablelands, Northern Goldfields and Upper Flinders, Herbert and Lower Burdekin, Central Coast and Whitsundays, Gulf Country, Central Highlands and Coalfields and Capricornia districts. Locations which may be affected include Georgetown, Sarina, Nebo, Forsayth, Einasleigh and Mount Garnet.  
+          
+          
+          Severe thunderstorms are no longer occurring in the Darling Downs and Granite Belt district and the warning for this district is CANCELLED.
+           
+          
+          59 mm of rainfall recorded at Yammanie Minnamoolka in the 1 hour to 4:16 pm.
+          3 cm hail reported in inner northern Brisbane suburbs around 3:20 pm.
+          52 mm of rainfall recorded at Mareeba in the 30 minutes to 2:24 pm.
+          57 mm of rainfall recorded at Fish Hole Creek in the 30 minutes to 12:45 pm.
+        </description>
+        <instruction>Emergency services advise people to:
+* If you have children make sure they are with you or an adult you trust.
+* Pack away, secure or tie down outdoor furniture, toys and trampolines if it s safe to do so.
+* Stay away from windows if there is giant hail.
+* Park your car undercover away from trees.
+* Close doors and windows.
+* Keep asthma medications close by. Storms and wind can trigger asthma attacks.
+* Charge mobile phones and power banks in case the power goes out.
+* Put your pets somewhere safe and make sure they can be identified in case they get lost.
+* Do not drive now unless you have to because conditions are dangerous.
+* Tell friends, family and neighbours in the area.
+* Go inside a strong building now. Stay inside until the storm has passed.
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Peninsula, Gulf Country, North Tropical Coast and Tablelands, Northern Goldfields and Upper Flinders, Herbert and Lower Burdekin, Central Coast and Whitsundays, Central Highlands and Coalfields, Capricornia, Wide Bay and Burnett and Southeast Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW001</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW002</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW003</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW004</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW005</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW006</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW007</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW014</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW015</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2025-11-27T06:36:57+00:00</effective>
+        <expires>2025-11-27T11:36:57+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Severe Thunderstorm Warning for Darling Downs and Granite Belt forecast district</headline>
+        <description/>
+        <instruction>Emergency services advise people to:
+* If you have children make sure they are with you or an adult you trust.
+* Pack away, secure or tie down outdoor furniture, toys and trampolines if it s safe to do so.
+* Stay away from windows if there is giant hail.
+* Park your car undercover away from trees.
+* Close doors and windows.
+* Keep asthma medications close by. Storms and wind can trigger asthma attacks.
+* Charge mobile phones and power banks in case the power goes out.
+* Put your pets somewhere safe and make sure they can be identified in case they get lost.
+* Do not drive now unless you have to because conditions are dangerous.
+* Tell friends, family and neighbours in the area.
+* Go inside a strong building now. Stay inside until the storm has passed.
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Darling Downs and Granite Belt forecast district</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW013</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

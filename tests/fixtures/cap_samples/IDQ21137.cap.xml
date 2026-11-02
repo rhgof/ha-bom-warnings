@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21137-2025-08-03T18:57:02+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-08-03T18:57:02+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDQ21137-2025-08-03T12:53:40+00:00,2025-08-03T12:53:40+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Weather</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>weather</value>
+        </eventCode>
+        <effective>2025-08-03T18:56:56+00:00</effective>
+        <expires>2025-08-04T01:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Coastal Hazard Warning for Southeast Coast forecast district</headline>
+        <description>
+          LARGE AND POWERFUL SURF CONDITIONS are likely, which may lead to coastal erosion and localised damage to coastal infrastructure between Cape Moreton and the New South Wales border. 
+          
+          Beach conditions in these areas could be dangerous and people should stay well away from the surf and surf exposed areas.
+          
+          These conditions are expected to ease by Monday afternoon.
+          
+          
+          Locations which may be affected include Gold Coast, and ocean-facing coasts of Moreton and North Stradbroke Islands. 
+          
+          Waves up to 6.6 metres were recorded at Brisbane monitoring site at 2:30 am on Monday.
+          
+          
+          A Hazardous Surf Warning is also current, refer to the latest warnings at www.bom.gov.au/qld/warnings/
+        </description>
+        <instruction>Emergency services advise people to:
+* Know your limitations around beaches, tidal rivers and creeks. Adhere to warning from lifesavers and lifeguards .
+* If you have a boat or water craft, haul out if possible or check your moorings are secure.
+* If you have children make sure they are within arm's reach around the water.
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Southeast Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>QLD_PW015</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

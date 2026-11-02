@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDS20240-2025-11-07T13:57:14+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-07T13:57:14+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Hazardous Road Conditions</event>
+        <urgency>Unknown</urgency>
+        <severity>Moderate</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>roadHazard</value>
+        </eventCode>
+        <effective>2025-11-07T13:30:00+00:00</effective>
+        <expires>2025-11-08T01:30:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Road Weather Alert for Adelaide</headline>
+        <description>Reduced visibility in low cloud and light showers will make road conditions dangerous during Saturday morning in the Adelaide Hills Area.</description>
+        <instruction>The SA Police advises that people should:
+Slow down and take extra care.
+Maintain a safe distance between you and the vehicle in front.
+Turn on your headlights.
+
+For information on any road closures, please contact your local council or the Police.</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>South Australia: Adelaide</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>SA_ME003</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

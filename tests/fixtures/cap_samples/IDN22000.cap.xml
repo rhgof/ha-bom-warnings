@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN22000-2025-11-25T17:43:44+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-25T17:43:44+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN22000-2025-11-25T05:14:30+00:00,2025-11-25T05:14:30+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Fire Weather</event>
+        <urgency>Unknown</urgency>
+        <severity>Extreme</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>fireWeather</value>
+        </eventCode>
+        <effective>2025-11-25T16:00:00+00:00</effective>
+        <expires>2025-11-26T13:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Catastrophic Fire Weather Warning for Lower Central West Plains fire district for 26 November</headline>
+        <instruction>The NSW Rural Fire Service advises you to:
+Action your Bushfire Survival Plan now.
+Monitor the fire and weather situation through your local radio station, www.rfs.nsw.gov.au and www.bom.gov.au.
+Call 000 (Triple Zero) in an emergency.
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Lower Central West Plains</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW015</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Fire Weather</event>
+        <urgency>Unknown</urgency>
+        <severity>Severe</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>fireWeather</value>
+        </eventCode>
+        <effective>2025-11-25T16:00:00+00:00</effective>
+        <expires>2025-11-26T13:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Extreme Fire Weather Warning for Greater Hunter, Greater Sydney Region, Illawarra/Shoalhaven, Central Ranges, North Western, Upper Central West Plains, Southern Slopes, Eastern Riverina, Southern Riverina and Northern Riverina fire districts for 26 November</headline>
+        <instruction>The NSW Rural Fire Service advises you to:
+Action your Bushfire Survival Plan now.
+Monitor the fire and weather situation through your local radio station, www.rfs.nsw.gov.au and www.bom.gov.au.
+Call 000 (Triple Zero) in an emergency.
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Greater Hunter, Greater Sydney Region, Illawarra/Shoalhaven, Central Ranges, North Western, Upper Central West Plains, Southern Slopes, Eastern Riverina, Southern Riverina and Northern Riverina</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW003</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW004</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW005</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW010</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW013</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW014</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW016</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW017</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW018</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_FW019</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

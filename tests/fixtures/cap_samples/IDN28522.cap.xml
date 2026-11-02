@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN28522-2025-11-12T16:51:55+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-12T16:51:55+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Large Coastal Surf</event>
+        <urgency>Unknown</urgency>
+        <severity>Moderate</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>largesurf</value>
+        </eventCode>
+        <effective>2025-11-12T16:51:00+00:00</effective>
+        <expires>2025-11-13T13:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Hazardous Surf Warning for Byron Coast: Point Danger to Wooli and Coffs Coast: Wooli to Smoky Cape for 13 November</headline>
+        <instruction>NSW Police Force, Marine Area Command advise that:
+People should consider staying out of the water and avoid walking near surf-exposed areas.
+Rock fishers should avoid coastal rock platforms exposed to the ocean and seek a safe location that is sheltered from the surf.
+Boaters planning to cross shallow water and ocean bars should consider changing or delaying their voyage.
+Boaters already on the water should carry the appropriate safety equipment and wear a lifejacket.
+Boaters should remember to log on with their local Marine Rescue radio base, via VHF Radio or the Marine Rescue APP, and consider their safety management plan.
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Byron Coast and Coffs Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_MW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_MW007</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

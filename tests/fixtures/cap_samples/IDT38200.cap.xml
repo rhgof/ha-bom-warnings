@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDT38200-2025-11-25T19:43:32+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-25T19:43:32+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Exposure</event>
+        <urgency>Unknown</urgency>
+        <severity>Moderate</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>exposure</value>
+        </eventCode>
+        <effective>2025-11-26T13:00:00+00:00</effective>
+        <expires>2025-11-27T13:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Bushwalkers Weather Alert for Central Plateau and Western forecast districts</headline>
+        <description>Bush walkers are advised that snow as low as 600 metres is expected from early Thursday morning until later in the day. These hazardous conditions are expected to occur in parts of the Western and Central Plateau forecast districts.</description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Tasmania: Western and Central Plateau forecast districts</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>TAS_PW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>TAS_PW009</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

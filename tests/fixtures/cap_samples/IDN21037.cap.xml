@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN21037-2025-11-24T23:58:25+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2025-11-24T23:58:25+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Weather</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>weather</value>
+        </eventCode>
+        <effective>2025-11-24T23:58:22+00:00</effective>
+        <expires>2025-11-25T08:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Weather Warning for Illawarra, South Coast, Central Tablelands, Southern Tablelands, South West Slopes, Snowy Mountains and Australian Capital Territory forecast districts</headline>
+        <description>
+          DAMAGING WEST TO NORTHWESTERLY WIND GUSTS in excess of 90 km/h are expected to develop across the warning area from Wednesday morning, continuing through the afternoon, before easing during Wednesday evening.
+          
+          
+          
+          Locations which may be affected include Wollongong, Goulburn, Nowra, Katoomba, Bowral and Braidwood.  
+        </description>
+        <instruction>The State Emergency Service advises that people should:
+* Move vehicles under cover or away from trees.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Trees that have been damaged by fire are likely to be more unstable and more likely to fall.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Stay vigilant and monitor conditions. Note that the landscape may have changed following bushfires.
+* For emergency help in floods and storms, ring your local SES Unit on 132 500.
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Illawarra, South Coast, Central Tablelands, Southern Tablelands, South West Slopes, Snowy Mountains and Australian Capital Territory</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW006</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW007</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW009</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW013</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW010</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW017</value>
+            </geocode>
+        </area>
+    </info>
+</alert>
