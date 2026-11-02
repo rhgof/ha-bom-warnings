@@ -12,9 +12,13 @@
       },
       "zone": {
         "title": "Zone",
-        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters; turn on coastal waters in the options to count their warnings.",
+        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters.",
         "data": {
-          "zone": "Zone"
+          "zone": "Zone",
+          "include_marine": "Include coastal waters"
+        },
+        "data_description": {
+          "include_marine": "Also count marine wind and hazardous surf warnings for the coastal waters the zone's circle reaches. You can change this later under Configure."
         }
       },
       "manual": {
@@ -108,7 +112,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Warning filters",
+        "title": "Options: warning types and coastal waters",
         "data": {
           "hide_final_cancelled": "Hide final and cancelled warnings",
           "event_types": "Warning types",
@@ -117,7 +121,8 @@
         "data_description": {
           "event_types": "Leave empty to show every type. Type a name to add one that is not listed.",
           "include_marine": "Also count marine wind and hazardous surf warnings for coastal waters that this location reaches. For a zone that means its circle, so make the radius large enough to touch the sea."
-        }
+        },
+        "description": "Choose which warnings count for this location. Turn on coastal waters to include marine wind and hazardous surf warnings for the sea this location reaches."
       }
     }
   }

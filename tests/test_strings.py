@@ -76,3 +76,21 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
 @pytest.mark.parametrize("key", ["fire_danger_today", "fire_danger_tomorrow"])
 def test_fire_danger_translates_every_enum_option(key: str) -> None:
     assert set(load(STRINGS)["entity"]["sensor"][key]["state"]) == set(LEVEL_KEYS)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        ("options", "step", "init", "title"),
+        ("options", "step", "init", "description"),
+        ("options", "step", "init", "data", "include_marine"),
+        ("config", "step", "zone", "data", "include_marine"),
+        ("config", "step", "zone", "data_description", "include_marine"),
+    ],
+    ids=".".join,
+)
+def test_the_coastal_waters_choice_is_labelled_where_it_is_offered(path: tuple[str, ...]) -> None:
+    node: Any = load(STRINGS)
+    for part in path:
+        node = node[part]
+    assert node

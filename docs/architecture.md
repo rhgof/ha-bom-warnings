@@ -140,7 +140,8 @@ Home Assistant layer:
   issue `refresh_failing`; the next success or the last entry leaving clears it. All entities go
   unavailable together on a failed refresh.
 - **Options (no restart):** hide final/cancelled warnings (default on), filter by event type
-  (default all), and include coastal waters (default off). The options flow reloads the entry.
+  (default all), and include coastal waters (default off). The options flow reloads the entry. A zone entry is also
+  asked about coastal waters in the config flow's zone step, which stores it as an option.
   Polling intervals are not configurable.
 - **Identity.** For Home and typed locations `unique_id` is the rounded coordinates and the title
   is the home location name, or `lat, lon`; a second entry for the same place is rejected. For a

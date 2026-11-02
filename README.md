@@ -19,7 +19,8 @@ Each zone is its own entry, so Home, Work and a holiday house each get their own
 ### Coastal waters
 
 Marine wind and hazardous surf warnings apply to coastal water zones, which a point on land is
-never inside. Turn on **Include coastal waters** in the entry's options and a zone whose circle
+never inside. Turn on **Include coastal waters** when adding a zone, or later under the entry's
+**Configure** (three-dot menu), and a zone whose circle
 reaches the sea (a few kilometres out from the coast is enough for a Sydney zone; a harbour is
 closer) also counts those warnings in the binary sensor, list sensor and event entity. It is off by
 default. Tsunami and tropical cyclone place warnings are not matched yet.

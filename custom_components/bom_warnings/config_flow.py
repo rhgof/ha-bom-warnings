@@ -129,13 +129,20 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         state.attributes["longitude"],
                         radius_m=min(float(state.attributes.get("radius", 0)), MAX_RADIUS_M),
                         extra={CONF_ZONE: zone_id},
+                        include_marine=user_input.get(CONF_INCLUDE_MARINE, False),
                     )
                 except _LocationError as err:
                     errors["base"] = err.key
         return self.async_show_form(
             step_id="zone",
             data_schema=probatio.Schema(
-                {probatio.Required(CONF_ZONE): EntitySelector(EntitySelectorConfig(domain="zone"))}
+                {
+                    probatio.Required(CONF_ZONE): EntitySelector(
+                        EntitySelectorConfig(domain="zone")
+                    ),
+                    # Asked here as well as under Configure, so it is found when the zone is added.
+                    probatio.Optional(CONF_INCLUDE_MARINE, default=False): BooleanSelector(),
+                }
             ),
             errors=errors,
         )
@@ -149,6 +156,7 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         *,
         radius_m: float = 0.0,
         extra: dict[str, Any] | None = None,
+        include_marine: bool = False,
     ) -> ConfigFlowResult:
         """Create the entry; raises _LocationError with the error key on failure."""
         await self.async_set_unique_id(unique_id)
@@ -171,7 +179,8 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         }
         if CONF_ZONE in data:
             data[CONF_RADIUS] = radius_m
-        return self.async_create_entry(title=title, data=data)
+        options = {CONF_INCLUDE_MARINE: include_marine} if CONF_ZONE in data else {}
+        return self.async_create_entry(title=title, data=data, options=options)
 
 
 class BomWarningsOptionsFlow(OptionsFlowWithReload):
