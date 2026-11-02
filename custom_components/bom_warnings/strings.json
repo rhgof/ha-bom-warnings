@@ -2,8 +2,83 @@
   "config": {
     "step": {
       "user": {
-        "title": "BoM Warnings",
-        "description": "TODO: location search and state selection."
+        "title": "Location",
+        "description": "Which location should warnings be watched for?",
+        "menu_options": {
+          "home": "Use my Home Assistant home location",
+          "manual": "Enter latitude and longitude"
+        }
+      },
+      "manual": {
+        "title": "Location",
+        "data": {
+          "latitude": "Latitude",
+          "longitude": "Longitude"
+        }
+      }
+    },
+    "error": {
+      "no_area": "The Bureau of Meteorology has no warning areas at this location. Check that it is in Australia.",
+      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later.",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This location is already configured.",
+      "no_area": "The Bureau of Meteorology has no warning areas at your home location. Enter a location in Australia instead.",
+      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later."
+    }
+  },
+  "issues": {
+    "refresh_failing": {
+      "title": "Cannot reach the Bureau of Meteorology",
+      "description": "BoM Warnings could not fetch warnings from the Bureau of Meteorology for the last 3 refreshes, so its entities are unavailable and no warnings will be reported until this clears.\n\nThis usually means Home Assistant cannot reach the Bureau's FTP server (ftp.bom.gov.au, port 21), or the server is down.\n\nTo fix it:\n1. Check that Home Assistant has internet access.\n2. Check that your firewall, router or DNS filter allows outgoing FTP to ftp.bom.gov.au on port 21.\n3. Check whether the Bureau's website is reporting an outage.\n4. Nothing more is needed once it is fixed: the integration retries every 10 minutes and this issue clears by itself when a refresh succeeds.\n\nIf it persists, download the diagnostics from the BoM Warnings integration page and include them in a bug report."
+    },
+    "no_area": {
+      "title": "No warning area for {title}",
+      "description": "After the Bureau of Meteorology updated its area boundaries, {title} is no longer inside any warning area, so its saved areas are being kept. Remove this location and add it again with coordinates inside Australia."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "warning_count": {
+        "name": "Warning count"
+      },
+      "most_severe_warning": {
+        "name": "Most severe warning"
+      }
+    },
+    "binary_sensor": {
+      "warning": {
+        "name": "Warning"
+      }
+    },
+    "event": {
+      "warning_event": {
+        "name": "Warning event",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "new": "New",
+              "update": "Update",
+              "final": "Final",
+              "cancelled": "Cancelled"
+            }
+          }
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Warning filters",
+        "data": {
+          "hide_final_cancelled": "Hide final and cancelled warnings",
+          "event_types": "Warning types"
+        },
+        "data_description": {
+          "event_types": "Leave empty to show every type. Type a name to add one that is not listed."
+        }
       }
     }
   }

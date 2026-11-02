@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import shapefile
 
-from custom_components.bom_warnings.areas import resolve_area_codes
+from custom_components.bom_warnings.areas import resolve_area_codes, state_of
 
 
 def _write(path: Path, shapes: list[tuple[str, list[list[tuple[float, float]]]]]) -> Path:
@@ -88,3 +88,17 @@ def test_real_bom_shapefiles(name, lat, lon, expected_flood, expected_district):
         assert expected_flood in codes
     else:
         assert not any("_RC" in c for c in codes)
+
+
+@pytest.mark.parametrize(
+    ("codes", "state"),
+    [
+        ({"QLD_PW011", "QLD_ME008"}, "QLD"),
+        ({"NSW_ME001", "NSW_PW002"}, "NSW"),
+        # The forecast district decides when codes straddle a border.
+        ({"QLD_ME008", "NSW_PW002"}, "NSW"),
+        ({"VIC_FW001"}, "VIC"),
+    ],
+)
+def test_state_comes_from_the_forecast_district(codes: set[str], state: str) -> None:
+    assert state_of(codes) == state

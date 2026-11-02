@@ -15,10 +15,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master
-  hacs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hacs/action@main
-        with:
-          category: integration
+  # HACS validation is disabled while the repo is private (it needs a public repo).
+  # Re-enable with hacs/action@main, category: integration, when the repo goes public.

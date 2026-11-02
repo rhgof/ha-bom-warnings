@@ -13,6 +13,14 @@ from pathlib import Path
 
 import shapefile
 
+_DISTRICT_MARKER = "_PW"
+
+
+def state_of(area_codes: set[str]) -> str:
+    """The state prefix of the forecast district code, e.g. `QLD_PW011` gives `QLD`."""
+    districts = sorted(code for code in area_codes if _DISTRICT_MARKER in code)
+    return (districts or sorted(area_codes))[0].split("_")[0]
+
 
 def _inside(lon: float, lat: float, points: list[tuple[float, float]], parts: list[int]) -> bool:
     """Even-odd rule over every ring of a shape, so holes and multipart areas work."""

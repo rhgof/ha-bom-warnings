@@ -6,7 +6,7 @@ No Home Assistant imports. Every method blocks, so callers run them in an execut
 from __future__ import annotations
 
 import ftplib
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -66,6 +66,18 @@ def parse_host(value: str | None) -> tuple[str, int]:
     if not port.isdecimal() or not 0 < int(port) < 65536:
         raise BomFtpError(f"invalid port in host: {value}")
     return host, int(port)
+
+
+HOST_ENV_VAR = "BOM_WARNINGS_FTP_HOST"
+
+
+def client_from_env(environ: Mapping[str, str], directory: str = WARNINGS_DIR) -> BomFtp:
+    """Build the client, honouring the dev-only `BOM_WARNINGS_FTP_HOST` override.
+
+    Call this once at setup, not per refresh, and never expose the override in the UI.
+    """
+    host, port = parse_host(environ.get(HOST_ENV_VAR))
+    return BomFtp(host, port, directory)
 
 
 class BomFtp:

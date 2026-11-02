@@ -33,7 +33,22 @@ Private custom component, official sources only. General HA rules are in `../CLA
 
 - Tests: `.venv/bin/python -m pytest -q`
 - Include the real-shapefile tests: `BOM_SPATIAL_DIR=<dir with unzipped IDM*> .venv/bin/python -m pytest -q`
+- Lint and types: `.venv/bin/ruff check . && .venv/bin/ruff format --check .`, and
+  `.venv/bin/mypy --explicit-package-bases custom_components` (bare `mypy` has no target and fails).
 - Tests use recorded fixtures only and never touch the network.
+
+## Fake BoM FTP (dev only)
+
+- `BOM_WARNINGS_FTP_HOST` (`host` or `host:port`, default `ftp.bom.gov.au:21`) redirects both
+  warnings and shapefiles. It is read once at setup through `ftp.client_from_env(os.environ)`, which
+  is the only place the integration may construct `BomFtp`. Never add it to the UI or config flow.
+- Serve a scenario: `.venv/bin/python -m scripts.fake_bom serve warning_appears --port 2121`, then
+  start the dev instance with `BOM_WARNINGS_FTP_HOST=127.0.0.1:2121`. `list` shows scenarios;
+  `apply <name>` rewrites the served directory (`config/fake-bom`) while a server runs.
+- Every scenario resets to the baseline first, so the end state is known. Add one by dropping a
+  module in `scripts/fake_bom/scenarios/` with `apply(root)`, using recorded CAP fixtures.
+- Shapefile zips are not in the repo: pass `--spatial-dir <dir of IDM000NN.zip>` or the spatial
+  directory is served empty.
 
 ## Workflow
 
