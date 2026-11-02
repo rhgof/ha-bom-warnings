@@ -13,7 +13,7 @@ from homeassistant.exceptions import ConfigEntryError
 from .coordinator import BomWarningsCoordinator
 from .ftp import BomFtpError, client_from_env
 
-PLATFORMS = [Platform.BINARY_SENSOR]
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT]
 
 
 @dataclass(slots=True)

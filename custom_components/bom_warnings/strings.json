@@ -33,6 +33,21 @@
       "warning": {
         "name": "Warning"
       }
+    },
+    "event": {
+      "warning_event": {
+        "name": "Warning event",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "new": "New",
+              "update": "Update",
+              "final": "Final",
+              "cancelled": "Cancelled"
+            }
+          }
+        }
+      }
     }
   }
 }
