@@ -14,3 +14,18 @@ Needs a human: onboarding and token creation in the throwaway instance. Not run 
    the entry). Expect `on`, with a `warnings` attribute listing `IDQ21013` (Extreme Heat).
 5. Cancel it: `apply baseline` (file removed). Expect `off` after the next poll.
 6. Note the result on the pull request.
+
+## Result (2026-11-02, HA 2026.10.4 dev instance, real BoM shapefile layers served by the fake server)
+
+Location `-21.5, 142.0` (in `QLD_PW003`), created through the config flow over REST.
+
+| Step | Fake server | binary sensor | count | most severe |
+| --- | --- | --- | --- | --- |
+| 1 | `baseline` | off | 0 | none |
+| 2 | `warning_appears` (IDQ21013 Extreme Heat) | on, lists Extreme Heat | 1 | Severe heatwave warning for Queensland |
+| 3 | `baseline` again (warning removed) | off | 0 | none |
+| 4 | server stopped | unavailable (all four entities) | | |
+
+A `new` event fired on the event entity in step 2. The poll interval is 10 minutes, so each step
+forced a refresh with `homeassistant.update_entity`. Step 3 removes the warning from the feed
+rather than serving a cancel message, because no recorded `Cancel` file covers this district.
