@@ -78,21 +78,23 @@ def table_entity_ids() -> list[str]:
     return [sensor_id(key) for _, key in WARNING_TYPE_SENSORS]
 
 
-async def enable_all(hass: HomeAssistant, freezer: Any) -> None:
+async def enable_all(
+    hass: HomeAssistant, freezer: Any, entity_ids: list[str] | None = None
+) -> None:
     """Enable every per-type sensor at once, as a user might, then let the entry reload."""
     registry = er.async_get(hass)
-    for entity_id in table_entity_ids():
+    for entity_id in entity_ids or table_entity_ids():
         registry.async_update_entity(entity_id, disabled_by=None)
     freezer.tick(RELOAD_DELAY + timedelta(seconds=1))
     async_fire_time_changed(hass, dt_util.utcnow())
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-def test_the_table_has_a_row_for_every_land_type_and_thunderstorm() -> None:
+def test_the_table_has_a_row_for_every_land_and_marine_type_and_thunderstorm() -> None:
     events = {event for event, _ in WARNING_TYPE_SENSORS}
-    assert events == {*LAND_IDS, "Thunderstorm"}
-    # Marine wind and surf arrive with #32 and tsunami has no zones yet (#25).
-    assert not events & {"Wind", "Large Coastal Surf", "Tsunami"}
+    assert events == {*LAND_IDS, "Thunderstorm", "Wind", "Large Coastal Surf"}
+    # Tsunami has no zones yet (#25).
+    assert "Tsunami" not in events
 
 
 def test_every_row_has_a_distinct_key_a_name_and_an_icon() -> None:
@@ -127,9 +129,9 @@ async def test_every_sensor_is_registered_disabled_and_costs_no_state(
         assert entry is not None, entity_id
         assert entry.disabled_by is er.RegistryEntryDisabler.INTEGRATION
         assert hass.states.get(entity_id) is None
-    # Ten disabled rows add registry rows only. The entry's own states are the warning, count, most
-    # severe and event entities (the fire danger sensors need a state in the NSW product).
-    assert len(WARNING_TYPE_SENSORS) == 10
+    # Twelve disabled rows add registry rows only. The entry's own states are the warning, count,
+    # most severe and event entities (the fire danger sensors need a state in the NSW product).
+    assert len(WARNING_TYPE_SENSORS) == 12
     assert len(hass.states.async_all()) - before <= 6
 
 
@@ -196,10 +198,11 @@ async def test_all_sensors_are_off_where_nothing_is_warned(
         assert state.attributes["warnings"] == []
 
 
-async def test_only_the_weather_sensor_says_it_is_for_display(
-    hass: HomeAssistant, freezer: Any
-) -> None:
-    """The Weather event is also BoM's Coastal Hazard Warning, so it is no automation trigger."""
+async def test_only_weather_and_marine_wind_carry_a_note(hass: HomeAssistant, freezer: Any) -> None:
+    """The Weather event is also BoM's Coastal Hazard Warning, so it is no automation trigger.
+
+    Marine wind has its own note (tests/test_type_sensors_marine.py): Wind is not wind at the house.
+    """
     await setup_entry(hass, entry_at("NSW_PW006"))
     await enable_all(hass, freezer)
 
@@ -209,27 +212,42 @@ async def test_only_the_weather_sensor_says_it_is_for_display(
     }
     assert "display" in (notes["severe_weather_warning"] or "").lower()
     assert "automation" in (notes["severe_weather_warning"] or "").lower()
-    assert all(note is None for key, note in notes.items() if key != "severe_weather_warning")
+    assert all(
+        note is None
+        for key, note in notes.items()
+        if key not in {"severe_weather_warning", "marine_wind_warning"}
+    )
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_PW999", "NSW_MW008"]])
 @pytest.mark.parametrize("entry_options", [{CONF_INCLUDE_MARINE: True}])
 async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
-    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Hazardous surf is a marine type (#32): in the list, count and event entity, not a sensor."""
+    """A type with no row (surf here, as if it were new) is in the list, count and event entity."""
+    without_surf = tuple(row for row in WARNING_TYPE_SENSORS if row[0] != "Large Coastal Surf")
+    monkeypatch.setattr(
+        "custom_components.bom_warnings.binary_sensor.WARNING_TYPE_SENSORS", without_surf
+    )
+    monkeypatch.setattr(
+        "custom_components.bom_warnings.coordinator.WARNING_TYPE_SENSORS", without_surf
+    )
     scenarios.apply("baseline", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
-    await enable_all(hass, freezer)
+    await enable_all(hass, freezer, [sensor_id(key) for _, key in without_surf])
 
     # The event entity fires on a change, so the surf warning arrives after the entry has loaded.
     scenarios.apply("all_types", fake_bom.root)
     await poll(hass, freezer)
 
-    assert "Large Coastal Surf" not in {event for event, _ in WARNING_TYPE_SENSORS}
     registry = er.async_get(hass)
     assert [e.entity_id for e in registry.entities.values() if "surf" in e.entity_id] == []
-    for entity_id in table_entity_ids():
+    for _, key in without_surf:
+        entity_id = sensor_id(key)
         assert hass.states.get(entity_id).state == STATE_OFF  # type: ignore[union-attr]
     listed = hass.states.get(ANY_WARNING)
     assert listed is not None

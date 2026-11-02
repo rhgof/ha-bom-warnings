@@ -121,6 +121,12 @@
       },
       "severe_weather_warning": {
         "name": "Severe weather warning"
+      },
+      "marine_wind_warning": {
+        "name": "Marine wind warning"
+      },
+      "hazardous_surf_warning": {
+        "name": "Hazardous surf warning"
       }
     },
     "event": {

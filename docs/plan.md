@@ -144,6 +144,25 @@ warning") and a position in a ranked list cannot do that, so slot sensors were r
    list's ranking (so BoM's `unknown`, sent for Severe Thunderstorm, ranks above moderate). A
    cancelled or final warning listed for reference never sets it. No "severe or above" variants.
 
+## Decisions (3 Nov 2026): the marine types (#32, C12)
+
+1. **Two rows, no new logic.** Wind (marine wind) and Large Coastal Surf join the table as "Marine
+   wind warning" and "Hazardous surf warning". The coordinator already drops marine area codes
+   unless `include_marine` is on (`_counted`), and the per-type grouping runs on the counted codes,
+   so the sensors follow the option and a land point cannot turn them on. Toggling the option
+   reloads the entry and does not re-resolve the location (tested).
+2. **Names say what they are.** BoM's Wind event is marine wind only. The name says "Marine", and a
+   `note` attribute on that sensor says it is not wind at the house and that damaging winds on land
+   arrive as the Severe weather warning. Surf needs no note.
+3. **Same decisions as the land types.** Disabled by default, severity an attribute (a gale,
+   Moderate, and a storm, Severe, both count, and the highest is reported), event-type filter not
+   applied, hide-final honoured.
+4. **No strength attribute here.** Strong, Gale Force and Storm Force are in the headline only
+   (CAP severity has just Moderate and Severe); that is #33.
+5. **Tests patch the table for the "no row" case.** Every CAP event now has a row except tsunami,
+   which has no zones, so the test that an unlisted event is still in the list, count and event
+   entity removes a row for its duration instead of relying on a type that has none.
+
 ## Decisions (3 Nov 2026): the remaining land types (#31, C11)
 
 1. **Nine rows added to the table, nothing else.** Fire Weather, Extreme Heat, Frost, Hazardous Road

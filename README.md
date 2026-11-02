@@ -50,12 +50,18 @@ warnings, which ranks between moderate and severe.
 | Exposure warning | Exposure warnings |
 | Tropical cyclone warning | Tropical Cyclone Watch and Warning |
 | Severe weather warning | Severe Weather Warning (**for display**, see below) |
+| Marine wind warning | Strong, Gale Force and Storm Force Wind Warnings for coastal waters (**marine only**, needs coastal waters) |
+| Hazardous surf warning | Hazardous Surf Warning (needs coastal waters) |
 
 **Severe weather warning is for display, not for automations.** BoM uses one event, Weather, for both
 Severe Weather Warnings and Coastal Hazard Warnings, so the sensor cannot tell which a warning is.
 Its `note` attribute says so. It is still a good thing to show on a dashboard.
 
-Marine wind and hazardous surf sensors come with #32, and tsunami with #25.
+**Marine wind is not wind at your house.** BoM's Wind event is for coastal and local waters; damaging
+winds on land arrive as the Severe weather warning. The Marine wind sensor's `note` attribute says
+so. Both marine sensors follow **Include coastal waters** (see Coastal waters above): with it off they
+stay off, and with it on they turn on only when the location's circle reaches a coastal or local
+water zone, so a land point never turns them on. Tsunami comes with #25.
 
 These sensors are **disabled when the entry is created**, so a location does not gain a long list of
 entities it never uses. To turn one on, open Settings, Devices & services, BoM Warnings, then the

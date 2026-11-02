@@ -20,7 +20,7 @@ entity id for a zone entry):
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
-| `binary_sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather) | on while a current warning of that CAP event covers the location. Disabled by default; enabling it in the entity registry reloads the entry. Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Ignores the event-type filter; honours hide-final and `include_marine`. The severe weather one adds a `note` that it is for display (the Weather event is also the Coastal Hazard Warning). | `coordinator.by_event` |
+| `binary_sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | on while a current warning of that CAP event covers the location. Disabled by default; enabling it in the entity registry reloads the entry. Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Ignores the event-type filter; honours hide-final and `include_marine`. The severe weather one adds a `note` that it is for display (the Weather event is also the Coastal Hazard Warning). | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 | `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 
@@ -168,7 +168,8 @@ Home Assistant layer:
   local water zone stores its `*_MW###` code with the rest. The coordinator counts those codes only
   when the `include_marine` option is on (`_counted`), so toggling it reloads without re-resolving.
   A point is never inside a water zone, so Home and typed entries get marine codes only if the
-  typed point is on the water. Nothing about severity gates marine warnings.
+  typed point is on the water. Nothing about severity gates marine warnings. The marine per-type sensors (marine wind, hazardous
+  surf) read the same counted codes, so they follow the option with no extra logic.
 
 ## Testing
 
