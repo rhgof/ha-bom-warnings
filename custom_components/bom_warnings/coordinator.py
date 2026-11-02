@@ -32,7 +32,13 @@ from .const import (
 )
 from .feed import WarningReader
 from .ftp import BomFtp, BomFtpError, client_from_env
-from .spatial import RefreshResult, SpatialDataError, refresh_layers, resolve_coordinate
+from .spatial import (
+    LAYERS,
+    RefreshResult,
+    SpatialDataError,
+    refresh_layers,
+    resolve_coordinate,
+)
 
 if TYPE_CHECKING:
     from . import BomWarningsConfigEntry
@@ -51,9 +57,10 @@ def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
     return f"no_area_{entry.entry_id}"
 
 
-# Shapefile layers change rarely, so checking their server times every poll would be wasted FTP
-# commands.
-LAYER_CHECK_INTERVAL = timedelta(hours=6)
+# Shapefile layers change rarely, so they are checked weekly, in the background.
+LAYER_CHECK_INTERVAL = timedelta(days=7)
+# When the last check reached the server, so a restart does not start a fresh one.
+LAYER_CHECK_RECORD = ".last_layer_check"
 
 
 @dataclass(frozen=True, slots=True)
@@ -211,7 +218,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
     when the last one detaches. The failure count lives here, so there is one repair issue.
     """
 
-    def __init__(self, hass: HomeAssistant, ftp: BomFtp) -> None:
+    def __init__(self, hass: HomeAssistant, ftp: BomFtp, layer_ftp: BomFtp) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -220,33 +227,95 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             update_interval=UPDATE_INTERVAL,
         )
         self._ftp = ftp
+        # The layer check runs in an executor beside warnings refreshes, and a BomFtp session is
+        # not thread-safe, so it gets its own client.
+        self._layer_ftp = layer_ftp
         self._reader = WarningReader(ftp)
         self.consecutive_failures = 0
+        # Due right after the first successful refresh, unless a recent record says otherwise.
         self._next_layer_check = dt_util.utcnow()
+        self._layer_task: asyncio.Task[None] | None = None
         self.layer_generation = 0
         # Entries using this feed, so the last one to leave can shut it down.
         self.entry_ids: set[str] = set()
         self.lock = asyncio.Lock()
 
-    def _refresh(self, check_layers: bool) -> tuple[list[CapWarning], bool]:
-        """Blocking. Returns the warnings, and whether a layer changed."""
+    def _cache_dir(self) -> Path:
+        return Path(self.hass.config.path(SPATIAL_CACHE_DIR))
+
+    def _read_layer_record(self) -> datetime | None:
+        """Blocking. When the last check reached the server; None if missing or unreadable."""
+        try:
+            last = datetime.fromisoformat((self._cache_dir() / LAYER_CHECK_RECORD).read_text())
+        except OSError, ValueError:
+            return None
+        return last if last.tzinfo else None
+
+    def _write_layer_record(self) -> None:
+        """Blocking. Failing to write only means the next start checks again."""
+        directory = self._cache_dir()
+        try:
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / LAYER_CHECK_RECORD).write_text(dt_util.utcnow().isoformat())
+        except OSError as err:
+            _LOGGER.debug("Could not record the layer check time: %s", err)
+
+    async def async_load_layer_record(self) -> None:
+        """Schedule the first layer check from the persisted record; call before the first poll."""
+        last = await self.hass.async_add_executor_job(self._read_layer_record)
+        now = dt_util.utcnow()
+        # A record from the future (clock change) would postpone the check for too long.
+        if last is not None and last <= now:
+            self._next_layer_check = last + LAYER_CHECK_INTERVAL
+
+    def _refresh(self) -> list[CapWarning]:
+        """Blocking. Only the warnings read: nothing else may delay or fail it."""
         # One connection per refresh instead of one login per file.
         with self._ftp.session():
-            changed = False
-            if check_layers:
-                cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
-                result: RefreshResult = refresh_layers(self._ftp, cache_dir)
-                for layer, error in result.failed.items():
-                    # The cached copy stays in use, and the next check retries.
-                    _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
-                changed = bool(result.changed)
-            return self._reader.refresh(), changed
+            return self._reader.refresh()
+
+    def _check_layers(self) -> tuple[bool, bool]:
+        """Blocking. Returns (a layer changed, the server was reached)."""
+        with self._layer_ftp.session():
+            result: RefreshResult = refresh_layers(self._layer_ftp, self._cache_dir())
+        for layer, error in result.failed.items():
+            # The cached copy stays in use, and the next check retries.
+            _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
+        reached = len(result.failed) < len(LAYERS)
+        if reached:
+            self._write_layer_record()
+        return bool(result.changed), reached
+
+    async def _async_check_layers(self) -> None:
+        try:
+            changed, reached = await self.hass.async_add_executor_job(self._check_layers)
+        except (BomFtpError, SpatialDataError, OSError) as err:
+            _LOGGER.debug("Layer check failed: %s", err)
+            changed = reached = False
+        if not reached:
+            # Never got through: due again on the next successful poll rather than in a week.
+            self._next_layer_check = dt_util.utcnow()
+        if changed and self.data is not None:
+            self.layer_generation += 1
+            self.async_set_updated_data(FeedSnapshot(self.data.warnings, self.layer_generation))
+
+    def _schedule_layer_check(self, now: datetime) -> None:
+        if now < self._next_layer_check or (self._layer_task and not self._layer_task.done()):
+            return
+        # Set now, not when it finishes, so a slow check is not scheduled a second time.
+        self._next_layer_check = now + LAYER_CHECK_INTERVAL
+        self._layer_task = self.hass.async_create_background_task(
+            self._async_check_layers(), f"{DOMAIN} layer check"
+        )
+
+    async def async_shutdown(self) -> None:
+        if self._layer_task:
+            self._layer_task.cancel()
+        await super().async_shutdown()
 
     async def _async_update_data(self) -> FeedSnapshot:
-        now = dt_util.utcnow()
-        check_layers = now >= self._next_layer_check
         try:
-            warnings, changed = await self.hass.async_add_executor_job(self._refresh, check_layers)
+            warnings = await self.hass.async_add_executor_job(self._refresh)
         except BomFtpError as err:
             self.consecutive_failures += 1
             if self.consecutive_failures >= FAILURES_BEFORE_REPAIR:
@@ -261,10 +330,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             raise UpdateFailed(f"Cannot read BoM warnings: {err}") from err
         self.consecutive_failures = 0
         ir.async_delete_issue(self.hass, DOMAIN, REFRESH_ISSUE_ID)
-        if check_layers:
-            self._next_layer_check = now + LAYER_CHECK_INTERVAL
-        if changed:
-            self.layer_generation += 1
+        self._schedule_layer_check(dt_util.utcnow())
         return FeedSnapshot(tuple(warnings), self.layer_generation)
 
 
@@ -275,8 +341,11 @@ async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
     """Join the shared feed, creating it and doing its first refresh if this is the first entry."""
     feed = hass.data.get(FEED)
     if feed is None:
-        # The only place the feed's client is built, so the dev-only host override applies once.
-        feed = hass.data[FEED] = SharedFeed(hass, client_from_env(os.environ))
+        # The only place the feed's clients are built, so the dev-only host override applies once.
+        feed = hass.data[FEED] = SharedFeed(
+            hass, client_from_env(os.environ), client_from_env(os.environ)
+        )
+        await feed.async_load_layer_record()
     feed.entry_ids.add(entry.entry_id)
     async with feed.lock:
         if feed.data is None or not feed.last_update_success:

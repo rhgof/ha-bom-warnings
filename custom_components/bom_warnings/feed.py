@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .cap import CapWarning, parse_cap
-from .ftp import BomFtpClient, BomFtpError, FileEntry
+from .ftp import BomFtpClient, BomFtpRejectedError, FileEntry
 
 CAP_SUFFIX = ".cap.xml"
 CAP_PATTERN = f"*{CAP_SUFFIX}"
@@ -28,13 +28,15 @@ class WarningReader:
     def _list(self) -> list[FileEntry]:
         try:
             return self._ftp.list_files(CAP_PATTERN)
-        except BomFtpError:
-            # The wildcard form is the fragile one; the plain listing names the same files.
+        except BomFtpRejectedError:
+            # Only a refusal means the server dislikes the wildcard form; the plain listing names
+            # the same files. A timeout is not a refusal: the client already retried it, and a
+            # second 400 KB listing would only stack up another wait.
             entries = self._ftp.list_files("*")
             return [e for e in entries if e.name.endswith(CAP_SUFFIX)]
 
     def refresh(self) -> list[CapWarning]:
-        """Blocking, so run it in an executor. Raises BomFtpError if both listings fail."""
+        """Blocking, so run it in an executor. Raises BomFtpError if the listing fails."""
         current: dict[str, tuple[str, CapWarning]] = {}
         for entry in self._list():
             known = self._seen.get(entry.name)

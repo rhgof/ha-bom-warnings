@@ -26,7 +26,9 @@ class FakeFtp:
         self.modified_error: BomFtpError | None = None
         self.downloads: list[tuple[str, str]] = []
         self.fetches: list[str] = []
-        # Raise only for the wildcard listing, like a server that rejects `LIST *.cap.xml`.
+        self.listings: list[str] = []
+        # Raise only for the wildcard listing: a BomFtpRejectedError is a server refusing
+        # `LIST *.cap.xml`, a plain BomFtpError is a timeout.
         self.wildcard_error: BomFtpError | None = None
         # Bumped on every change so the listing line differs, as a new mtime would.
         self._versions: dict[str, int] = {}
@@ -43,6 +45,7 @@ class FakeFtp:
         return f"-rw-r--r-- 1 ftp ftp {len(data)} Nov  2 10:{minute:02d} {name}"
 
     def list_files(self, pattern: str) -> list[FileEntry]:
+        self.listings.append(pattern)
         if self.error:
             raise self.error
         if self.wildcard_error and pattern != "*":

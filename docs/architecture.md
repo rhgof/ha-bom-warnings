@@ -26,18 +26,21 @@ Entities per location (all on one device, `unique_id` is `"lat,lon"` at 3 decima
 BoM FTP  ──LIST/RETR──▶  WarningReader  ──▶  SharedFeed  ──listener──▶  BomWarningsCoordinator ──▶ entities
 (/anon/gen/fwo/)         (changed files      (one per HA;                (one per config entry:
                           only, parse_cap)    polls every 10 min;         area codes, options,
-                                              layer check every 6 h)     state, per-entry filter)
+                                              layer check weekly,
+                                              in the background)     state, per-entry filter)
 BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ──▶  entry.data["area_codes"]
 (/anon/home/adfd/spatial/)  (<config>/bom_warnings/spatial)       (config flow, and on layer change)
 ```
 
 1. `SharedFeed` (`coordinator.py`) is the only thing that polls. One refresh runs in an executor
-   inside a single FTP session: optionally check shapefile layers, then `WarningReader.refresh()`.
-   Its result is `FeedSnapshot(warnings, layer_generation)`: every current warning nationwide.
+   inside a single FTP session and does only `WarningReader.refresh()`. Its result is
+   `FeedSnapshot(warnings, layer_generation)`: every current warning nationwide. After a
+   successful refresh, if the shapefile layer check is due, it is started as a background task
+   (see "Layer changes").
 2. `WarningReader` (`feed.py`) lists `*.cap.xml`, compares each whole listing line with the last
    one (BoM's listing has no year, so the whole line is the change signal), fetches only new or
-   changed files, and drops files no longer listed. If the wildcard listing fails it falls back
-   to `LIST *`. An empty, vanished (550) or unparseable file is skipped, and a changed file whose
+   changed files, and drops files no longer listed. If the server refuses the wildcard listing
+   (`BomFtpRejectedError`) it falls back to `LIST *`; a timeout does not, it fails the refresh. An empty, vanished (550) or unparseable file is skipped, and a changed file whose
    re-fetch fails keeps its previous parse.
 3. Each entry's `BomWarningsCoordinator` never polls. It listens to the feed and re-derives its
    own view with `_covering` / `_in_state` / `_states`, using its area codes and options.
@@ -51,7 +54,7 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | --- | --- |
 | `cap.py` | `parse_cap(bytes) -> CapWarning \| None`. `Phase` and `Severity` enums. Rejects DOCTYPE/entities, treats offset-less times as UTC. |
 | `areas.py` | `resolve_area_codes(layer paths, lat, lon)` point-in-polygon over shapefiles (cp1252 forced); `state_of(codes)`. |
-| `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
+| `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `spatial.py` | Layer cache: `resolve_coordinate` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 
@@ -70,9 +73,18 @@ Home Assistant layer:
 
 ## Behaviour worth knowing
 
-- **FTP clients.** Every `BomFtp` is built by `client_from_env(os.environ)`. That is the only construction site, and it reads the dev-only
-  `BOM_WARNINGS_FTP_HOST`. The feed and each entry have their own client because
-  `BomFtp.session()` (one login reused across calls) is not thread-safe.
+- **FTP clients.** Every `BomFtp` is built by `client_from_env(os.environ)`, which reads the
+  dev-only `BOM_WARNINGS_FTP_HOST`. The feed has two (warnings, and layer check) and each entry
+  has one, because `BomFtp.session()` (one login reused across calls) is not thread-safe and these
+  run concurrently in executors.
+- **Flaky server.** BoM's control login works while the passive data transfer sometimes stalls,
+  then works a second later. So `TIMEOUT` is 10 s, and `list_files`, `fetch`, `modified` and
+  `download` each try up to `ATTEMPTS` (3) times, `RETRY_DELAY` (1 s) apart, on a plain
+  `BomFtpError` (timeout, reset, 4xx). A permanent 5xx reply raises `BomFtpRejectedError`, which is
+  never retried; 550 on a fetch or `MDTM` (missing) and 550 on `LIST *` (empty) are not errors.
+  Inside `session()` a dropped connection is re-opened, so the retry and later calls still share
+  one. A refresh therefore fails only after those retries. Setup blocks on the first warnings
+  refresh only, never on the layer check.
 - **Shared feed lifecycle.** Created by the first entry, kept in `hass.data[FEED]`, polls only
   while an entry listens, shut down by the last entry to unload or be removed. A failed setup
   keeps the feed so its failure count survives Home Assistant's setup retries.
@@ -90,11 +102,18 @@ Home Assistant layer:
 - **Severity order:** unknown < minor < moderate < severe < extreme; ties go to the most recent
   `sent`. The count and most-severe sensors cover the whole state (`state_warnings`), the binary
   sensor only the location.
-- **Layer changes.** Every 6 hours the feed compares each layer's server `MDTM` with the cached
-  one. If any changed it bumps `layer_generation`; each entry then re-resolves its own point once
+- **Layer changes.** Weekly (`LAYER_CHECK_INTERVAL`), in a background task started after a
+  successful warnings refresh, on the feed's second client, the feed compares each layer's server
+  `MDTM` with the cached one. The next check is set when it is scheduled, so it cannot start
+  twice. Its errors are logged at debug and never fail a refresh or count towards the repair
+  issue. A check that reached the server records its time in `<spatial cache>/.last_layer_check`,
+  so a restart within a week does not repeat it; a missing, corrupt or old record means check
+  after the first refresh, and a check where every layer failed is not recorded, so it retries on
+  a later poll. If any layer changed the feed bumps `layer_generation` and publishes a new
+  `FeedSnapshot`; each entry then re-resolves its own point once
   (advancing its seen generation only on success, so failures retry). If the point now resolves to
   nothing, the entry keeps its old codes and raises a `no_area_<entry_id>` repair issue.
-- **Reliability.** Three consecutive failed feed refreshes create one shared, non-fixable repair
+- **Reliability.** Three consecutive failed feed refreshes (each already retried inside `BomFtp`) create one shared, non-fixable repair
   issue `refresh_failing`; the next success or the last entry leaving clears it. All entities go
   unavailable together on a failed refresh.
 - **Options (no restart):** hide final/cancelled warnings (default on), and filter by event type
@@ -109,8 +128,8 @@ Home Assistant layer:
 (`IDM00001/IDM00001.shp`, ...); see `CLAUDE.md`.
 
 - Recorded CAP files live in `tests/fixtures/cap/`. Add new ones by capturing real BoM output.
-- `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and can change,
-  remove and fail files.
+- `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and listings
+  and can change, remove and fail files (a rejected or timed-out wildcard listing).
 - `scripts/fake_bom/`: a real local FTP server (pyftpdlib) laid out like BoM, with scenarios
   (`baseline`, `warning_appears`, `warning_updated`, `warning_cancelled`, `warning_removed`,
   `file_empty`, `unavailable`). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
@@ -126,6 +145,8 @@ Home Assistant layer:
 
 - If entry A unloads while entry B is stuck in setup retry, the feed is torn down and the failure
   count resets.
+- A failed setup retry still counts towards the repair issue, but a refresh now fails only after
+  `BomFtp`'s own retries, so a brief stall no longer adds to it.
 - A warning that expires between polls stays on for up to 10 minutes.
 - The `no_area` repair issue is informational; there is no fix flow.
 - `KNOWN_EVENT_TYPES` is hand-written, not taken from live BoM data.

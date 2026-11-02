@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from custom_components.bom_warnings.feed import WarningReader, read_current_warnings
-from custom_components.bom_warnings.ftp import BomFtpError, parse_listing_line
+from custom_components.bom_warnings.ftp import BomFtpError, BomFtpRejectedError, parse_listing_line
 from tests.fake_ftp import FakeFtp
 
 CAP = Path(__file__).parent / "fixtures" / "cap"
@@ -117,10 +117,25 @@ def test_new_file_is_fetched():
 
 def test_wildcard_listing_error_falls_back_to_full_listing():
     ftp = FakeFtp(recorded() | {"readme.txt": b"hello"})
-    ftp.wildcard_error = BomFtpError("550 no match")
+    ftp.wildcard_error = BomFtpRejectedError("550 no match")
     result = WarningReader(ftp).refresh()
     assert ids(result) == ids(read_current_warnings(FakeFtp(recorded())))
     assert "readme.txt" not in ftp.fetches
+
+
+def test_wildcard_timeout_raises_without_a_second_listing():
+    ftp = FakeFtp(recorded())
+    ftp.wildcard_error = BomFtpError("timed out")
+    with pytest.raises(BomFtpError):
+        WarningReader(ftp).refresh()
+    assert ftp.listings == ["*.cap.xml"]
+
+
+def test_rejected_wildcard_falls_back_to_exactly_one_full_listing():
+    ftp = FakeFtp(recorded())
+    ftp.wildcard_error = BomFtpRejectedError("500 bad")
+    WarningReader(ftp).refresh()
+    assert ftp.listings == ["*.cap.xml", "*"]
 
 
 def test_full_listing_failure_surfaces():
@@ -169,5 +184,5 @@ def test_failed_changed_file_is_retried_next_refresh():
 
 def test_read_current_warnings_uses_wildcard_fallback():
     ftp = FakeFtp(recorded())
-    ftp.wildcard_error = BomFtpError("550 no match")
+    ftp.wildcard_error = BomFtpRejectedError("550 no match")
     assert len(read_current_warnings(ftp)) == len(recorded())

@@ -27,6 +27,18 @@ def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
     """Let Home Assistant load custom_components from this repo."""
 
 
+@pytest.fixture(autouse=True)
+def isolated_config_dir(request: pytest.FixtureRequest, tmp_path: Path) -> None:
+    """Give Home Assistant tests their own config dir.
+
+    The default one is shared by every test and run, and the layer cache and check record live in
+    it, so a check recorded by one test would silence the next.
+    """
+    if "hass" in request.fixturenames:
+        hass = request.getfixturevalue("hass")
+        hass.config.config_dir = str(tmp_path / "config")
+
+
 @pytest.fixture
 def fake_bom(tmp_path: Path, socket_enabled: None) -> Iterator[FakeBom]:
     """A local FTP server on the baseline scenario.
