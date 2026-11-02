@@ -13,7 +13,13 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import BomWarningsConfigEntry
-from .const import DEFAULT_EVENT_ICON, DOMAIN, EVENT_ICONS, WARNING_TYPE_SENSORS
+from .const import (
+    DEFAULT_EVENT_ICON,
+    DOMAIN,
+    EVENT_ICONS,
+    WARNING_TYPE_NOTES,
+    WARNING_TYPE_SENSORS,
+)
 from .coordinator import ActiveWarning, BomWarningsCoordinator
 from .sensor import rank_warnings
 
@@ -102,10 +108,13 @@ class WarningTypeBinarySensor(_DeviceBinarySensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {
+        attributes: dict[str, Any] = {
             "severity": highest_severity(self._warnings),
             "warnings": [_attributes(w) for w in self._warnings],
         }
+        if note := WARNING_TYPE_NOTES.get(self._event):
+            attributes["note"] = note
+        return attributes
 
 
 class WarningActiveBinarySensor(_DeviceBinarySensor):

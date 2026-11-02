@@ -69,8 +69,29 @@ DEFAULT_EVENT_ICON = "mdi:alert-circle"
 
 # One binary sensor per warning type, each disabled by default so a user enables only the types an
 # automation needs: (CAP event, translation key). The icon comes from EVENT_ICONS, the single place
-# an event gets one. A new type is a new row here, plus its name in strings.json.
-WARNING_TYPE_SENSORS = (("Thunderstorm", "thunderstorm_warning"),)
+# an event gets one. A new type is a new row here, plus its name in strings.json. Tsunami has no
+# zones yet (#25), and the marine types (Wind, Large Coastal Surf) come with #32.
+WARNING_TYPE_SENSORS = (
+    ("Thunderstorm", "thunderstorm_warning"),
+    ("Fire Weather", "fire_weather_warning"),
+    ("Extreme Heat", "extreme_heat_warning"),
+    ("Frost", "frost_warning"),
+    ("Hazardous Road Conditions", "hazardous_road_conditions_warning"),
+    ("Riverine Flood", "flood_warning"),
+    ("Sheep Grazier Warning", "sheep_grazier_warning"),
+    ("Exposure", "exposure_warning"),
+    ("Tropical Cyclone", "tropical_cyclone_warning"),
+    ("Weather", "severe_weather_warning"),
+)
+# An entity has no description field, so a type that is a poor automation trigger says so in a
+# `note` attribute. BoM's Weather event is both the Severe Weather Warning and the Coastal Hazard
+# Warning, and which of the two a warning is can only be told from its headline.
+WARNING_TYPE_NOTES = {
+    "Weather": (
+        "For display. BoM's Weather event covers both Severe Weather Warnings and Coastal Hazard "
+        "Warnings, so it is not a good automation trigger."
+    ),
+}
 NO_WARNING_ICON = "mdi:check-circle-outline"
 
 # Fire danger rating levels, lowest first (the keys the parser stores), with the colours BoM's own

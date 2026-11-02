@@ -144,6 +144,24 @@ warning") and a position in a ranked list cannot do that, so slot sensors were r
    list's ranking (so BoM's `unknown`, sent for Severe Thunderstorm, ranks above moderate). A
    cancelled or final warning listed for reference never sets it. No "severe or above" variants.
 
+## Decisions (3 Nov 2026): the remaining land types (#31, C11)
+
+1. **Nine rows added to the table, nothing else.** Fire Weather, Extreme Heat, Frost, Hazardous Road
+   Conditions, Riverine Flood, Sheep Grazier Warning, Exposure, Tropical Cyclone and Weather join
+   Thunderstorm. All disabled by default, severity an attribute, event-type filter not applied, the
+   same one-pass `by_event` grouping. Tsunami (no zones, #25) and the marine types (#32) are not rows.
+2. **Names say what BoM calls the thing.** Riverine Flood is "Flood warning" (what a user reads in
+   a headline), Extreme Heat is "Extreme heat warning", and Weather is "Severe weather warning".
+3. **Weather is a display sensor, said in a `note` attribute.** An entity has no description
+   field, and the Weather event is both Severe Weather Warnings and Coastal Hazard Warnings, so it
+   is not a good trigger. The first #31 text said the recorded files do not name the hazard; they do
+   (`description` names it in capitals for IDN21037), so a hazard attribute is possible later and is
+   a separate ticket. The note rides in the attributes because that is where Developer Tools and the
+   more-info panel show it; the README says the same.
+4. **The sensor must agree with the list.** A test enables every row and checks each sensor is on
+   exactly when the any-warning list holds that event, at the location of each land sample, so a
+   row cannot be wired to the wrong event.
+
 ## Open questions to verify first
 
 4. Public or private. RSS terms allow personal non-commercial use; republishing publicly still needs BoM's copyright page read, and the JSON API remains "must not use".

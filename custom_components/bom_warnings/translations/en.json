@@ -94,6 +94,33 @@
       },
       "thunderstorm_warning": {
         "name": "Thunderstorm warning"
+      },
+      "fire_weather_warning": {
+        "name": "Fire weather warning"
+      },
+      "extreme_heat_warning": {
+        "name": "Extreme heat warning"
+      },
+      "frost_warning": {
+        "name": "Frost warning"
+      },
+      "hazardous_road_conditions_warning": {
+        "name": "Hazardous road conditions warning"
+      },
+      "flood_warning": {
+        "name": "Flood warning"
+      },
+      "sheep_grazier_warning": {
+        "name": "Sheep grazier warning"
+      },
+      "exposure_warning": {
+        "name": "Exposure warning"
+      },
+      "tropical_cyclone_warning": {
+        "name": "Tropical cyclone warning"
+      },
+      "severe_weather_warning": {
+        "name": "Severe weather warning"
       }
     },
     "event": {

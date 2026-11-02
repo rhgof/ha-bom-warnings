@@ -33,10 +33,29 @@ changes. Locations in NSW and the ACT also get today's and tomorrow's fire dange
 
 ### Per-warning-type sensors (disabled by default)
 
-A binary sensor per warning type, such as **Thunderstorm warning**, is on while a current warning of
-that type covers the location. Use these in automations, for example to close the blinds on a severe
-thunderstorm warning. The highest severity is in the `severity` attribute. BoM sends `unknown` for
-Severe Thunderstorm warnings, which ranks between moderate and severe.
+A binary sensor per warning type is on while a current warning of that type covers the location.
+Use these in automations, for example to close the blinds on a severe thunderstorm warning. The
+highest severity is in the `severity` attribute. BoM sends `unknown` for Severe Thunderstorm
+warnings, which ranks between moderate and severe.
+
+| Sensor | BoM warning |
+| --- | --- |
+| Thunderstorm warning | Severe Thunderstorm Warning |
+| Fire weather warning | Fire Weather Warning (Severe, Extreme, Catastrophic) |
+| Extreme heat warning | Heatwave warnings |
+| Frost warning | Frost Warning |
+| Hazardous road conditions warning | Road Weather Alert |
+| Flood warning | Riverine flood warnings |
+| Sheep grazier warning | Warning to Sheep Graziers |
+| Exposure warning | Exposure warnings |
+| Tropical cyclone warning | Tropical Cyclone Watch and Warning |
+| Severe weather warning | Severe Weather Warning (**for display**, see below) |
+
+**Severe weather warning is for display, not for automations.** BoM uses one event, Weather, for both
+Severe Weather Warnings and Coastal Hazard Warnings, so the sensor cannot tell which a warning is.
+Its `note` attribute says so. It is still a good thing to show on a dashboard.
+
+Marine wind and hazardous surf sensors come with #32, and tsunami with #25.
 
 These sensors are **disabled when the entry is created**, so a location does not gain a long list of
 entities it never uses. To turn one on, open Settings, Devices & services, BoM Warnings, then the
