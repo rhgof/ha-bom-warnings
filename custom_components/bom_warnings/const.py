@@ -28,3 +28,33 @@ KNOWN_EVENT_TYPES = (
     "Weather",
     "Wind",
 )
+
+# Ranking level of a warning, lowest first, with its colour. The levels are CAP severities, but
+# `unknown` sits between moderate and severe: BoM sends it for Severe Weather and Severe
+# Thunderstorm warnings, which must not rank below a minor flood. Colours run yellow to purple.
+LEVEL_COLORS = {
+    "minor": "#FDD835",
+    "moderate": "#FB8C00",
+    "unknown": "#FF6F00",
+    "severe": "#D32F2F",
+    "extreme": "#7B1FA2",
+}
+
+# One icon per CAP event; every name is checked against the frontend icon list in the tests.
+EVENT_ICONS = {
+    "Exposure": "mdi:snowflake-thermometer",
+    "Extreme Heat": "mdi:thermometer-alert",
+    "Fire Weather": "mdi:fire-alert",
+    "Frost": "mdi:snowflake-alert",
+    "Hazardous Road Conditions": "mdi:car-brake-alert",
+    "Large Coastal Surf": "mdi:waves-arrow-up",
+    "Riverine Flood": "mdi:home-flood",
+    "Sheep Grazier Warning": "mdi:sheep",
+    "Thunderstorm": "mdi:weather-lightning-rainy",
+    "Tropical Cyclone": "mdi:weather-hurricane",
+    "Tsunami": "mdi:tsunami",
+    "Weather": "mdi:cloud-alert",
+    "Wind": "mdi:weather-windy",
+}
+DEFAULT_EVENT_ICON = "mdi:alert-circle"
+NO_WARNING_ICON = "mdi:check-circle-outline"

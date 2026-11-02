@@ -131,27 +131,6 @@ def _covering(
     return _active(warnings, now, lambda info: bool(info.area_codes & area_codes), **filters)
 
 
-def _in_state(
-    warnings: list[CapWarning],
-    state: str,
-    area_codes: frozenset[str],
-    now: datetime,
-    **filters: Any,
-) -> tuple[ActiveWarning, ...]:
-    # Area codes are prefixed with the state ("QLD_PW001"). Also keep warnings that cover the
-    # entry, in case a location sits across a border.
-    prefix = f"{state}_"
-    return _active(
-        warnings,
-        now,
-        lambda info: (
-            bool(info.area_codes & area_codes)
-            or any(code.startswith(prefix) for code in info.area_codes)
-        ),
-        **filters,
-    )
-
-
 @dataclass(frozen=True, slots=True)
 class WarningState:
     """What the event entity compares between refreshes: one product, whatever its phase.
@@ -425,10 +404,6 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # reflected in the codes it was created with, so reloading must not re-resolve.
         self._seen_generation = feed.layer_generation
         self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
-        self._state: str = config_entry.data[CONF_STATE]
-        # Every current warning in the entry's state, for the count and most-severe sensors.
-        # `data` stays limited to warnings covering the location.
-        self.state_warnings: tuple[ActiveWarning, ...] = ()
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
         self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
         self._issue_id = no_area_issue_id(config_entry)
@@ -483,7 +458,6 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         if codes == self._area_codes:
             return
         self._area_codes = frozenset(codes)
-        self._state = state_of(codes)
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
@@ -511,5 +485,4 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             "event_types": self._event_types,
         }
         self.states = _states(warnings, self._area_codes, now, self._event_types)
-        self.state_warnings = _in_state(warnings, self._state, self._area_codes, now, **filters)
         return _covering(warnings, self._area_codes, now, **filters)

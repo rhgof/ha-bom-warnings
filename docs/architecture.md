@@ -16,8 +16,8 @@ Entities per location (all on one device, `unique_id` is `"lat,lon"` at 3 decima
 | Entity | State | Reads |
 | --- | --- | --- |
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
-| `sensor.<title>_warning_count` | number of current warnings in the location's state | `state_warnings` |
-| `sensor.<title>_most_severe_warning` | headline of the most severe one, or `none` | `state_warnings` |
+| `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
+| `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 
 ## Data flow
@@ -43,7 +43,7 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
    (`BomFtpRejectedError`) it falls back to `LIST *`; a timeout does not, it fails the refresh. An empty, vanished (550) or unparseable file is skipped, and a changed file whose
    re-fetch fails keeps its previous parse.
 3. Each entry's `BomWarningsCoordinator` never polls. It listens to the feed and re-derives its
-   own view with `_covering` / `_in_state` / `_states`, using its area codes and options.
+   own view with `_covering` / `_states`, using its area codes and options.
 4. Entities read the entry coordinator.
 
 ## Modules
@@ -99,9 +99,17 @@ Home Assistant layer:
   events; `hide_final` deliberately does not, because final/cancelled are the events. A product that
   vanishes from the feed or expires without a cancel fires nothing. Chosen over bus events because
   HA guidance models momentary occurrences as `event` entities.
-- **Severity order:** unknown < minor < moderate < severe < extreme; ties go to the most recent
-  `sent`. The count and most-severe sensors cover the whole state (`state_warnings`), the binary
-  sensor only the location.
+- **Ranking.** Both sensors read only warnings covering the location (never the whole state, which
+  would list, say, a western NSW sheep graziers alert for a Sydney home). `rank_warnings` in
+  `sensor.py` sorts by level, most recent `sent`, undated last, then product id. Level order is
+  minor < moderate < unknown < severe < extreme: CAP `unknown` is what BoM sends for Severe Weather
+  and Severe Thunderstorm, so it must outrank a minor flood. The list holds current warnings, then
+  (with `hide_final_cancelled` off) ended ones, marked by `phase`. Each item has `level`, an `icon`
+  chosen per CAP event (`EVENT_ICONS`, default `DEFAULT_EVENT_ICON`) and a hex `color` per level
+  (`LEVEL_COLORS`), all in `const.py`. The two sensors' `icon` follows the top warning, or
+  `NO_WARNING_ICON`. The binary sensor is unchanged. `docs/dashboard.md` has card examples. The
+  event entity still orders a product's blocks with the enum order (unknown lowest); it only picks
+  one block per product, and was left alone.
 - **Layer changes.** Weekly (`LAYER_CHECK_INTERVAL`), in a background task started after a
   successful warnings refresh, on the feed's second client, the feed compares each layer's server
   `MDTM` with the cached one. The next check is set when it is scheduled, so it cannot start
@@ -156,8 +164,10 @@ Home Assistant layer:
   and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
 - Area codes of kind MW (coastal water: surf, marine wind), TW (tsunami) and PT (cyclone zone) are
   never matched to a location, because the shapefile layers cover only PW, ME, FW, RC and FL. The
-  binary sensor stays off for them; the state-wide count and most-severe sensors still include
-  surf and marine wind (state prefix). Cyclones match only through their PW codes.
+  binary sensor, count and most-severe sensors all ignore them. Cyclones match only through
+  their PW codes.
+- Severity grades inside headlines (Catastrophic, Extreme, Minor or Moderate flood) are not parsed; only the CAP `severity` ranks. Severe Weather and Severe Thunderstorm arrive as `unknown` and rank by the unknown rule, between moderate and severe.
+- A headline over 255 characters is cut for the `most_severe_warning` state (HA would otherwise show `unknown`); the attributes keep it whole.
 - The CAP event `Weather` is ambiguous: it is used for both severe weather and coastal hazard
   warnings, so filtering on it keeps both.
 - `areas.py` does not guard against null or non-polygon shapes in a shapefile.

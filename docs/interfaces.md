@@ -10,7 +10,10 @@ and a ticket disagree, ask; where this file and the plan disagree, this file win
 - Python 3.14, Home Assistant 2026.10.4 (matches the live instance).
 - Polling is about every 10 minutes and is not user-configurable.
 - A "current" warning is one for which `CapWarning.is_active(now)` is true.
-- Severity order for "most severe": unknown < minor < moderate < severe < extreme.
+- Severity order for ranking and colour: minor < moderate < unknown < severe < extreme. This
+  replaces the earlier unknown < minor order: BoM sends CAP `unknown` for Severe Weather and Severe
+  Thunderstorm, which must not rank below a minor flood. The count and most-severe sensors cover
+  only warnings covering the location, not the state.
 - The user's **state** is the prefix of the district area code (the `*_PW###` code) found when
   the entry is created, for example `QLD_PW011` gives `QLD`. ACT areas return `ACT`.
 - A config entry's `unique_id` is the latitude and longitude rounded to 3 decimals. Its title is

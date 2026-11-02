@@ -85,28 +85,29 @@ async def test_location_in_the_warned_area_turns_the_binary_sensor_on(
     assert (product_id, event) in pairs(hass, ENTITY_ID)
 
 
-# Warnings in coastal-water (MW) or tsunami (TW) zones are never matched to a land location,
-# so the binary sensor stays off; the state-wide sensors still see them, except the tsunami
-# whose file name is not listed by `*.cap.xml` (known gap).
-STATE_ONLY = [
-    ("IDN28522", "Large Coastal Surf", "NSW_PW999", True),
-    ("IDD20105", "Wind", "NT_PW999", True),
-    ("IDY68027", "Tsunami", "QLD_PW999", False),
+# Warnings in coastal-water (MW) or tsunami (TW) zones are never matched to a land location, so
+# the binary sensor and the location-only sensors all stay empty (the tsunami file is also not
+# listed by `*.cap.xml`, a known gap).
+WATER_ONLY = [
+    ("IDN28522", "Large Coastal Surf", "NSW_PW999"),
+    ("IDD20105", "Wind", "NT_PW999"),
+    ("IDY68027", "Tsunami", "QLD_PW999"),
 ]
 
 
 @pytest.mark.parametrize(
-    ("product_id", "event", "code", "seen_by_state"),
-    STATE_ONLY,
-    ids=[event for _, event, _, _ in STATE_ONLY],
+    ("product_id", "event", "code"),
+    WATER_ONLY,
+    ids=[event for _, event, _ in WATER_ONLY],
 )
-async def test_water_zone_warning_leaves_the_binary_sensor_off(
-    hass: HomeAssistant, product_id: str, event: str, code: str, seen_by_state: bool
+async def test_water_zone_warning_is_not_seen_at_a_land_location(
+    hass: HomeAssistant, product_id: str, event: str, code: str
 ) -> None:
     await setup_entry(hass, entry_at(code))
 
     assert hass.states.get(ENTITY_ID).state == STATE_OFF  # type: ignore[union-attr]
-    assert ((product_id, event) in pairs(hass, MOST_SEVERE)) is seen_by_state
+    assert pairs(hass, MOST_SEVERE) == set()
+    assert hass.states.get("sensor.home_warning_count").state == "0"  # type: ignore[union-attr]
 
 
 async def test_event_type_filter_keeps_a_thunderstorm_warning(
