@@ -3,6 +3,7 @@
 import io
 import os
 import zipfile
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -14,6 +15,7 @@ from custom_components.bom_warnings.spatial import (
     LAYERS,
     SPATIAL_DIR,
     SpatialDataError,
+    refresh_layers,
     resolve_coordinate,
 )
 from tests.fake_ftp import FakeFtp
@@ -98,6 +100,83 @@ def test_retry_after_corrupt_download_succeeds(ftp: FakeFtp, tmp_path: Path) -> 
         resolve_coordinate(ftp, cache, lat=5, lon=5)
     ftp.files[_remote(LAYERS[0])] = good
     assert f"T_{LAYERS[0]}" in resolve_coordinate(ftp, cache, lat=5, lon=5)
+
+
+T0 = datetime(2026, 10, 1, tzinfo=UTC)
+T1 = datetime(2026, 11, 1, tzinfo=UTC)
+
+
+@pytest.fixture
+def cached(ftp: FakeFtp, tmp_path: Path) -> Path:
+    ftp.mtimes = {_remote(layer): T0 for layer in LAYERS}
+    cache = tmp_path / "cache"
+    resolve_coordinate(ftp, cache, lat=5, lon=5)
+    ftp.downloads.clear()
+    return cache
+
+
+def test_unchanged_layers_are_not_downloaded(ftp: FakeFtp, cached: Path) -> None:
+    result = refresh_layers(ftp, cached)
+    assert result.changed == [] and result.failed == {}
+    assert ftp.downloads == []
+
+
+def test_changed_layer_is_redownloaded_and_reported(
+    ftp: FakeFtp, cached: Path, tmp_path: Path
+) -> None:
+    layer = LAYERS[1]
+    ftp.files[_remote(layer)] = _zip_layer(tmp_path, layer, "NEW_CODE")
+    ftp.mtimes[_remote(layer)] = T1
+    result = refresh_layers(ftp, cached)
+    assert result.changed == [layer] and result.failed == {}
+    assert [remote for remote, _ in ftp.downloads] == [_remote(layer)]
+    assert "NEW_CODE" in resolve_coordinate(ftp, cached, lat=5, lon=5)
+    assert refresh_layers(ftp, cached).changed == []
+    assert sorted(p.name for p in cached.iterdir()) == sorted(LAYERS)
+
+
+def test_layer_cached_without_known_mtime_is_refreshed(ftp: FakeFtp, tmp_path: Path) -> None:
+    cache = tmp_path / "cache"
+    resolve_coordinate(ftp, cache, lat=5, lon=5)
+    ftp.mtimes = {_remote(layer): T0 for layer in LAYERS}
+    assert refresh_layers(ftp, cache).changed == list(LAYERS)
+
+
+def test_failed_check_keeps_cache_and_reports(ftp: FakeFtp, cached: Path) -> None:
+    ftp.modified_error = BomFtpError("offline")
+    result = refresh_layers(ftp, cached)
+    assert result.changed == [] and set(result.failed) == set(LAYERS)
+    assert resolve_coordinate(ftp, cached, lat=5, lon=5)
+
+
+@pytest.mark.parametrize("bad", [b"", b"junk"], ids=["empty", "garbage"])
+def test_failed_download_keeps_old_copy_and_other_layers_proceed(
+    ftp: FakeFtp, cached: Path, tmp_path: Path, bad: bytes
+) -> None:
+    broken, fine = LAYERS[0], LAYERS[1]
+    ftp.files[_remote(broken)] = bad
+    ftp.files[_remote(fine)] = _zip_layer(tmp_path, fine, "NEW_CODE")
+    ftp.mtimes[_remote(broken)] = ftp.mtimes[_remote(fine)] = T1
+    result = refresh_layers(ftp, cached)
+    assert result.changed == [fine] and set(result.failed) == {broken}
+    codes = resolve_coordinate(ftp, cached, lat=5, lon=5)
+    assert f"T_{broken}" in codes and "NEW_CODE" in codes
+    # The failed layer is retried next time.
+    assert set(refresh_layers(ftp, cached).failed) == {broken}
+
+
+def test_download_error_keeps_old_copy(ftp: FakeFtp, cached: Path) -> None:
+    ftp.mtimes[_remote(LAYERS[0])] = T1
+    ftp.error = BomFtpError("dropped")
+    result = refresh_layers(ftp, cached)
+    assert set(result.failed) == {LAYERS[0]}
+    ftp.error = None
+    assert f"T_{LAYERS[0]}" in resolve_coordinate(ftp, cached, lat=5, lon=5)
+
+
+def test_missing_remote_layer_is_a_failure(ftp: FakeFtp, cached: Path) -> None:
+    del ftp.mtimes[_remote(LAYERS[0])]
+    assert set(refresh_layers(ftp, cached).failed) == {LAYERS[0]}
 
 
 SPATIAL = os.environ.get("BOM_SPATIAL_DIR")
