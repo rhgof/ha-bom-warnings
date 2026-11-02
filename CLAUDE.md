@@ -33,6 +33,8 @@ Private custom component, official sources only. General HA rules are in `../CLA
 
 - Tests: `.venv/bin/python -m pytest -q`
 - Include the real-shapefile tests: `BOM_SPATIAL_DIR=<dir with unzipped IDM*> .venv/bin/python -m pytest -q`
+- Lint and types: `.venv/bin/ruff check . && .venv/bin/ruff format --check .`, and
+  `.venv/bin/mypy --explicit-package-bases custom_components` (bare `mypy` has no target and fails).
 - Tests use recorded fixtures only and never touch the network.
 
 ## Fake BoM FTP (dev only)
