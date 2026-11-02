@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -22,6 +21,7 @@ from homeassistant.helpers.selector import (
     SelectSelectorConfig,
 )
 
+from .areas import state_of
 from .const import (
     CONF_AREA_CODES,
     CONF_EVENT_TYPES,
@@ -35,16 +35,6 @@ from .const import (
 )
 from .ftp import BomFtpError, client_from_env
 from .spatial import SpatialDataError, resolve_coordinate
-
-_LOGGER = logging.getLogger(__name__)
-
-_DISTRICT_MARKER = "_PW"
-
-
-def state_of(area_codes: set[str]) -> str:
-    """The state prefix of the forecast district code, e.g. `QLD_PW011` gives `QLD`."""
-    districts = sorted(code for code in area_codes if _DISTRICT_MARKER in code)
-    return (districts or sorted(area_codes))[0].split("_")[0]
 
 
 def _resolve(cache_dir: Path, lat: float, lon: float) -> set[str]:
@@ -117,7 +107,6 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         except (BomFtpError, SpatialDataError, OSError) as err:
             raise _LocationError("cannot_connect") from err
         except Exception as err:
-            _LOGGER.exception("Unexpected error resolving a location")
             raise _LocationError("unknown") from err
         if not codes:
             raise _LocationError("no_area")

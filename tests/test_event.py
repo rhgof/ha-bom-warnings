@@ -9,6 +9,7 @@ from homeassistant.const import EVENT_STATE_CHANGED, STATE_UNAVAILABLE
 from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bom_warnings.const import CONF_EVENT_TYPES
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -190,3 +191,35 @@ async def test_warning_that_disappears_fires_nothing(
     await poll(hass, freezer)
 
     assert fired == []
+
+
+@pytest.mark.parametrize(
+    ("event_types", "expected"),
+    [
+        # hide_final defaults to on, yet final and cancelled are the events themselves.
+        (["Thunderstorm"], ["final", "cancelled"]),
+        ([], ["final", "cancelled"]),
+        (["Extreme Heat"], []),
+    ],
+)
+async def test_event_type_option_filters_events(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    fired: list[dict[str, Any]],
+    freezer: Any,
+    event_types: list[str],
+    expected: list[str],
+) -> None:
+    mock_config_entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        mock_config_entry, options={CONF_EVENT_TYPES: event_types}
+    )
+    await setup_entry(hass, mock_config_entry)
+
+    reissue(fake_bom, final)
+    await poll(hass, freezer)
+    reissue(fake_bom, cancelled)
+    await poll(hass, freezer)
+
+    assert [e["event_type"] for e in fired] == expected

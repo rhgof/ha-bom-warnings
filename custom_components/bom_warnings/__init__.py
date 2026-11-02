@@ -8,14 +8,16 @@ from dataclasses import dataclass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
+from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers import issue_registry as ir
 
 from .const import DOMAIN
 from .coordinator import (
     BomWarningsCoordinator,
+    async_abandon_setup,
     async_acquire_feed,
     async_release_feed,
+    async_release_removed_entry,
     no_area_issue_id,
 )
 from .ftp import BomFtpError, client_from_env
@@ -37,16 +39,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
     """Set up one location on top of the refresh shared by every entry."""
     try:
         feed = await async_acquire_feed(hass, entry)
-        # The feed's own client may be in use on another thread, so this entry gets its own.
-        ftp = client_from_env(os.environ)
     except BomFtpError as err:
         raise ConfigEntryError(f"Invalid BOM_WARNINGS_FTP_HOST: {err}") from err
 
-    coordinator = BomWarningsCoordinator(hass, entry, feed, ftp)
     try:
+        # The feed's own client may be in use on another thread, so this entry gets its own.
+        ftp = client_from_env(os.environ)
+        coordinator = BomWarningsCoordinator(hass, entry, feed, ftp)
         await coordinator.async_config_entry_first_refresh()
-    except ConfigEntryNotReady:
-        await async_release_feed(hass, entry)
+    except BomFtpError as err:
+        await async_abandon_setup(hass, entry)
+        raise ConfigEntryError(f"Invalid BOM_WARNINGS_FTP_HOST: {err}") from err
+    except BaseException:
+        # Whatever went wrong, the entry must not stay registered on the shared feed.
+        await async_abandon_setup(hass, entry)
         raise
     coordinator.attach()
     entry.runtime_data = BomWarningsData(coordinator)
@@ -58,6 +64,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
 async def async_remove_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
     """Drop the entry's repair issue, which would otherwise outlive it."""
     ir.async_delete_issue(hass, DOMAIN, no_area_issue_id(entry))
+    await async_release_removed_entry(hass, entry)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> bool:

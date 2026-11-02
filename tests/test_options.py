@@ -25,7 +25,7 @@ from custom_components.bom_warnings.const import (
     CONF_STATE,
     DOMAIN,
 )
-from custom_components.bom_warnings.spatial import RefreshResult
+from custom_components.bom_warnings.spatial import RefreshResult, SpatialDataError
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -103,7 +103,7 @@ async def test_event_type_choice_applies_without_a_restart(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_MW001"]])
-async def test_cancelled_warnings_are_shown_when_not_hidden(
+async def test_cancelled_warnings_are_listed_but_not_current_when_not_hidden(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
@@ -114,10 +114,18 @@ async def test_cancelled_warnings_are_shown_when_not_hidden(
     scenarios.apply("warning_cancelled", fake_bom.root)
     await poll(hass, freezer)
     assert sensor_state(hass).state == STATE_OFF
+    count = hass.states.get("sensor.home_warning_count")
+    assert count is not None
+    current = count.state
+    top = hass.states.get("sensor.home_most_severe_warning")
+    assert top is not None
 
     await set_options(hass, mock_config_entry, **{CONF_HIDE_FINAL: False})
 
-    assert sensor_state(hass).state == STATE_ON
+    # An ended warning is listed for reference, but is not a current one.
+    assert sensor_state(hass).state == STATE_OFF
+    assert hass.states.get("sensor.home_warning_count").state == current  # type: ignore[union-attr]
+    assert hass.states.get("sensor.home_most_severe_warning").state == top.state  # type: ignore[union-attr]
     [warning] = sensor_state(hass).attributes["warnings"]
     assert warning["phase"] == "cancelled"
 
@@ -201,3 +209,25 @@ async def test_no_area_after_layer_change_raises_a_repair_and_keeps_codes(
     resolve.return_value = {"QLD_PW001"}
     await poll(hass, freezer, LAYER_CHECK_DUE)
     assert issue_of(mock_config_entry, hass) is None
+
+
+async def test_failed_re_resolve_is_retried_on_the_next_poll(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    layers: MagicMock,
+    resolve: MagicMock,
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+
+    resolve.side_effect = [SpatialDataError("half-written"), {"NSW_PW002", "QLD_ME008"}]
+    layers.return_value = RefreshResult(changed=["IDM00001"])
+    await poll(hass, freezer, LAYER_CHECK_DUE)
+    assert mock_config_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]
+
+    # The layers did not change again, but the change was never applied, so it is retried.
+    layers.return_value = RefreshResult()
+    await poll(hass, freezer)
+
+    assert mock_config_entry.data[CONF_AREA_CODES] == ["NSW_PW002", "QLD_ME008"]

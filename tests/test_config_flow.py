@@ -139,13 +139,17 @@ async def test_cannot_connect(hass: HomeAssistant, resolve: MagicMock, error: Ex
     assert result["errors"] == {"base": "cannot_connect"}
 
 
-async def test_unexpected_error(hass: HomeAssistant, resolve: MagicMock) -> None:
+async def test_unexpected_error(
+    hass: HomeAssistant, resolve: MagicMock, caplog: pytest.LogCaptureFixture
+) -> None:
     resolve.side_effect = ValueError("bug")
 
     result = await start_manual(hass, BRISBANE)
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "unknown"}
+    # Flow errors map to a translated key and are not logged.
+    assert not [r for r in caplog.records if r.name.startswith("custom_components.bom_warnings")]
 
 
 async def test_duplicate_location_is_rejected(hass: HomeAssistant, resolve: MagicMock) -> None:

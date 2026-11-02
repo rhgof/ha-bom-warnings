@@ -267,3 +267,26 @@ async def test_layers_are_checked_once_and_each_entry_re_resolves_its_own_point(
     points = {(c.kwargs["lat"], c.kwargs["lon"]) for c in resolve.call_args_list}
     assert points == {(-27.47, 153.021), (-27.6, 152.9)}
     assert resolve.call_count == 2
+
+
+async def test_reloading_an_entry_does_not_re_resolve_after_an_earlier_layer_change(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    work_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    resolve: MagicMock,  # noqa: F811
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+    await setup_entry(hass, work_entry)
+    layers.return_value = RefreshResult(changed=["IDM00001"])
+    await poll(hass, freezer, LAYER_CHECK_DUE)
+    resolve.reset_mock()
+
+    # The layers already changed before this reload, so there is nothing new to resolve.
+    await hass.config_entries.async_reload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+    await poll(hass, freezer)
+
+    resolve.assert_not_called()

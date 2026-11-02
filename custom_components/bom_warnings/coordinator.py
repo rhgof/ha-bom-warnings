@@ -18,8 +18,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
+from .areas import state_of
 from .cap import CapWarning, Info, Phase, Severity
-from .config_flow import state_of
 from .const import (
     CONF_AREA_CODES,
     CONF_EVENT_TYPES,
@@ -70,11 +70,19 @@ class ActiveWarning:
     # Last, with a default, so existing constructors keep working.
     phase: Phase = Phase.UNKNOWN
 
+    @property
+    def is_current(self) -> bool:
+        """False for a cancelled or final warning, which `hide_final=False` lists for reference."""
+        return self.phase not in _ENDED
+
+
+_ENDED = (Phase.CANCELLED, Phase.FINAL)
+
 
 def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
     if info.is_active(now):
         return True
-    ended = info.phase in (Phase.CANCELLED, Phase.FINAL)
+    ended = info.phase in _ENDED
     return ended and not hide_final and (info.expires is None or info.expires > now)
 
 
@@ -154,7 +162,10 @@ class WarningState:
 
 
 def _states(
-    warnings: list[CapWarning], area_codes: frozenset[str], now: datetime
+    warnings: list[CapWarning],
+    area_codes: frozenset[str],
+    now: datetime,
+    event_types: frozenset[str] = frozenset(),
 ) -> dict[str, WarningState]:
     states: dict[str, WarningState] = {}
     for warning in warnings:
@@ -163,7 +174,10 @@ def _states(
             info
             for info in warning.infos
             if info.area_codes & area_codes
-            and (info.phase in (Phase.CANCELLED, Phase.FINAL) or info.is_active(now))
+            and (info.phase in _ENDED or info.is_active(now))
+            # The event_types filter applies; hide_final deliberately does not, because a final
+            # or cancelled transition is exactly what the event entity reports.
+            and (not event_types or info.event in event_types)
         ]
         if not covering:
             continue
@@ -209,7 +223,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self._reader = WarningReader(ftp)
         self.consecutive_failures = 0
         self._next_layer_check = dt_util.utcnow()
-        self._layer_generation = 0
+        self.layer_generation = 0
         # Entries using this feed, so the last one to leave can shut it down.
         self.entry_ids: set[str] = set()
         self.lock = asyncio.Lock()
@@ -250,8 +264,8 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         if check_layers:
             self._next_layer_check = now + LAYER_CHECK_INTERVAL
         if changed:
-            self._layer_generation += 1
-        return FeedSnapshot(tuple(warnings), self._layer_generation)
+            self.layer_generation += 1
+        return FeedSnapshot(tuple(warnings), self.layer_generation)
 
 
 FEED: HassKey[SharedFeed] = HassKey(DOMAIN)
@@ -268,9 +282,21 @@ async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
         if feed.data is None or not feed.last_update_success:
             await feed.async_refresh()
     if not feed.last_update_success:
-        await async_release_feed(hass, entry)
+        # The feed stays, so its failure count survives Home Assistant's setup retries and the
+        # repair issue can appear when BoM is down at startup.
+        feed.entry_ids.discard(entry.entry_id)
         raise ConfigEntryNotReady("Cannot read BoM warnings")
     return feed
+
+
+async def async_abandon_setup(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
+    """Unregister an entry whose setup failed, keeping the feed and its failure count.
+
+    Nothing listens to the feed, so it does not poll. It is torn down when the last entry is
+    unloaded or removed.
+    """
+    if (feed := hass.data.get(FEED)) is not None:
+        feed.entry_ids.discard(entry.entry_id)
 
 
 async def async_release_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
@@ -281,6 +307,25 @@ async def async_release_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
     feed.entry_ids.discard(entry.entry_id)
     if feed.entry_ids:
         return
+    await _async_shutdown_feed(hass, feed)
+
+
+async def async_release_removed_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
+    """Tear the feed down if the last entry is removed without ever having been unloaded.
+
+    An entry stuck in setup retry is never unloaded, yet it keeps the failing feed (and its
+    repair issue) alive.
+    """
+    feed = hass.data.get(FEED)
+    if feed is None:
+        return
+    feed.entry_ids.discard(entry.entry_id)
+    others = [e for e in hass.config_entries.async_entries(DOMAIN) if e.entry_id != entry.entry_id]
+    if not feed.entry_ids and not others:
+        await _async_shutdown_feed(hass, feed)
+
+
+async def _async_shutdown_feed(hass: HomeAssistant, feed: SharedFeed) -> None:
     del hass.data[FEED]
     await feed.async_shutdown()
     ir.async_delete_issue(hass, DOMAIN, REFRESH_ISSUE_ID)
@@ -307,7 +352,9 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # This entry's own client: a BomFtp session is not safe to share between threads.
         self._ftp = ftp
         self._unsubscribe: CALLBACK_TYPE | None = None
-        self._seen_generation = 0
+        # Start at the feed's generation: layer changes before this entry existed are already
+        # reflected in the codes it was created with, so reloading must not re-resolve.
+        self._seen_generation = feed.layer_generation
         self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
         self._state: str = config_entry.data[CONF_STATE]
         # Every current warning in the entry's state, for the count and most-severe sensors.
@@ -383,9 +430,10 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             raise UpdateFailed("The shared BoM refresh is failing")
         snapshot = feed.data
         if snapshot.layer_generation != self._seen_generation:
-            self._seen_generation = snapshot.layer_generation
             new_codes = await self.hass.async_add_executor_job(self._re_resolve)
+            # Only after success, so a failed attempt is retried on the next poll.
             if new_codes is not None:
+                self._seen_generation = snapshot.layer_generation
                 self._apply_resolved(new_codes)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
@@ -393,6 +441,6 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             "hide_final": self._hide_final,
             "event_types": self._event_types,
         }
-        self.states = _states(warnings, self._area_codes, now)
+        self.states = _states(warnings, self._area_codes, now, self._event_types)
         self.state_warnings = _in_state(warnings, self._state, self._area_codes, now, **filters)
         return _covering(warnings, self._area_codes, now, **filters)

@@ -78,7 +78,7 @@ class WarningCountSensor(_WarningSensor):
 
     @property
     def native_value(self) -> int:
-        return len(self.coordinator.state_warnings)
+        return sum(w.is_current for w in self.coordinator.state_warnings)
 
 
 class MostSevereWarningSensor(_WarningSensor):
@@ -86,11 +86,11 @@ class MostSevereWarningSensor(_WarningSensor):
 
     @property
     def native_value(self) -> str:
-        warning = most_severe(self.coordinator.state_warnings)
+        warning = most_severe(w for w in self.coordinator.state_warnings if w.is_current)
         return warning.headline if warning else STATE_NONE
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         warnings = self.coordinator.state_warnings
-        top = most_severe(warnings)
+        top = most_severe(w for w in warnings if w.is_current)
         return {**(_attributes(top) if top else {}), "warnings": [_attributes(w) for w in warnings]}

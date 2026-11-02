@@ -55,7 +55,7 @@ class WarningActiveBinarySensor(CoordinatorEntity[BomWarningsCoordinator], Binar
 
     @property
     def is_on(self) -> bool:
-        return bool(self.coordinator.data)
+        return any(w.is_current for w in self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
