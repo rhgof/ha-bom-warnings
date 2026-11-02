@@ -24,6 +24,8 @@ class FakeFtp:
         self.mtimes = mtimes or {}
         # Raise only from MDTM, so a refresh check can fail while downloads still work.
         self.modified_error: BomFtpError | None = None
+        # Raise only from RETR, so a listing can succeed while the transfer stalls.
+        self.fetch_error: BomFtpError | None = None
         self.downloads: list[tuple[str, str]] = []
         self.fetches: list[str] = []
         self.listings: list[str] = []
@@ -50,16 +52,20 @@ class FakeFtp:
             raise self.error
         if self.wildcard_error and pattern != "*":
             raise self.wildcard_error
+        # A pattern without a wildcard is an exact file name, as `LIST IDN10016.xml` is on BoM.
         suffix = pattern.removeprefix("*")
+        wildcard = pattern.startswith("*")
         return [
             FileEntry(name, len(data), self._line(name, data))
             for name, data in sorted(self.files.items())
-            if name.endswith(suffix)
+            if (name.endswith(suffix) if wildcard else name == pattern)
         ]
 
     def fetch(self, name: str) -> bytes | None:
         if self.error:
             raise self.error
+        if self.fetch_error:
+            raise self.fetch_error
         self.fetches.append(name)
         if name in self.vanished:
             return None

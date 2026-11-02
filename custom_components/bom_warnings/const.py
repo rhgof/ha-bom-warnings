@@ -58,3 +58,23 @@ EVENT_ICONS = {
 }
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
 NO_WARNING_ICON = "mdi:check-circle-outline"
+
+# Fire danger rating levels, lowest first (the keys the parser stores), with the colours BoM's own
+# fire danger legend uses (the `fireDanger` palette in bom.gov.au's front-end bundle, read
+# 2026-11-02), and one icon each. Every icon name is checked against the frontend list in tests.
+FIRE_DANGER_COLORS = {
+    "no_rating": "#949494",
+    "moderate": "#64BF30",
+    "high": "#FEDD3A",
+    "extreme": "#F78100",
+    "catastrophic": "#AD0909",
+}
+FIRE_DANGER_ICONS = {
+    "no_rating": "mdi:fire-off",
+    "moderate": "mdi:fire-circle",
+    "high": "mdi:fire",
+    "extreme": "mdi:fire-alert",
+    "catastrophic": "mdi:alert-octagon",
+}
+# For a day with no data, or a level this code does not know.
+DEFAULT_FIRE_DANGER_ICON = "mdi:help-circle-outline"

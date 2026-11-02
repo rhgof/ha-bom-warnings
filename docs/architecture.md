@@ -19,6 +19,7 @@ Entities per location (all on one device, `unique_id` is `"lat,lon"` at 3 decima
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
+| `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 
 ## Data flow
 
@@ -28,6 +29,8 @@ BoM FTP  ──LIST/RETR──▶  WarningReader  ──▶  SharedFeed  ──l
                           only, parse_cap)    polls every 10 min;         area codes, options,
                                               layer check weekly,
                                               in the background)     state, per-entry filter)
+BoM FTP  ──LIST/RETR IDN10016.xml etc.──▶  FireDangerReader ──▶ SharedFeed (same snapshot)
+(optional step after the warnings read; one exact-name listing per needed product)
 BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ──▶  entry.data["area_codes"]
 (/anon/home/adfd/spatial/)  (<config>/bom_warnings/spatial)       (config flow, and on layer change)
 ```
@@ -45,6 +48,14 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
 3. Each entry's `BomWarningsCoordinator` never polls. It listens to the feed and re-derives its
    own view with `_covering` / `_states`, using its area codes and options.
 4. Entities read the entry coordinator.
+5. Fire danger (`FireDangerReader` in `feed.py`) is a separate, optional step in the same FTP
+   session, run after the warnings read. For each product some entry needs (a stored `_FW` code
+   whose state prefix is in `fire_danger.PRODUCTS`) it lists the exact file name (`LIST IDN10016.xml`),
+   fetches it only when the listing line changed, and parses it. It never raises: a timeout, 550,
+   missing, empty or unparseable file is logged at debug and the previous parse (or none) stays. It
+   cannot touch `consecutive_failures`, the repair issue or the layer check. `FeedSnapshot.fire_danger`
+   carries the parsed products (default empty, so existing constructors still work). Each entry
+   coordinator picks its district by exact code (`match_district`) into `coordinator.fire_danger`.
 
 ## Modules
 
@@ -55,7 +66,8 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `cap.py` | `parse_cap(bytes) -> CapWarning \| None`. `Phase` and `Severity` enums. Rejects DOCTYPE/entities, treats offset-less times as UTC. |
 | `areas.py` | `resolve_area_codes(layer paths, lat, lon)` point-in-polygon over shapefiles (cp1252 forced); `state_of(codes)`. |
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
-| `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
+| `feed.py` | `WarningReader` (incremental refresh), `read_current_warnings`, and `FireDangerReader` (optional fire danger step). |
+| `fire_danger.py` | `parse_fire_danger(bytes) -> FireDangerProduct \| None`, the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. Reuses `cap._safe_parse`. |
 | `spatial.py` | Layer cache: `resolve_coordinate` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 
 Home Assistant layer:
@@ -141,7 +153,8 @@ Home Assistant layer:
 - `scripts/fake_bom/`: a real local FTP server (pyftpdlib) laid out like BoM, with scenarios
   (`baseline`, `warning_appears`, `warning_updated`, `warning_cancelled`, `warning_removed`,
   `file_empty`, `unavailable`, `all_types`: the baseline plus one real sample of every warning
-  type with dates shifted to now). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
+  type with dates shifted to now). Every scenario also serves the seven recorded fire danger
+  products unchanged (`layout.put_fire_danger`). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
   and by hand against the dev instance.
 - Home Assistant tests run through `hass` with `pytest-homeassistant-custom-component`; the
   config flow tests patch `resolve_coordinate` rather than ship shapefiles. Time is frozen because
@@ -150,7 +163,42 @@ Home Assistant layer:
 - `scripts/ha-dev.sh` runs a throwaway Home Assistant on `127.0.0.1:8124` (README "Dev instance");
   `docs/live-verification-c1.md` has the walkthrough and the recorded result.
 
+## Fire danger ratings
+
+Product and states. Every state publishes the same shape of file in `/anon/gen/fwo/`, with
+`fire-district` areas keyed by the `IDM00007` fire weather district code: `IDN10016` (NSW and the
+ACT, as `NSW_FW008`), `IDD10731` (NT), `IDQ13016` (QLD), `IDS10070` (SA), `IDT13151` (TAS),
+`IDV18555` (VIC), `IDW15100` (WA). Each has a real capture in `tests/fixtures/fire_danger/` and every
+district code in them was checked against the real `IDM00007` layer. Adding a state is one line in
+`fire_danger.PRODUCTS` plus a fixture. The captures are from 1 to 2 November 2026; none of this
+has been run against the dev instance.
+
+- **Today and tomorrow** come from the period dates against the local date, where "local" is the
+  offset in the product's `issue-time-local` (a fixed offset, so a daylight-saving change between
+  issue and read can be off by an hour around midnight). The morning issue starts today, the
+  afternoon issue starts tomorrow. The coordinator remembers every period it has seen for the
+  entry's district (in memory only), so today's rating survives the afternoon issue. After a restart
+  or reload that memory is empty: after an afternoon issue, today is unknown until the next morning
+  issue. When no period covers a day, the state is unknown.
+- **Entities** are created when the entry's codes match a fetched product, or later when one
+  arrives (a listener adds them once). After that they go unavailable, never removed, if the
+  district leaves the product. A failed or missing file keeps the previous data, so they stay
+  available (with a stale `issued`) rather than flap.
+- **Attributes**: `level` (stored text), `color`, `icon`, `fire_behaviour_index` for the day,
+  `forecast` (all periods of the latest issue), `issued`, `district`, `source` (product id) and the
+  BoM attribution. An unseen level is state unknown with its text in `level`.
+- **Colours and icons** are defined once in `const.py` (`FIRE_DANGER_COLORS`, `FIRE_DANGER_ICONS`).
+  The colours come from the `fireDanger` palette in BoM's own front-end bundle (read 2026-11-02);
+  no standalone AFDRS style guide was reachable (afdrs.com.au answered 403).
+- **Which products are fetched** follows the stored codes at each refresh, so a new entry in a
+  state not yet fetched gets its entities after the next poll (up to 10 minutes).
+
 ## Known gaps
+
+- Fire danger: the midnight rollover of today/tomorrow happens at the next feed update (up to 10
+  minutes late); nothing persists across a restart; the timezone is a fixed offset (see above).
+- Fire danger not verified in the dev instance or a browser. The two icons `mdi:fire-circle` and
+  `mdi:fire-off` were checked against the frontend icon list in a separate virtualenv.
 
 - If entry A unloads while entry B is stuck in setup retry, the feed is torn down and the failure
   count resets.

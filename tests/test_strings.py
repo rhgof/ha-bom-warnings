@@ -7,6 +7,8 @@ from typing import Any
 
 import pytest
 
+from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
+
 COMPONENT = Path(__file__).parent.parent / "custom_components" / "bom_warnings"
 STRINGS = COMPONENT / "strings.json"
 ENGLISH = COMPONENT / "translations" / "en.json"
@@ -41,6 +43,8 @@ def test_translations_match_strings() -> None:
         ("entity.event", "warning_event"),
         ("entity.sensor", "warning_count"),
         ("entity.sensor", "most_severe_warning"),
+        ("entity.sensor", "fire_danger_today"),
+        ("entity.sensor", "fire_danger_tomorrow"),
     ],
 )
 def test_every_translation_key_used_in_code_exists(section: str, key: str) -> None:
@@ -63,3 +67,8 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
         "warning_count",
         "most_severe_warning",
     }
+
+
+@pytest.mark.parametrize("key", ["fire_danger_today", "fire_danger_tomorrow"])
+def test_fire_danger_translates_every_enum_option(key: str) -> None:
+    assert set(load(STRINGS)["entity"]["sensor"][key]["state"]) == set(LEVEL_KEYS)

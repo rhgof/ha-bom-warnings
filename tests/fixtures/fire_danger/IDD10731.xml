@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+            <region>Northern Territory</region>
+            <office>NTRO</office>
+            <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDD10731</identifier>
+        <issue-time-utc>2026-11-01T19:30:00Z</issue-time-utc>
+        <issue-time-local tz="CST">2026-11-02T05:00:00+09:30</issue-time-local>
+        <sent-time>2026-11-01T19:30:12Z</sent-time>
+        <expiry-time>2026-11-03T07:30:00Z</expiry-time>
+        <validity-bgn-time-local tz="CST">2026-11-02T05:00:12+09:30</validity-bgn-time-local>
+        <validity-end-time-local tz="CST">2026-11-05T23:59:59+09:30</validity-end-time-local>
+        <next-routine-issue-time-utc>2026-11-02T06:30:00Z</next-routine-issue-time-utc>
+        <next-routine-issue-time-local tz="CST">2026-11-02T16:00:00+09:30</next-routine-issue-time-local>
+        <status>O</status>
+        <service>WSF</service>
+        <product-type>F</product-type>
+        <phase>NEW</phase>
+    </amoc>
+    <forecast>
+        <area aac="NT_FA001" description="Northern Territory" type="region">
+            <forecast-period start-time-local="2026-11-02T05:00:12+09:30" end-time-local="2026-11-02T05:00:12+09:30" start-time-utc="2026-11-01T19:30:12Z" end-time-utc="2026-11-01T19:30:12Z">
+                <text type="fire_danger_footer">
+                    <p>Notes</p>
+                    <p>For all weather information, visit the Bureau of Meteorology web page at www.bom.gov.au.</p>
+                    <p>For information on how to prepare for fires visit www.securent.nt.gov.au.</p>
+                    <p>Note: On occasion Fire Danger Ratings may not adhere to FBI thresholds above due to agency discretion in setting FDRs.</p>
+                </text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW001" description="Darwin and Adelaide River" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">18</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW002" description="Northern Fire Protection Zone" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW003" description="Daly South" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW004" description="Tiwi" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW005" description="Arnhem West" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW006" description="Arnhem East" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW007" description="Katherine Fire Protection Zone" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">18</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW008" description="Carpentaria West" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW009" description="Carpentaria East" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW010" description="Gregory North West" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW011" description="Gregory South East" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW012" description="Barkly North" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">20</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">20</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW013" description="Barkly South" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW014" description="Alice Springs Fire Protection Zone" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW015" description="Simpson West" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW016" description="Simpson East" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">25</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">34</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">29</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">31</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW017" description="Lasseter West" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW018" description="Lasseter East" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW019" description="Tanami North" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">0</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">0</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">0</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">0</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+        </area>
+        <area aac="NT_FW020" description="Tanami South" type="fire-district" parent-aac="NT_FA001">
+            <forecast-period index="0" start-time-local="2026-11-02T05:35:00+09:30" end-time-local="2026-11-03T00:00:00+09:30" start-time-utc="2026-11-01T20:05:00Z" end-time-utc="2026-11-02T14:30:00Z">
+                <element type="fire_behaviour_index">10</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+09:30" end-time-local="2026-11-04T00:00:00+09:30" start-time-utc="2026-11-02T14:30:00Z" end-time-utc="2026-11-03T14:30:00Z">
+                <element type="fire_behaviour_index">10</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+09:30" end-time-local="2026-11-05T00:00:00+09:30" start-time-utc="2026-11-03T14:30:00Z" end-time-utc="2026-11-04T14:30:00Z">
+                <element type="fire_behaviour_index">10</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+09:30" end-time-local="2026-11-06T00:00:00+09:30" start-time-utc="2026-11-04T14:30:00Z" end-time-utc="2026-11-05T14:30:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+    </forecast>
+</product>

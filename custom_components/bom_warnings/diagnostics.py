@@ -11,9 +11,28 @@ from homeassistant.core import HomeAssistant
 
 from . import BomWarningsConfigEntry
 from .const import CONF_LATITUDE, CONF_LONGITUDE
+from .coordinator import FireDangerView
 
 # The unique id is the rounded coordinates and the title is the zone name or the coordinates.
 TO_REDACT = {CONF_LATITUDE, CONF_LONGITUDE, CONF_NAME, "title", "unique_id"}
+
+
+def _fire_danger(view: FireDangerView | None) -> dict[str, Any] | None:
+    if view is None:
+        return None
+    return {
+        "product": view.product_id,
+        "issued": view.issued.isoformat() if view.issued else None,
+        "district": view.district_code,
+        "periods": [
+            {
+                "date": period.date.isoformat(),
+                "level": period.level,
+                "fire_behaviour_index": period.fire_behaviour_index,
+            }
+            for period in view.forecast
+        ],
+    }
 
 
 async def async_get_config_entry_diagnostics(
@@ -44,5 +63,6 @@ async def async_get_config_entry_diagnostics(
                 }
                 for warning in coordinator.data or ()
             ],
+            "fire_danger": _fire_danger(coordinator.fire_danger),
         },
     }

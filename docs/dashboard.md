@@ -64,3 +64,38 @@ rows still shows the ranking.
 
 Defined once in `custom_components/bom_warnings/const.py` (`LEVEL_COLORS`): minor `#FDD835`,
 moderate `#FB8C00`, unknown `#FF6F00` (deep amber), severe `#D32F2F`, extreme `#7B1FA2`.
+
+## Fire danger rating
+
+`sensor.<title>_fire_danger_today` and `sensor.<title>_fire_danger_tomorrow` exist when your
+location is in a BoM fire weather district (all states publish a product; see
+`docs/architecture.md`). The state is `no_rating`, `moderate`, `high`, `extreme` or `catastrophic`
+(shown translated), or unknown when the latest issue has no period for that day or the level is
+new to the integration (the text is then in the `level` attribute). Attributes: `level`, `color`,
+`icon`, `fire_behaviour_index`, `forecast` (a list of `date`, `level`, `fire_behaviour_index`),
+`issued`, `district`, `source`.
+
+Colours, from BoM's own fire danger legend (defined once in `const.py`, `FIRE_DANGER_COLORS`):
+
+| Level | Colour | Icon |
+| --- | --- | --- |
+| No Rating | grey `#949494` | `mdi:fire-off` |
+| Moderate | green `#64BF30` | `mdi:fire-circle` |
+| High | yellow `#FEDD3A` | `mdi:fire` |
+| Extreme | orange `#F78100` | `mdi:fire-alert` |
+| Catastrophic | red `#AD0909` | `mdi:alert-octagon` |
+
+```yaml
+type: markdown
+title: Fire danger
+content: >-
+  {% for e in ['today', 'tomorrow'] %}
+  {% set s = states['sensor.<title>_fire_danger_' ~ e] %}
+  <ha-icon icon="{{ s.attributes.icon }}" style="color: {{ s.attributes.color }}"></ha-icon>
+  **{{ e | title }}**: {{ s.state | replace('_', ' ') | title }}
+
+  {% endfor %}
+```
+
+Not verified in a browser (same caveat about inline `style` as above). A tile or entity card
+shows the dynamic icon without any template.

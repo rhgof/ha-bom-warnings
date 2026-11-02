@@ -3,19 +3,30 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorStateClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import MAX_LENGTH_STATE_STATE as MAX_STATE_LENGTH
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from . import BomWarningsConfigEntry
-from .const import DEFAULT_EVENT_ICON, DOMAIN, EVENT_ICONS, LEVEL_COLORS, NO_WARNING_ICON
-from .coordinator import ActiveWarning, BomWarningsCoordinator
+from .const import (
+    DEFAULT_EVENT_ICON,
+    DEFAULT_FIRE_DANGER_ICON,
+    DOMAIN,
+    EVENT_ICONS,
+    FIRE_DANGER_COLORS,
+    FIRE_DANGER_ICONS,
+    LEVEL_COLORS,
+    NO_WARNING_ICON,
+)
+from .coordinator import ActiveWarning, BomWarningsCoordinator, FireDangerView
+from .fire_danger import LEVEL_KEYS, FireDangerPeriod
 
 PARALLEL_UPDATES = 0
 
@@ -79,6 +90,25 @@ async def async_setup_entry(
         [WarningCountSensor(coordinator, entry), MostSevereWarningSensor(coordinator, entry)]
     )
 
+    # Fire danger entities exist only for an entry whose codes are in a fetched product. That
+    # product may arrive after setup (the optional step failed or the file was missing), so keep
+    # checking until it does; once added, a missing district only makes them unavailable.
+    added = False
+
+    @callback
+    def _add_fire_danger() -> None:
+        nonlocal added
+        if added or coordinator.fire_danger is None:
+            return
+        added = True
+        async_add_entities(
+            [FireDangerSensor(coordinator, entry, offset) for offset in FIRE_DANGER_DAYS]
+        )
+
+    _add_fire_danger()
+    if not added:
+        entry.async_on_unload(coordinator.async_add_listener(_add_fire_danger))
+
 
 class _WarningSensor(CoordinatorEntity[BomWarningsCoordinator], SensorEntity):
     _attr_has_entity_name = True
@@ -139,3 +169,77 @@ class MostSevereWarningSensor(_WarningSensor):
     def extra_state_attributes(self) -> dict[str, Any]:
         top = self._top
         return {**(_item(top) if top else {}), "warnings": [_item(w) for w in self._ranked]}
+
+
+# Translation key by day offset from the local date.
+FIRE_DANGER_DAYS = {0: "fire_danger_today", 1: "fire_danger_tomorrow"}
+FIRE_DANGER_ATTRIBUTION = "Australian Government Bureau of Meteorology"
+
+
+def _period_item(period: FireDangerPeriod) -> dict[str, Any]:
+    return {
+        "date": period.date.isoformat(),
+        "level": period.level,
+        "fire_behaviour_index": period.fire_behaviour_index,
+    }
+
+
+class FireDangerSensor(_WarningSensor):
+    """The fire danger rating of the entry's fire weather district for today or tomorrow."""
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = list(LEVEL_KEYS)
+    _attr_attribution = FIRE_DANGER_ATTRIBUTION
+
+    def __init__(
+        self, coordinator: BomWarningsCoordinator, entry: BomWarningsConfigEntry, day_offset: int
+    ) -> None:
+        self._attr_translation_key = FIRE_DANGER_DAYS[day_offset]
+        self._day_offset = day_offset
+        super().__init__(coordinator, entry)
+
+    @property
+    def available(self) -> bool:
+        return super().available and self.coordinator.fire_danger is not None
+
+    @property
+    def _view(self) -> FireDangerView | None:
+        return self.coordinator.fire_danger
+
+    @property
+    def _period(self) -> FireDangerPeriod | None:
+        view = self._view
+        if view is None:
+            return None
+        day = view.local_date(dt_util.utcnow()) + timedelta(days=self._day_offset)
+        return view.by_date.get(day)
+
+    @property
+    def _level(self) -> str | None:
+        period = self._period
+        return period.level if period else None
+
+    @property
+    def native_value(self) -> str | None:
+        # An enum sensor must not report a state outside its options; the raw text is an attribute.
+        return self._level if self._level in LEVEL_KEYS else None
+
+    @property
+    def icon(self) -> str:
+        return FIRE_DANGER_ICONS.get(self._level or "", DEFAULT_FIRE_DANGER_ICON)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        view = self._view
+        if view is None:
+            return {}
+        level = self._level
+        return {
+            "level": level,
+            "color": FIRE_DANGER_COLORS.get(level or ""),
+            "fire_behaviour_index": self._period.fire_behaviour_index if self._period else None,
+            "forecast": [_period_item(p) for p in view.forecast],
+            "issued": view.issued.isoformat() if view.issued else None,
+            "district": view.district_name,
+            "source": view.product_id,
+        }

@@ -11,6 +11,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 CAP_FIXTURES = REPO / "tests" / "fixtures" / "cap"
 CAP_SAMPLES = REPO / "tests" / "fixtures" / "cap_samples"
+FIRE_DANGER_FIXTURES = REPO / "tests" / "fixtures" / "fire_danger"
 
 WARNINGS = Path("anon/gen/fwo")
 SPATIAL = Path("anon/home/adfd/spatial")
@@ -26,6 +27,14 @@ def put_cap(root: Path, product: str, *, mtime: float = BASE_TIME) -> Path:
     """Copy a recorded CAP fixture into the warnings directory."""
     target = root / WARNINGS / f"{product}.cap.xml"
     shutil.copyfile(CAP_FIXTURES / f"{product}.cap.xml", target)
+    os.utime(target, (mtime, mtime))
+    return target
+
+
+def put_fire_danger(root: Path, product: str, *, mtime: float = BASE_TIME) -> Path:
+    """Copy a recorded fire danger rating product (IDN10016 and its state equivalents)."""
+    target = root / WARNINGS / f"{product}.xml"
+    shutil.copyfile(FIRE_DANGER_FIXTURES / f"{product}.xml", target)
     os.utime(target, (mtime, mtime))
     return target
 
@@ -91,6 +100,8 @@ def reset(root: Path, spatial_from: Path | None = None) -> None:
     (root / SPATIAL).mkdir(parents=True)
     for product in BASELINE_WARNINGS:
         put_cap(root, product)
+    for path in sorted(FIRE_DANGER_FIXTURES.glob("ID*.xml")):
+        put_fire_danger(root, path.stem)
     if spatial_from:
         for path in spatial_from.glob("IDM*"):
             if path.is_file():

@@ -5,9 +5,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from collections.abc import Callable
-from dataclasses import dataclass
-from datetime import datetime, timedelta
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta, tzinfo
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -30,7 +30,13 @@ from .const import (
     DOMAIN,
     SPATIAL_CACHE_DIR,
 )
-from .feed import WarningReader
+from .feed import FireDangerReader, WarningReader
+from .fire_danger import (
+    FireDangerPeriod,
+    FireDangerProduct,
+    fire_product_ids,
+    match_district,
+)
 from .ftp import BomFtp, BomFtpError, client_from_env
 from .spatial import (
     LAYERS,
@@ -188,6 +194,26 @@ class FeedSnapshot:
     warnings: tuple[CapWarning, ...]
     # Bumped whenever a shapefile layer changed, so each entry re-resolves its own location once.
     layer_generation: int
+    # Product id -> latest parse, for the products some entry needs. Empty when none could be read.
+    fire_danger: Mapping[str, FireDangerProduct] = field(default_factory=dict)
+
+
+@dataclass(frozen=True, slots=True)
+class FireDangerView:
+    """One entry's fire district: the latest issue, plus days remembered from earlier issues."""
+
+    product_id: str
+    issued: datetime | None
+    district_code: str
+    district_name: str
+    # Every period of the latest issue, in date order.
+    forecast: tuple[FireDangerPeriod, ...]
+    by_date: Mapping[date, FireDangerPeriod]
+    # The product's own local offset, which decides what "today" means for its district.
+    tz: tzinfo
+
+    def local_date(self, now: datetime) -> date:
+        return now.astimezone(self.tz).date()
 
 
 class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
@@ -210,6 +236,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         # not thread-safe, so it gets its own client.
         self._layer_ftp = layer_ftp
         self._reader = WarningReader(ftp)
+        self._fire_reader = FireDangerReader(ftp)
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
         self._next_layer_check = dt_util.utcnow()
@@ -247,11 +274,22 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         if last is not None and last <= now:
             self._next_layer_check = last + LAYER_CHECK_INTERVAL
 
-    def _refresh(self) -> list[CapWarning]:
-        """Blocking. Only the warnings read: nothing else may delay or fail it."""
+    def _refresh(
+        self, fire_products: set[str]
+    ) -> tuple[list[CapWarning], dict[str, FireDangerProduct]]:
+        """Blocking. The warnings read decides success; the fire danger step runs after it."""
         # One connection per refresh instead of one login per file.
         with self._ftp.session():
-            return self._reader.refresh()
+            warnings = self._reader.refresh()
+            # Never raises: a failure here keeps the previous fire danger data.
+            return warnings, self._fire_reader.refresh(fire_products)
+
+    def _wanted_fire_products(self) -> set[str]:
+        return fire_product_ids(
+            code
+            for entry in self.hass.config_entries.async_entries(DOMAIN)
+            for code in entry.data.get(CONF_AREA_CODES, ())
+        )
 
     def _check_layers(self) -> tuple[bool, bool]:
         """Blocking. Returns (a layer changed, the server was reached)."""
@@ -276,7 +314,9 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             self._next_layer_check = dt_util.utcnow()
         if changed and self.data is not None:
             self.layer_generation += 1
-            self.async_set_updated_data(FeedSnapshot(self.data.warnings, self.layer_generation))
+            self.async_set_updated_data(
+                FeedSnapshot(self.data.warnings, self.layer_generation, self.data.fire_danger)
+            )
 
     def _schedule_layer_check(self, now: datetime) -> None:
         if now < self._next_layer_check or (self._layer_task and not self._layer_task.done()):
@@ -294,7 +334,9 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
 
     async def _async_update_data(self) -> FeedSnapshot:
         try:
-            warnings = await self.hass.async_add_executor_job(self._refresh)
+            warnings, fire_danger = await self.hass.async_add_executor_job(
+                self._refresh, self._wanted_fire_products()
+            )
         except BomFtpError as err:
             self.consecutive_failures += 1
             if self.consecutive_failures >= FAILURES_BEFORE_REPAIR:
@@ -310,7 +352,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self.consecutive_failures = 0
         ir.async_delete_issue(self.hass, DOMAIN, REFRESH_ISSUE_ID)
         self._schedule_layer_check(dt_util.utcnow())
-        return FeedSnapshot(tuple(warnings), self.layer_generation)
+        return FeedSnapshot(tuple(warnings), self.layer_generation, fire_danger)
 
 
 FEED: HassKey[SharedFeed] = HassKey(DOMAIN)
@@ -409,6 +451,11 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self._issue_id = no_area_issue_id(config_entry)
         # Latest state of every covering product in any phase, keyed by product id.
         self.states: dict[str, WarningState] = {}
+        # This entry's fire district, or None when no stored code is in a fetched product.
+        self.fire_danger: FireDangerView | None = None
+        # Periods seen in earlier issues, so the afternoon issue (which starts tomorrow) does not
+        # erase today's rating. In memory only: a restart forgets it until the next morning issue.
+        self._remembered: tuple[str, dict[date, FireDangerPeriod]] = ("", {})
 
     @property
     def consecutive_failures(self) -> int:
@@ -467,6 +514,30 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             },
         )
 
+    def _derive_fire_danger(self, snapshot: FeedSnapshot, now: datetime) -> FireDangerView | None:
+        match = match_district(snapshot.fire_danger, self._area_codes)
+        if match is None:
+            return None
+        product, district = match
+        code, remembered = self._remembered
+        if code != district.code:
+            remembered = {}
+        # The latest issue wins for any day both cover.
+        remembered = {**remembered, **{p.date: p for p in district.periods}}
+        tz = product.issued.tzinfo if product.issued and product.issued.tzinfo else None
+        local_today = now.astimezone(tz or dt_util.get_default_time_zone()).date()
+        remembered = {d: p for d, p in remembered.items() if d >= local_today - timedelta(days=1)}
+        self._remembered = (district.code, remembered)
+        return FireDangerView(
+            product_id=product.product_id,
+            issued=product.issued,
+            district_code=district.code,
+            district_name=district.name,
+            forecast=district.periods,
+            by_date=remembered,
+            tz=tz or dt_util.get_default_time_zone(),
+        )
+
     async def _async_update_data(self) -> tuple[ActiveWarning, ...]:
         feed = self._feed
         if not feed.last_update_success or feed.data is None:
@@ -485,4 +556,5 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             "event_types": self._event_types,
         }
         self.states = _states(warnings, self._area_codes, now, self._event_types)
+        self.fire_danger = self._derive_fire_danger(snapshot, now)
         return _covering(warnings, self._area_codes, now, **filters)

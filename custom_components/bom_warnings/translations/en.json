@@ -45,6 +45,26 @@
       },
       "most_severe_warning": {
         "name": "Most severe warning"
+      },
+      "fire_danger_today": {
+        "name": "Fire danger today",
+        "state": {
+          "no_rating": "No Rating",
+          "moderate": "Moderate",
+          "high": "High",
+          "extreme": "Extreme",
+          "catastrophic": "Catastrophic"
+        }
+      },
+      "fire_danger_tomorrow": {
+        "name": "Fire danger tomorrow",
+        "state": {
+          "no_rating": "No Rating",
+          "moderate": "Moderate",
+          "high": "High",
+          "extreme": "Extreme",
+          "catastrophic": "Catastrophic"
+        }
       }
     },
     "binary_sensor": {
