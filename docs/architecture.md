@@ -20,7 +20,7 @@ entity id for a zone entry):
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
-| `binary_sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | on while a current warning of that CAP event covers the location. Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: `severity` (highest of the current ones, by the list's ranking, `None` when off) and `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather one adds a `note` that it is for display (the Weather event is also the Coastal Hazard Warning). | `coordinator.by_event` |
+| `sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | enum level sensor: the highest level among the type's current warnings (`none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`; BoM's CAP `unknown` is shown as `unrated`). Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: the top warning's `headline`, `expires`, `product_id`, `event`, plus `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather and marine wind ones add a `note`. | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 | `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 
@@ -146,8 +146,9 @@ Home Assistant layer:
   `warning_types.event_is_on`, answers "is this event on" for the list, count, most severe, event
   entity, any-warning sensor and the per-type sensors. The options flow reloads the entry. Config
   entry version 2: `async_migrate_entry` turns the version 1 `event_types` filter and
-  `include_marine` switch into the checklist (`warning_types.keys_from_legacy_options`) and enables
-  the old default-disabled sensors of types that are on.
+  `include_marine` switch into the checklist (`warning_types.keys_from_legacy_options`). Version 3
+  removes the old per-type `binary_sensor` registry entries, because the type sensors changed
+  domain (the level sensors reuse the same unique ids); version 1 entries pass through both steps.
   Polling intervals are not configurable.
 - **Identity.** For Home and typed locations `unique_id` is the rounded coordinates and the title
   is the home location name, or `lat, lon`; a second entry for the same place is rejected. For a

@@ -71,7 +71,7 @@ def zone_options() -> dict[str, Any]:
 def zone_entry(zone_codes: list[str], zone_options: dict[str, Any]) -> MockConfigEntry:
     return MockConfigEntry(
         domain=DOMAIN,
-        version=2,
+        version=3,
         unique_id=ZONE,
         title="Holiday house",
         options=zone_options,

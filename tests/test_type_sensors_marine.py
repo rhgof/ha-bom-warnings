@@ -9,7 +9,6 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -29,8 +28,8 @@ from .test_zones import ZONE, set_zone, zone_codes, zone_entry, zone_options  # 
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
-WIND = "binary_sensor.holiday_house_marine_wind_warning"
-SURF = "binary_sensor.holiday_house_hazardous_surf_warning"
+WIND = "sensor.holiday_house_marine_wind_warning"
+SURF = "sensor.holiday_house_hazardous_surf_warning"
 
 # Event, translation key, name, sample product, the water-zone codes a circle can reach, and the
 # severity of the warning there. IDD20105 has a gale (Moderate) and a storm (Severe) block.
@@ -77,7 +76,7 @@ def all_types(fake_bom: FakeBom) -> None:
 
 
 def entity(key: str) -> str:
-    return f"binary_sensor.holiday_house_{key}"
+    return f"sensor.holiday_house_{key}"
 
 
 @pytest.mark.parametrize(
@@ -93,7 +92,7 @@ def test_the_marine_types_are_in_the_table_with_a_clear_name(
 ) -> None:
     assert (event, key) in WARNING_TYPE_SENSORS
     assert event in EVENT_ICONS
-    assert load(STRINGS)["entity"]["binary_sensor"][key]["name"] == name
+    assert load(STRINGS)["entity"]["sensor"][key]["name"] == name
 
 
 @pytest.mark.parametrize(
@@ -116,8 +115,8 @@ async def test_marine_sensor_follows_its_toggle_without_re_resolving(
     # The warning is in the feed and the circle reaches the water, and the type is on.
     state = hass.states.get(entity(key))
     assert state is not None
-    assert state.state == STATE_ON
-    assert state.attributes["severity"] == severity
+    assert state.state == severity
+    assert "severity" not in state.attributes
     assert {(w["product_id"], w["event"]) for w in state.attributes["warnings"]} == {
         (product_id, event)
     }
@@ -129,7 +128,7 @@ async def test_marine_sensor_follows_its_toggle_without_re_resolving(
     resolve.assert_not_called()
 
     await set_options(hass, zone_entry, **{key: True})
-    assert hass.states.get(entity(key)).state == STATE_ON  # type: ignore[union-attr]
+    assert hass.states.get(entity(key)).state == severity  # type: ignore[union-attr]
     resolve.assert_not_called()
 
 
@@ -146,7 +145,7 @@ async def test_wind_and_surf_sensors_are_each_on_only_for_their_own_type(
     for entity_id, product_id in ((WIND, "IDD20105"), (SURF, "IDN28522")):
         state = hass.states.get(entity_id)
         assert state is not None
-        assert state.state == STATE_ON
+        assert state.state != "none"
         assert {w["product_id"] for w in state.attributes["warnings"]} == {product_id}
 
 
@@ -162,8 +161,8 @@ async def test_a_water_zone_without_a_wind_warning_leaves_the_wind_sensor_off(
 
     state = hass.states.get(WIND)
     assert state is not None
-    assert state.state == STATE_OFF
-    assert state.attributes["severity"] is None
+    assert state.state == "none"
+    assert state.attributes["headline"] is None
 
 
 @pytest.mark.parametrize("zone_codes", [["NT_PW999", "NT_MW004", "NSW_MW008"]])

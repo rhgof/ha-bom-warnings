@@ -50,12 +50,30 @@ Saving reloads the entry, with no restart. Entries from before the checklist are
 they load: an empty type filter becomes every type on, and a filter with names becomes just those
 types; Marine wind and Hazardous surf are on only if coastal waters were on.
 
-### Per-warning-type sensors
+### Per-warning-type level sensors
 
-A binary sensor per warning type is on while a current warning of that type covers the location.
-Use these in automations, for example to close the blinds on a severe thunderstorm warning. The
-highest severity is in the `severity` attribute. BoM sends `unknown` for Severe Thunderstorm
-warnings, which ranks between moderate and severe.
+One sensor per warning type says how bad the current warnings of that type are at the location. Its
+state is the highest level among them, or `none`. The states, lowest first:
+
+| State | Meaning |
+| --- | --- |
+| `none` | No current warning of this type |
+| `minor`, `moderate`, `severe`, `extreme` | The warning's CAP severity |
+| `unrated` | BoM sends the severity `unknown` for Severe Thunderstorm and Severe Weather warnings. It is shown as `unrated`, because `unknown` is Home Assistant's own no-value state. It ranks between `moderate` and `severe`. |
+
+The top warning's `headline`, `expires`, `product_id` and `event` are attributes (all empty when the
+state is `none`), so a tile can show them. The `warnings` attribute lists every current warning of the
+type with its severity, phase and times. The sensors have no unit and keep no history statistics.
+
+In an automation, trigger when the state changes to the levels you care about, for example to close
+the blinds on a thunderstorm warning:
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.home_thunderstorm_warning
+    to: [unrated, severe, extreme]
+```
 
 | Sensor | BoM warning |
 | --- | --- |
@@ -78,7 +96,7 @@ Its `note` attribute says so. It is still a good thing to show on a dashboard.
 
 **Marine wind is not wind at your house.** BoM's Wind event is for coastal and local waters; damaging
 winds on land arrive as the Severe weather warning. The Marine wind sensor's `note` attribute says
-so. Both marine sensors turn on only when the location's circle reaches a coastal or local water
+so. Both marine sensors rate a warning only when the location's circle reaches a coastal or local water
 zone, so a land point never turns them on. Tsunami comes with #25.
 
 ## Dev instance

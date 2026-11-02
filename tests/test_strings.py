@@ -9,6 +9,7 @@ import pytest
 
 from custom_components.bom_warnings.const import OTHER_WARNINGS, WARNING_TYPE_SENSORS
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
+from custom_components.bom_warnings.sensor import LEVEL_OPTIONS
 
 COMPONENT = Path(__file__).parent.parent / "custom_components" / "bom_warnings"
 STRINGS = COMPONENT / "strings.json"
@@ -72,11 +73,22 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
         "warning_count",
         "most_severe_warning",
     }
+    # The per-type sensors take their translation key from WARNING_TYPE_SENSORS, not a literal.
 
 
 @pytest.mark.parametrize("key", ["fire_danger_today", "fire_danger_tomorrow"])
 def test_fire_danger_translates_every_enum_option(key: str) -> None:
     assert set(load(STRINGS)["entity"]["sensor"][key]["state"]) == set(LEVEL_KEYS)
+
+
+@pytest.mark.parametrize("key", [key for _, key in WARNING_TYPE_SENSORS])
+def test_every_warning_type_sensor_is_named_and_translates_every_level(key: str) -> None:
+    sensor = load(STRINGS)["entity"]["sensor"][key]
+    assert sensor["name"].strip()
+    assert set(sensor["state"]) == set(LEVEL_OPTIONS)
+    assert all(text.strip() for text in sensor["state"].values())
+    # The type sensors are level sensors now; no binary sensor of that name may linger.
+    assert key not in load(STRINGS)["entity"]["binary_sensor"]
 
 
 @pytest.mark.parametrize(

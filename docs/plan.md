@@ -208,9 +208,33 @@ visibility or enablement. Replaced by one idea, relevance.
    for a removed sensor shows "entity not available" until it is deleted.
 7. **Migration (config entry version 1 to 2).** An empty filter turns every land type and Other on;
    a filter with names turns only those on; a name with no row means Other; Marine wind and surf
-   are on only if `include_marine` was on (and named, if the filter had names). Sensors that were
-   disabled by default and never touched are enabled for types that are on; a sensor the user
-   disabled themselves stays disabled.
+   are on only if `include_marine` was on (and named, if the filter had names). The old per-type
+   binary sensors are removed by the version 3 step (see the level sensors decision below), so the
+   disabled-by-default sensors need no separate handling.
+
+## Decision (3 Nov 2026): the type sensors are level sensors (#37)
+
+Owner decision, applied on the #37 branch before it is merged: the per-type entities are enum
+`sensor`s, not `binary_sensor`s. Reason: one entity per question, and the state says how bad it is,
+as the fire danger sensors already do. This **replaces "severity as an attribute"** (#30).
+
+1. **State:** the highest level among the type's current warnings in force, or `none`. States, lowest
+   first: `none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`. The existing ranking is kept.
+2. **`unrated` is BoM's CAP `unknown`.** BoM sends it for Severe Thunderstorm and Severe Weather
+   warnings. `unknown` is Home Assistant's own no-value state, so we never use it as ours.
+3. **Attributes (top level, for tiles):** the top warning's `headline`, `expires`, `product_id` and
+   `event` (all empty when `none`), the `warnings` list as before, and the `note` on Severe weather
+   and Marine wind. `severity` is gone: it is the state. The safety device class is dropped, there is
+   no state class, and icons still come from `EVENT_ICONS`.
+4. **Unchanged:** the any-warning binary sensor, count, most severe and event entity, and all #37
+   checklist semantics (off removes the sensor, Other warnings, marine toggles, hide final).
+5. **Migration (config entry version 3).** The domain changed, so the old
+   `binary_sensor.<name>_<type>_warning` registry rows are removed for every entry (also those that
+   come through the version 1 to 2 step). The level sensors are new entities with the same unique
+   ids, so nothing is orphaned. Dashboards and automations that used the binary sensors must be
+   pointed at `sensor.<name>_<type>_warning` and a state trigger.
+6. **Consequence:** a sensor the user had disabled themselves is not carried over; the new sensor is
+   created enabled.
 
 ## Open questions to verify first
 

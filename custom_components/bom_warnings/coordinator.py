@@ -103,6 +103,19 @@ class ActiveWarning:
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
 
 
+def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
+    """One warning as the list attributes of the binary sensors and the type sensors show it."""
+    return {
+        "product_id": warning.product_id,
+        "event": warning.event,
+        "headline": warning.headline,
+        "severity": str(warning.severity),
+        "phase": str(warning.phase),
+        "effective": warning.effective.isoformat() if warning.effective else None,
+        "expires": warning.expires.isoformat() if warning.expires else None,
+    }
+
+
 def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
     if info.is_active(now):
         return True

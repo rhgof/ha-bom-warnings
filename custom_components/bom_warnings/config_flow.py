@@ -56,7 +56,7 @@ class _LocationError(Exception):
 class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Pick the Home Assistant home location, a zone, or type coordinates."""
 
-    VERSION = 2
+    VERSION = 3
 
     @staticmethod
     @callback

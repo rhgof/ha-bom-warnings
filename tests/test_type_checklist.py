@@ -41,7 +41,7 @@ pytestmark = pytest.mark.freeze_time(NOW)
 TYPE_KEYS = [key for _, key in WARNING_TYPE_SENSORS]
 MARINE_KEYS = ["marine_wind_warning", "hazardous_surf_warning"]
 LAND_KEYS = [key for key in TYPE_KEYS if key not in MARINE_KEYS]
-THUNDERSTORM = "binary_sensor.home_thunderstorm_warning"
+THUNDERSTORM = "sensor.home_thunderstorm_warning"
 
 
 def events_listed(hass: HomeAssistant, entity_id: str = ANY_WARNING) -> set[str]:
@@ -71,7 +71,7 @@ async def test_a_new_entry_has_every_type_on_and_every_sensor_enabled(
 
     registry = er.async_get(hass)
     for key in TYPE_KEYS:
-        entity_id = f"binary_sensor.home_{key}"
+        entity_id = f"sensor.home_{key}"
         entry = registry.async_get(entity_id)
         assert entry is not None, entity_id
         assert entry.disabled_by is None
@@ -89,7 +89,7 @@ async def test_turning_a_type_off_removes_it_everywhere_and_back_on_restores_it(
     await setup_entry(hass, mock_config_entry)
     assert events_listed(hass) == {"Extreme Heat", "Thunderstorm"}
     assert hass.states.get(COUNT).state == "2"  # type: ignore[union-attr]
-    assert hass.states.get(THUNDERSTORM).state == STATE_ON  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == "unrated"  # type: ignore[union-attr]
 
     await set_options(hass, mock_config_entry, thunderstorm_warning=False)
 
@@ -101,13 +101,13 @@ async def test_turning_a_type_off_removes_it_everywhere_and_back_on_restores_it(
     assert registry.async_get(THUNDERSTORM) is None
     assert hass.states.get(THUNDERSTORM) is None
     # The other types keep their sensors.
-    assert registry.async_get("binary_sensor.home_extreme_heat_warning") is not None
+    assert registry.async_get("sensor.home_extreme_heat_warning") is not None
 
     await set_options(hass, mock_config_entry, thunderstorm_warning=True)
 
     assert events_listed(hass) == {"Extreme Heat", "Thunderstorm"}
     assert registry.async_get(THUNDERSTORM) is not None
-    assert hass.states.get(THUNDERSTORM).state == STATE_ON  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == "unrated"  # type: ignore[union-attr]
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008", "QLD_PW001"]])
@@ -130,7 +130,7 @@ async def test_every_type_off_leaves_nothing_counted(
     remaining = [
         entity.entity_id
         for entity in registry.entities.values()
-        if entity.domain == "binary_sensor" and entity.entity_id != ANY_WARNING
+        if any((entity.unique_id or "").endswith(f"_{key}") for key in TYPE_KEYS)
     ]
     assert remaining == []
 
@@ -165,8 +165,8 @@ async def test_marine_wind_is_a_toggle_and_never_re_resolves(
     scenarios.apply("all_types", fake_bom.root)
     set_zone(hass)
     await setup_entry(hass, zone_entry)
-    wind = "binary_sensor.holiday_house_marine_wind_warning"
-    assert hass.states.get(wind).state == STATE_ON  # type: ignore[union-attr]
+    wind = "sensor.holiday_house_marine_wind_warning"
+    assert hass.states.get(wind).state == "severe"  # type: ignore[union-attr]
     assert "Wind" in events_listed(hass, "binary_sensor.holiday_house_warning")
 
     await set_options(hass, zone_entry, marine_wind_warning=False)
@@ -179,7 +179,7 @@ async def test_marine_wind_is_a_toggle_and_never_re_resolves(
 
     await set_options(hass, zone_entry, marine_wind_warning=True)
 
-    assert hass.states.get(wind).state == STATE_ON  # type: ignore[union-attr]
+    assert hass.states.get(wind).state == "severe"  # type: ignore[union-attr]
     resolve.assert_not_called()
 
 
@@ -193,7 +193,7 @@ async def test_other_warnings_covers_a_type_with_no_row(
 ) -> None:
     """Surf stands in for a type BoM adds later: it has no row, so the Other toggle governs it."""
     without_surf = tuple(row for row in WARNING_TYPE_SENSORS if row[0] != "Large Coastal Surf")
-    for module in ("binary_sensor", "coordinator", "warning_types"):
+    for module in ("sensor", "coordinator", "warning_types"):
         monkeypatch.setattr(
             f"custom_components.bom_warnings.{module}.WARNING_TYPE_SENSORS", without_surf
         )
@@ -261,7 +261,7 @@ async def test_an_entry_from_before_the_checklist_is_migrated(
     await setup_entry(hass, entry)
 
     assert entry.state is ConfigEntryState.LOADED
-    assert entry.version == 2
+    assert entry.version == 3
     assert set(entry.options[CONF_WARNING_TYPES]) == set(kept)
     assert entry.options[CONF_HIDE_FINAL] is False
     assert "event_types" not in entry.options
@@ -292,28 +292,33 @@ async def test_an_entry_with_no_options_at_all_is_migrated(
     assert set(entry.options[CONF_WARNING_TYPES]) == set(LAND_KEYS + [OTHER_WARNINGS])
 
 
+@pytest.mark.parametrize("version", [1, 2])
 @pytest.mark.parametrize(
     ("old", "thunderstorm_after", "frost_after"),
     [
-        pytest.param({}, "enabled", "user-disabled", id="on-types-are-enabled"),
-        pytest.param({"event_types": ["Frost"]}, "removed", "user-disabled", id="off-types-go"),
+        pytest.param({}, True, True, id="every-type-on"),
+        pytest.param({"event_types": ["Frost"]}, False, True, id="only-frost"),
     ],
 )
-async def test_migration_enables_the_old_default_disabled_sensors_of_types_that_are_on(
+async def test_the_old_binary_type_sensors_are_removed_and_replaced_by_level_sensors(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     layers: MagicMock,  # noqa: F811
+    version: int,
     old: dict[str, Any],
-    thunderstorm_after: str,
-    frost_after: str,
+    thunderstorm_after: bool,
+    frost_after: bool,
 ) -> None:
-    """Sensors were disabled by default; those the user did not touch must not stay disabled."""
+    """The type sensors used to be binary sensors, so nothing may be left orphaned."""
+    options: dict[str, Any] = old
+    if version == 2:
+        options = {CONF_WARNING_TYPES: ["frost_warning"] if "event_types" in old else TYPE_KEYS}
     entry = MockConfigEntry(
         domain=DOMAIN,
-        version=1,
+        version=version,
         unique_id="-27.470,153.021",
         title="Home",
-        options=old,
+        options=options,
         data={
             CONF_LATITUDE: -27.47,
             CONF_LONGITUDE: 153.021,
@@ -325,7 +330,8 @@ async def test_migration_enables_the_old_default_disabled_sensors_of_types_that_
     registry = er.async_get(hass)
     for key, disabled_by in (
         ("thunderstorm_warning", er.RegistryEntryDisabler.INTEGRATION),
-        ("frost_warning", er.RegistryEntryDisabler.USER),
+        ("frost_warning", None),
+        ("marine_wind_warning", er.RegistryEntryDisabler.USER),
     ):
         registry.async_get_or_create(
             "binary_sensor",
@@ -339,15 +345,19 @@ async def test_migration_enables_the_old_default_disabled_sensors_of_types_that_
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    thunder = registry.async_get(THUNDERSTORM)
-    if thunderstorm_after == "removed":
-        assert thunder is None
-    else:
-        assert thunder is not None and thunder.disabled_by is None
+    assert entry.version == 3
+    old_binaries = [
+        e.entity_id
+        for e in registry.entities.values()
+        if e.domain == "binary_sensor" and e.entity_id != ANY_WARNING
+    ]
+    assert old_binaries == []
+    assert (registry.async_get(THUNDERSTORM) is not None) is thunderstorm_after
+    assert (registry.async_get("sensor.home_frost_warning") is not None) is frost_after
+    if thunderstorm_after:
+        thunderstorm = registry.async_get(THUNDERSTORM)
+        assert thunderstorm is not None and thunderstorm.disabled_by is None
         assert hass.states.get(THUNDERSTORM) is not None
-    frost = registry.async_get("binary_sensor.home_frost_warning")
-    assert frost is not None
-    assert frost.disabled_by is er.RegistryEntryDisabler.USER
 
 
 async def test_the_zone_step_no_longer_asks_about_coastal_waters(

@@ -92,36 +92,29 @@ async def async_unload_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry)
 
 
 async def async_migrate_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> bool:
-    """Version 1 had an event-type filter and a coastal-waters switch; version 2 has a checklist."""
-    if entry.version > 2:
+    """Version 2 replaced the type filter and coastal waters switch with a checklist; 3 made the
+    per-type sensors level sensors instead of binary sensors."""
+    if entry.version > 3:
         return False
     if entry.version == 1:
-        on = keys_from_legacy_options(entry.options)
         options = {
             key: value
             for key, value in entry.options.items()
             if key not in (CONF_EVENT_TYPES, CONF_INCLUDE_MARINE)
         }
-        options[CONF_WARNING_TYPES] = on
-        _enable_old_default_disabled_sensors(hass, entry, set(on))
+        options[CONF_WARNING_TYPES] = keys_from_legacy_options(entry.options)
         hass.config_entries.async_update_entry(entry, options=options, version=2)
+    if entry.version == 2:
+        _remove_old_binary_type_sensors(hass, entry)
+        hass.config_entries.async_update_entry(entry, version=3)
     return True
 
 
-def _enable_old_default_disabled_sensors(
-    hass: HomeAssistant, entry: BomWarningsConfigEntry, on: set[str]
-) -> None:
-    """Per-type sensors used to be disabled by default; one the user never touched must not stay so.
-
-    A sensor the user disabled themselves is left alone. Sensors of types that are off are removed
-    when the entry loads.
-    """
+def _remove_old_binary_type_sensors(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
+    """The per-type entities used to be binary sensors. Their domain changed, so the registry rows
+    would be orphaned: remove them. The level sensors are new entities with the same unique ids."""
     registry = er.async_get(hass)
     unique_id = entry.unique_id or entry.entry_id
     for _, key in WARNING_TYPE_SENSORS:
-        entity_id = registry.async_get_entity_id("binary_sensor", DOMAIN, f"{unique_id}_{key}")
-        if not entity_id or key not in on:
-            continue
-        registered = registry.async_get(entity_id)
-        if registered and registered.disabled_by is er.RegistryEntryDisabler.INTEGRATION:
-            registry.async_update_entity(entity_id, disabled_by=None)
+        if entity_id := registry.async_get_entity_id("binary_sensor", DOMAIN, f"{unique_id}_{key}"):
+            registry.async_remove(entity_id)

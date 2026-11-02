@@ -82,47 +82,143 @@
           "extreme": "Extreme",
           "catastrophic": "Catastrophic"
         }
+      },
+      "thunderstorm_warning": {
+        "name": "Thunderstorm warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "fire_weather_warning": {
+        "name": "Fire weather warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "extreme_heat_warning": {
+        "name": "Extreme heat warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "frost_warning": {
+        "name": "Frost warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "hazardous_road_conditions_warning": {
+        "name": "Hazardous road conditions warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "flood_warning": {
+        "name": "Flood warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "sheep_grazier_warning": {
+        "name": "Sheep grazier warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "exposure_warning": {
+        "name": "Exposure warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "tropical_cyclone_warning": {
+        "name": "Tropical cyclone warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "severe_weather_warning": {
+        "name": "Severe weather warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "marine_wind_warning": {
+        "name": "Marine wind warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
+      },
+      "hazardous_surf_warning": {
+        "name": "Hazardous surf warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme"
+        }
       }
     },
     "binary_sensor": {
       "warning": {
         "name": "Warning"
-      },
-      "thunderstorm_warning": {
-        "name": "Thunderstorm warning"
-      },
-      "fire_weather_warning": {
-        "name": "Fire weather warning"
-      },
-      "extreme_heat_warning": {
-        "name": "Extreme heat warning"
-      },
-      "frost_warning": {
-        "name": "Frost warning"
-      },
-      "hazardous_road_conditions_warning": {
-        "name": "Hazardous road conditions warning"
-      },
-      "flood_warning": {
-        "name": "Flood warning"
-      },
-      "sheep_grazier_warning": {
-        "name": "Sheep grazier warning"
-      },
-      "exposure_warning": {
-        "name": "Exposure warning"
-      },
-      "tropical_cyclone_warning": {
-        "name": "Tropical cyclone warning"
-      },
-      "severe_weather_warning": {
-        "name": "Severe weather warning"
-      },
-      "marine_wind_warning": {
-        "name": "Marine wind warning"
-      },
-      "hazardous_surf_warning": {
-        "name": "Hazardous surf warning"
       }
     },
     "event": {

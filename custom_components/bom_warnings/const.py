@@ -73,7 +73,7 @@ EVENT_ICONS = {
 }
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
 
-# One binary sensor per warning type: (CAP event, translation key). The key is also the name of the
+# One level sensor per warning type: (CAP event, translation key). The key is also the name of the
 # type's toggle in the options checklist, so a type is switched on or off in one place and its
 # sensor exists only while it is on. The icon comes from EVENT_ICONS, the single place an event gets
 # one. A new type is a new row here, plus its name in strings.json. Tsunami has no zones yet (#25).

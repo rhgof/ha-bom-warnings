@@ -70,7 +70,7 @@ def mock_config_entry(area_codes: list[str], entry_options: dict[str, Any]) -> M
     """A location in a QLD forecast district that no baseline warning covers."""
     return MockConfigEntry(
         domain=DOMAIN,
-        version=2,
+        version=3,
         unique_id="-27.470,153.021",
         title="Home",
         options=entry_options,

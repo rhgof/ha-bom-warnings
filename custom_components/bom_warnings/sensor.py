@@ -9,6 +9,7 @@ from typing import Any
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.const import MAX_LENGTH_STATE_STATE as MAX_STATE_LENGTH
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -24,8 +25,15 @@ from .const import (
     FIRE_DANGER_ICONS,
     LEVEL_COLORS,
     NO_WARNING_ICON,
+    WARNING_TYPE_NOTES,
+    WARNING_TYPE_SENSORS,
 )
-from .coordinator import ActiveWarning, BomWarningsCoordinator, FireDangerView
+from .coordinator import (
+    ActiveWarning,
+    BomWarningsCoordinator,
+    FireDangerView,
+    warning_attributes,
+)
 from .fire_danger import LEVEL_KEYS, FireDangerPeriod
 
 PARALLEL_UPDATES = 0
@@ -35,10 +43,26 @@ _LEVEL_RANK = {level: rank for rank, level in enumerate(LEVEL_COLORS)}
 _EPOCH = datetime.min.replace(tzinfo=UTC)
 
 STATE_NONE = "none"
+# The states of a type sensor, lowest first: the ranking above, with BoM's CAP severity `unknown`
+# (sent for Severe Thunderstorm and Severe Weather warnings) called `unrated`, because `unknown` is
+# Home Assistant's own no-value state and must not be a state of ours.
+LEVEL_OPTIONS = [
+    STATE_NONE,
+    *("unrated" if level == "unknown" else level for level in LEVEL_COLORS),
+]
 
 
 def _level(warning: ActiveWarning) -> str:
     return warning.severity.value
+
+
+def highest_level(warnings: Iterable[ActiveWarning]) -> str:
+    """The top level among the warnings still in force, or `none`."""
+    current = rank_warnings(w for w in warnings if w.is_current)
+    if not current:
+        return STATE_NONE
+    level = _level(current[0])
+    return "unrated" if level == "unknown" else level
 
 
 def _icon(warning: ActiveWarning) -> str:
@@ -86,8 +110,25 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data.coordinator
+    registry = er.async_get(hass)
+    unique_id = entry.unique_id or entry.entry_id
+    for _, key in WARNING_TYPE_SENSORS:
+        if key not in coordinator.enabled_types and (
+            entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{unique_id}_{key}")
+        ):
+            # A type that is off has no sensor at all, not a disabled one, so the entity list
+            # only shows what the location cares about. Turning it on again recreates it.
+            registry.async_remove(entity_id)
     async_add_entities(
-        [WarningCountSensor(coordinator, entry), MostSevereWarningSensor(coordinator, entry)]
+        [
+            WarningCountSensor(coordinator, entry),
+            MostSevereWarningSensor(coordinator, entry),
+            *(
+                WarningTypeSensor(coordinator, entry, event, key)
+                for event, key in WARNING_TYPE_SENSORS
+                if key in coordinator.enabled_types
+            ),
+        ]
     )
 
     # Fire danger entities exist only for an entry whose codes are in a fetched product. That
@@ -182,6 +223,60 @@ def _period_item(period: FireDangerPeriod) -> dict[str, Any]:
         "level": period.level,
         "fire_behaviour_index": period.fire_behaviour_index,
     }
+
+
+class WarningTypeSensor(_WarningSensor):
+    """How bad the current warnings of one CAP event are at the location, as a level.
+
+    The state is the highest level among that type's current warnings (`none` when there are
+    none). The top warning's fields are top-level attributes so a tile can show them. Only created
+    for a type that is on in the options checklist.
+    """
+
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = LEVEL_OPTIONS
+
+    def __init__(
+        self,
+        coordinator: BomWarningsCoordinator,
+        entry: BomWarningsConfigEntry,
+        event: str,
+        key: str,
+    ) -> None:
+        self._attr_translation_key = key
+        self._event = event
+        super().__init__(coordinator, entry)
+
+    @property
+    def _warnings(self) -> tuple[ActiveWarning, ...]:
+        return self.coordinator.by_event.get(self._event, ())
+
+    @property
+    def _top_current(self) -> ActiveWarning | None:
+        current = rank_warnings(w for w in self._warnings if w.is_current)
+        return current[0] if current else None
+
+    @property
+    def native_value(self) -> str:
+        return highest_level(self._warnings)
+
+    @property
+    def icon(self) -> str:
+        return EVENT_ICONS.get(self._event, DEFAULT_EVENT_ICON)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        top = self._top_current
+        attributes: dict[str, Any] = {
+            "headline": top.headline if top else None,
+            "expires": top.expires.isoformat() if top and top.expires else None,
+            "product_id": top.product_id if top else None,
+            "event": top.event if top else None,
+            "warnings": [warning_attributes(w) for w in self._warnings],
+        }
+        if note := WARNING_TYPE_NOTES.get(self._event):
+            attributes["note"] = note
+        return attributes
 
 
 class FireDangerSensor(_WarningSensor):
