@@ -177,9 +177,13 @@ has been run against the dev instance.
   offset in the product's `issue-time-local` (a fixed offset, so a daylight-saving change between
   issue and read can be off by an hour around midnight). The morning issue starts today, the
   afternoon issue starts tomorrow. The coordinator remembers every period it has seen for the
-  entry's district (in memory only), so today's rating survives the afternoon issue. After a restart
-  or reload that memory is empty: after an afternoon issue, today is unknown until the next morning
-  issue. When no period covers a day, the state is unknown.
+  entry's district and persists them in a per-entry `Store` (`bom_warnings.fire_danger.<entry_id>`,
+  saved when they change, loaded before the first refresh, deleted with the entry). A period is
+  shown only on its own local date, so a remembered rating is valid until the end of that local day
+  and is replaced as soon as a newer issue covers the day; periods older than yesterday are
+  pruned from the store. So today's rating survives the afternoon issue and a restart. Gap: if HA
+  was down for the whole morning issue and starts after the afternoon one, today is unknown. After a
+  restart the entities still wait for a fetched product, as before. When no period covers a day, the state is unknown.
 - **Entities** are created when the entry's codes match a fetched product, or later when one
   arrives (a listener adds them once). After that they go unavailable, never removed, if the
   district leaves the product. A failed or missing file keeps the previous data, so they stay

@@ -10,14 +10,17 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.storage import Store
 
 from .const import DOMAIN
 from .coordinator import (
+    FIRE_STORE_VERSION,
     BomWarningsCoordinator,
     async_abandon_setup,
     async_acquire_feed,
     async_release_feed,
     async_release_removed_entry,
+    fire_store_key,
     no_area_issue_id,
 )
 from .ftp import BomFtpError, client_from_env
@@ -46,6 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
         # The feed's own client may be in use on another thread, so this entry gets its own.
         ftp = client_from_env(os.environ)
         coordinator = BomWarningsCoordinator(hass, entry, feed, ftp)
+        await coordinator.async_load_remembered()
         await coordinator.async_config_entry_first_refresh()
     except BomFtpError as err:
         await async_abandon_setup(hass, entry)
@@ -62,8 +66,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
 
 
 async def async_remove_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
-    """Drop the entry's repair issue, which would otherwise outlive it."""
+    """Drop the entry's repair issue and remembered ratings, which would otherwise outlive it."""
     ir.async_delete_issue(hass, DOMAIN, no_area_issue_id(entry))
+    await Store(hass, FIRE_STORE_VERSION, fire_store_key(entry)).async_remove()
     await async_release_removed_entry(hass, entry)
 
 

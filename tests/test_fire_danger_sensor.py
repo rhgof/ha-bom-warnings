@@ -326,8 +326,25 @@ async def test_todays_rating_is_remembered_after_the_afternoon_issue_drops_it(
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW001"]])
-async def test_the_remembered_rating_is_gone_after_a_reload(
-    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
+@pytest.mark.parametrize(
+    ("restart_at", "today", "tomorrow"),
+    [
+        # Same local day as the remembered rating (3 Nov): it survives the restart.
+        ("2026-11-03 06:00:00+00:00", "no_rating", "no_rating"),
+        ("2026-11-03 12:59:00+00:00", "no_rating", "no_rating"),
+        # Local midnight: 3 Nov is over and the issue's own 4 Nov period takes over.
+        ("2026-11-03 13:00:00+00:00", "no_rating", "moderate"),
+    ],
+    ids=["afternoon", "before_midnight", "next_day"],
+)
+async def test_the_remembered_rating_survives_a_reload_until_the_end_of_its_local_day(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+    restart_at: str,
+    today: str,
+    tomorrow: str,
 ) -> None:
     freezer.move_to(AFTER_THE_05_05_ISSUE)
     await setup_entry(hass, mock_config_entry)
@@ -335,11 +352,61 @@ async def test_the_remembered_rating_is_gone_after_a_reload(
     freezer.move_to("2026-11-03 06:00:00+00:00")
     await poll(hass, freezer)
 
+    freezer.move_to(restart_at)
     await hass.config_entries.async_reload(mock_config_entry.entry_id)
     await hass.async_block_till_done()
 
-    assert state_of(hass, TODAY).state == STATE_UNKNOWN
-    assert state_of(hass, TOMORROW).state == "no_rating"
+    assert state_of(hass, TODAY).state == today
+    assert state_of(hass, TOMORROW).state == tomorrow
+
+
+@pytest.mark.parametrize("area_codes", [["NSW_FW004"]])
+async def test_a_restored_rating_never_outlives_its_day_and_is_pruned_from_storage(
+    hass: HomeAssistant,
+    hass_storage: dict[str, Any],
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+) -> None:
+    # NSW_FW004 is Moderate on the 3rd and 4th, High on the 5th (the capture).
+    freezer.move_to(AFTER_THE_05_05_ISSUE)
+    await setup_entry(hass, mock_config_entry)
+    assert state_of(hass, TODAY).state == "moderate"
+    stored = hass_storage[f"bom_warnings.fire_danger.{mock_config_entry.entry_id}"]["data"]
+    assert [p["date"] for p in stored["periods"]] == [
+        "2026-11-03",
+        "2026-11-04",
+        "2026-11-05",
+        "2026-11-06",
+    ]
+
+    # Down for two days: the 3rd must not be shown on the 5th, nor kept in storage.
+    freezer.move_to("2026-11-05 00:30:00+00:00")  # 11:30 on 5 Nov
+    await hass.config_entries.async_reload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert state_of(hass, TODAY).state == "high"
+    stored = hass_storage[f"bom_warnings.fire_danger.{mock_config_entry.entry_id}"]["data"]
+    assert [p["date"] for p in stored["periods"]][0] == "2026-11-04"
+
+
+@pytest.mark.parametrize("area_codes", [["NSW_FW001"]])
+async def test_removing_the_entry_deletes_its_remembered_ratings(
+    hass: HomeAssistant,
+    hass_storage: dict[str, Any],
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+) -> None:
+    freezer.move_to(AFTER_THE_05_05_ISSUE)
+    await setup_entry(hass, mock_config_entry)
+    key = f"bom_warnings.fire_danger.{mock_config_entry.entry_id}"
+    assert key in hass_storage
+
+    await hass.config_entries.async_remove(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert key not in hass_storage
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW004"]])

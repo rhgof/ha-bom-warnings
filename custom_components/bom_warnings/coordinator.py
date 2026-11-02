@@ -11,9 +11,11 @@ from datetime import date, datetime, timedelta, tzinfo
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
@@ -57,6 +59,11 @@ UPDATE_INTERVAL = timedelta(minutes=10)
 FAILURES_BEFORE_REPAIR = 3
 # One issue for the whole integration: the refresh is shared, so its failure is too.
 REFRESH_ISSUE_ID = "refresh_failing"
+FIRE_STORE_VERSION = 1
+
+
+def fire_store_key(entry: ConfigEntry) -> str:
+    return f"{DOMAIN}.fire_danger.{entry.entry_id}"
 
 
 def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
@@ -454,8 +461,45 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # This entry's fire district, or None when no stored code is in a fetched product.
         self.fire_danger: FireDangerView | None = None
         # Periods seen in earlier issues, so the afternoon issue (which starts tomorrow) does not
-        # erase today's rating. In memory only: a restart forgets it until the next morning issue.
+        # erase today's rating. Persisted, so a restart in the afternoon keeps it too. A period is
+        # only ever shown on its own local date, so it expires at the end of that day.
         self._remembered: tuple[str, dict[date, FireDangerPeriod]] = ("", {})
+        self._fire_store: Store[dict[str, Any]] = Store(
+            hass, FIRE_STORE_VERSION, fire_store_key(config_entry)
+        )
+
+    async def async_load_remembered(self) -> None:
+        """Restore the remembered fire danger periods; call before the first refresh."""
+        stored = await self._fire_store.async_load()
+        if not stored:
+            return
+        try:
+            periods = {
+                (d := date.fromisoformat(item["date"])): FireDangerPeriod(
+                    d, item["level"], item["fire_behaviour_index"]
+                )
+                for item in stored["periods"]
+            }
+            self._remembered = (stored["district"], periods)
+        except KeyError, TypeError, ValueError:
+            # A damaged file is replaced by the next save; the next issue refills it.
+            _LOGGER.debug("Ignoring unreadable remembered fire danger data")
+
+    async def _async_save_remembered(self) -> None:
+        code, periods = self._remembered
+        await self._fire_store.async_save(
+            {
+                "district": code,
+                "periods": [
+                    {
+                        "date": p.date.isoformat(),
+                        "level": p.level,
+                        "fire_behaviour_index": p.fire_behaviour_index,
+                    }
+                    for _, p in sorted(periods.items())
+                ],
+            }
+        )
 
     @property
     def consecutive_failures(self) -> int:
@@ -556,5 +600,8 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             "event_types": self._event_types,
         }
         self.states = _states(warnings, self._area_codes, now, self._event_types)
+        before = self._remembered
         self.fire_danger = self._derive_fire_danger(snapshot, now)
+        if self._remembered != before:
+            await self._async_save_remembered()
         return _covering(warnings, self._area_codes, now, **filters)
