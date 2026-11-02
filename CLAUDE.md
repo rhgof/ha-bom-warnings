@@ -33,7 +33,9 @@ Private custom component, official sources only. General HA rules are in `../CLA
 ## Commands
 
 - Tests: `.venv/bin/python -m pytest -q`
-- Include the real-shapefile tests: `BOM_SPATIAL_DIR=<dir with unzipped IDM*> .venv/bin/python -m pytest -q`
+- Include the real-shapefile tests: `BOM_SPATIAL_DIR=<dir with unzipped IDM*> .venv/bin/python -m pytest -q`.
+  It needs all six layers (including `IDM00003`), one folder each; see "Testing" in
+  `docs/architecture.md`.
 - Lint and types: `.venv/bin/ruff check . && .venv/bin/ruff format --check .`, and
   `.venv/bin/mypy --explicit-package-bases custom_components` (bare `mypy` has no target and fails).
 - Tests use recorded fixtures only and never touch the network.

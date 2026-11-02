@@ -174,6 +174,22 @@ Home Assistant layer:
 `BOM_SPATIAL_DIR` pointing at a directory with one folder per layer
 (`IDM00001/IDM00001.shp`, ...); see `CLAUDE.md`.
 
+- Location matching (`areas.py`, `spatial.py`, zones) is tested in two tiers:
+  - Synthetic polygons written with pyshp (`tests/test_areas.py`) run everywhere. They cover
+    holes, multipart shapes, a radius reaching a neighbour, and the 0 m radius equalling the point
+    test.
+  - Real-shapefile tests are skipped unless `BOM_SPATIAL_DIR` is set. It needs all six layers
+    (`IDM00001`, `IDM00003`, `IDM00007`, `IDM00014`, `IDM00017`, `IDM00020`), each unzipped into
+    its own folder. Fetch the zips read-only from `ftp://ftp.bom.gov.au/anon/home/adfd/spatial/`
+    into an empty directory outside the repo. They use central Sydney: 100 m equals the point
+    result, 2 km reaches `NSW_MW009`, 12 km adds `NSW_MW004`, 50 km reaches `NSW_MW003` but not
+    `NSW_MW008`.
+  - The speed test only guards against an accidental quadratic (bound 5 s). Matching costs about
+    0.33 s for any point, because every shape is parsed before the bounding box is checked, and
+    about 0.6 s in central Australia (huge polygons) at the 50 km cap. To re-measure, time
+    `resolve_area_codes` on the real layers at `-25.0, 135.0` with `radius_m=50_000`.
+  - The config flow tests patch `resolve_coordinate`, so they never need shapefiles. Zone edits,
+    deletion and `include_marine` are tested through Home Assistant in `tests/test_zones.py`.
 - Recorded CAP files live in `tests/fixtures/cap/`. Add new ones by capturing real BoM output.
 - `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and listings
   and can change, remove and fail files (a rejected or timed-out wildcard listing).
