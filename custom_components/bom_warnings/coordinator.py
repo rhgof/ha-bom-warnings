@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
@@ -51,6 +52,7 @@ class ActiveWarning:
     severity: Severity
     effective: datetime | None
     expires: datetime | None
+    sent: datetime | None = None
     # Last, with a default, so existing constructors keep working.
     phase: Phase = Phase.UNKNOWN
 
@@ -62,16 +64,16 @@ def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
     return ended and not hide_final and (info.expires is None or info.expires > now)
 
 
-def _covering(
+def _active(
     warnings: list[CapWarning],
-    area_codes: frozenset[str],
     now: datetime,
+    matches: Callable[[Info], bool],
     *,
     hide_final: bool = True,
     event_types: frozenset[str] = frozenset(),
 ) -> tuple[ActiveWarning, ...]:
     # Match per info block: one file can mix areas, so a warning-level match could report an
-    # inactive block that happens to share the file with a covering one.
+    # inactive block that happens to share the file with a matching one.
     return tuple(
         ActiveWarning(
             product_id=warning.product_id,
@@ -80,13 +82,44 @@ def _covering(
             severity=info.severity,
             effective=info.effective,
             expires=info.expires,
+            sent=warning.sent,
             phase=info.phase,
         )
         for warning in warnings
         for info in warning.infos
         if _shown(info, now, hide_final)
-        and info.area_codes & area_codes
+        and matches(info)
         and (not event_types or info.event in event_types)
+    )
+
+
+def _covering(
+    warnings: list[CapWarning],
+    area_codes: frozenset[str],
+    now: datetime,
+    **filters: Any,
+) -> tuple[ActiveWarning, ...]:
+    return _active(warnings, now, lambda info: bool(info.area_codes & area_codes), **filters)
+
+
+def _in_state(
+    warnings: list[CapWarning],
+    state: str,
+    area_codes: frozenset[str],
+    now: datetime,
+    **filters: Any,
+) -> tuple[ActiveWarning, ...]:
+    # Area codes are prefixed with the state ("QLD_PW001"). Also keep warnings that cover the
+    # entry, in case a location sits across a border.
+    prefix = f"{state}_"
+    return _active(
+        warnings,
+        now,
+        lambda info: (
+            bool(info.area_codes & area_codes)
+            or any(code.startswith(prefix) for code in info.area_codes)
+        ),
+        **filters,
     )
 
 
@@ -113,6 +146,10 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self._ftp = ftp
         self._reader = WarningReader(ftp)
         self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
+        self._state: str = config_entry.data[CONF_STATE]
+        # Every current warning in the entry's state, for the count and most-severe sensors.
+        # `data` stays limited to warnings covering the location.
+        self.state_warnings: tuple[ActiveWarning, ...] = ()
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
         self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
         self._issue_id = f"no_area_{config_entry.entry_id}"
@@ -158,6 +195,7 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         if codes == self._area_codes:
             return
         self._area_codes = frozenset(codes)
+        self._state = state_of(codes)
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
@@ -180,10 +218,9 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             self._next_layer_check = now + LAYER_CHECK_INTERVAL
         if new_codes is not None:
             self._apply_resolved(new_codes)
-        return _covering(
-            warnings,
-            self._area_codes,
-            now,
-            hide_final=self._hide_final,
-            event_types=self._event_types,
-        )
+        filters: dict[str, Any] = {
+            "hide_final": self._hide_final,
+            "event_types": self._event_types,
+        }
+        self.state_warnings = _in_state(warnings, self._state, self._area_codes, now, **filters)
+        return _covering(warnings, self._area_codes, now, **filters)
