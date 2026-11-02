@@ -1,18 +1,22 @@
-"""Polls the BoM warning feed for one config entry."""
+"""One shared nationwide refresh, and one coordinator per config entry that filters it."""
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.core import HomeAssistant
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
+from homeassistant.util.hass_dict import HassKey
 
 from .cap import CapWarning, Info, Phase, Severity
 from .config_flow import state_of
@@ -27,7 +31,7 @@ from .const import (
     SPATIAL_CACHE_DIR,
 )
 from .feed import WarningReader
-from .ftp import BomFtp, BomFtpError
+from .ftp import BomFtp, BomFtpError, client_from_env
 from .spatial import RefreshResult, SpatialDataError, refresh_layers, resolve_coordinate
 
 if TYPE_CHECKING:
@@ -39,10 +43,12 @@ _LOGGER = logging.getLogger(__name__)
 UPDATE_INTERVAL = timedelta(minutes=10)
 # A single failed poll is routine; three in a row (30 minutes) is worth telling the user about.
 FAILURES_BEFORE_REPAIR = 3
+# One issue for the whole integration: the refresh is shared, so its failure is too.
+REFRESH_ISSUE_ID = "refresh_failing"
 
 
-def refresh_issue_id(entry: BomWarningsConfigEntry) -> str:
-    return f"refresh_failing_{entry.entry_id}"
+def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
+    return f"no_area_{entry.entry_id}"
 
 
 # Shapefile layers change rarely, so checking their server times every poll would be wasted FTP
@@ -175,61 +181,172 @@ def _states(
     return states
 
 
-class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
-    """One coordinator, one FTP reader and one location per config entry.
+@dataclass(frozen=True, slots=True)
+class FeedSnapshot:
+    """The nationwide result of one refresh, before any entry filters it."""
 
-    Ticket #21 shares a single nationwide refresh between locations. The seam for that is
-    `_refresh`: it already returns every current warning, and only `_covering` is specific to
-    this entry's area codes, so that is where the split goes.
+    warnings: tuple[CapWarning, ...]
+    # Bumped whenever a shapefile layer changed, so each entry re-resolves its own location once.
+    layer_generation: int
+
+
+class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
+    """The one FTP refresh of the whole integration, shared by every config entry.
+
+    It polls only while an entry is listening, so it starts with the first loaded entry and stops
+    when the last one detaches. The failure count lives here, so there is one repair issue.
+    """
+
+    def __init__(self, hass: HomeAssistant, ftp: BomFtp) -> None:
+        super().__init__(
+            hass,
+            _LOGGER,
+            config_entry=None,
+            name=f"{DOMAIN} feed",
+            update_interval=UPDATE_INTERVAL,
+        )
+        self._ftp = ftp
+        self._reader = WarningReader(ftp)
+        self.consecutive_failures = 0
+        self._next_layer_check = dt_util.utcnow()
+        self._layer_generation = 0
+        # Entries using this feed, so the last one to leave can shut it down.
+        self.entry_ids: set[str] = set()
+        self.lock = asyncio.Lock()
+
+    def _refresh(self, check_layers: bool) -> tuple[list[CapWarning], bool]:
+        """Blocking. Returns the warnings, and whether a layer changed."""
+        # One connection per refresh instead of one login per file.
+        with self._ftp.session():
+            changed = False
+            if check_layers:
+                cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
+                result: RefreshResult = refresh_layers(self._ftp, cache_dir)
+                for layer, error in result.failed.items():
+                    # The cached copy stays in use, and the next check retries.
+                    _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
+                changed = bool(result.changed)
+            return self._reader.refresh(), changed
+
+    async def _async_update_data(self) -> FeedSnapshot:
+        now = dt_util.utcnow()
+        check_layers = now >= self._next_layer_check
+        try:
+            warnings, changed = await self.hass.async_add_executor_job(self._refresh, check_layers)
+        except BomFtpError as err:
+            self.consecutive_failures += 1
+            if self.consecutive_failures >= FAILURES_BEFORE_REPAIR:
+                ir.async_create_issue(
+                    self.hass,
+                    DOMAIN,
+                    REFRESH_ISSUE_ID,
+                    is_fixable=False,
+                    severity=ir.IssueSeverity.WARNING,
+                    translation_key="refresh_failing",
+                )
+            raise UpdateFailed(f"Cannot read BoM warnings: {err}") from err
+        self.consecutive_failures = 0
+        ir.async_delete_issue(self.hass, DOMAIN, REFRESH_ISSUE_ID)
+        if check_layers:
+            self._next_layer_check = now + LAYER_CHECK_INTERVAL
+        if changed:
+            self._layer_generation += 1
+        return FeedSnapshot(tuple(warnings), self._layer_generation)
+
+
+FEED: HassKey[SharedFeed] = HassKey(DOMAIN)
+
+
+async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> SharedFeed:
+    """Join the shared feed, creating it and doing its first refresh if this is the first entry."""
+    feed = hass.data.get(FEED)
+    if feed is None:
+        # The only place the feed's client is built, so the dev-only host override applies once.
+        feed = hass.data[FEED] = SharedFeed(hass, client_from_env(os.environ))
+    feed.entry_ids.add(entry.entry_id)
+    async with feed.lock:
+        if feed.data is None or not feed.last_update_success:
+            await feed.async_refresh()
+    if not feed.last_update_success:
+        await async_release_feed(hass, entry)
+        raise ConfigEntryNotReady("Cannot read BoM warnings")
+    return feed
+
+
+async def async_release_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
+    """Leave the shared feed; the last entry out shuts it down and clears its repair issue."""
+    feed = hass.data.get(FEED)
+    if feed is None:
+        return
+    feed.entry_ids.discard(entry.entry_id)
+    if feed.entry_ids:
+        return
+    del hass.data[FEED]
+    await feed.async_shutdown()
+    ir.async_delete_issue(hass, DOMAIN, REFRESH_ISSUE_ID)
+
+
+class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
+    """Derives one config entry's data from the shared nationwide refresh.
+
+    It never polls: it re-derives whenever the shared feed updates. Only the area codes, state,
+    options and layer re-resolution are specific to this entry.
     """
 
     config_entry: BomWarningsConfigEntry
 
     def __init__(
-        self, hass: HomeAssistant, config_entry: BomWarningsConfigEntry, ftp: BomFtp
+        self,
+        hass: HomeAssistant,
+        config_entry: BomWarningsConfigEntry,
+        feed: SharedFeed,
+        ftp: BomFtp,
     ) -> None:
-        super().__init__(
-            hass,
-            _LOGGER,
-            config_entry=config_entry,
-            name=DOMAIN,
-            update_interval=UPDATE_INTERVAL,
-        )
+        super().__init__(hass, _LOGGER, config_entry=config_entry, name=DOMAIN)
+        self._feed = feed
+        # This entry's own client: a BomFtp session is not safe to share between threads.
         self._ftp = ftp
-        self._reader = WarningReader(ftp)
+        self._unsubscribe: CALLBACK_TYPE | None = None
+        self._seen_generation = 0
         self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
-        self.consecutive_failures = 0
         self._state: str = config_entry.data[CONF_STATE]
         # Every current warning in the entry's state, for the count and most-severe sensors.
         # `data` stays limited to warnings covering the location.
         self.state_warnings: tuple[ActiveWarning, ...] = ()
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
         self._event_types = frozenset(config_entry.options.get(CONF_EVENT_TYPES, []))
-        self._issue_id = f"no_area_{config_entry.entry_id}"
-        self._next_layer_check = dt_util.utcnow()
+        self._issue_id = no_area_issue_id(config_entry)
         # Latest state of every covering product in any phase, keyed by product id.
         self.states: dict[str, WarningState] = {}
 
-    def _refresh(self, check_layers: bool) -> tuple[list[CapWarning], set[str] | None]:
-        """Blocking. Returns the warnings, and new area codes when a layer change moved them."""
-        cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
-        data = self.config_entry.data
-        new_codes: set[str] | None = None
-        # One connection per refresh instead of one login per file.
-        with self._ftp.session():
-            if check_layers:
-                new_codes = self._re_resolve(cache_dir, data[CONF_LATITUDE], data[CONF_LONGITUDE])
-            return self._reader.refresh(), new_codes
+    @property
+    def consecutive_failures(self) -> int:
+        return self._feed.consecutive_failures
 
-    def _re_resolve(self, cache_dir: Path, lat: float, lon: float) -> set[str] | None:
-        result: RefreshResult = refresh_layers(self._ftp, cache_dir)
-        for layer, error in result.failed.items():
-            # The cached copy stays in use, and the next check retries.
-            _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
-        if not result.changed:
-            return None
+    def attach(self) -> None:
+        """Follow the shared feed; this is also what keeps the feed polling."""
+        self._unsubscribe = self._feed.async_add_listener(self._on_feed_update)
+
+    def detach(self) -> None:
+        if self._unsubscribe:
+            self._unsubscribe()
+            self._unsubscribe = None
+
+    @callback
+    def _on_feed_update(self) -> None:
+        self.config_entry.async_create_background_task(
+            self.hass, self.async_refresh(), f"{DOMAIN} derive {self.config_entry.entry_id}"
+        )
+
+    def _re_resolve(self) -> set[str] | None:
+        """Blocking. The area codes now covering this entry's location, or None if unknown."""
+        data = self.config_entry.data
+        cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
         try:
-            return resolve_coordinate(self._ftp, cache_dir, lat=lat, lon=lon)
+            with self._ftp.session():
+                return resolve_coordinate(
+                    self._ftp, cache_dir, lat=data[CONF_LATITUDE], lon=data[CONF_LONGITUDE]
+                )
         except (BomFtpError, SpatialDataError, OSError) as err:
             _LOGGER.debug("Could not re-resolve the location after a layer change: %s", err)
             return None
@@ -261,30 +378,17 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         )
 
     async def _async_update_data(self) -> tuple[ActiveWarning, ...]:
+        feed = self._feed
+        if not feed.last_update_success or feed.data is None:
+            raise UpdateFailed("The shared BoM refresh is failing")
+        snapshot = feed.data
+        if snapshot.layer_generation != self._seen_generation:
+            self._seen_generation = snapshot.layer_generation
+            new_codes = await self.hass.async_add_executor_job(self._re_resolve)
+            if new_codes is not None:
+                self._apply_resolved(new_codes)
         now = dt_util.utcnow()
-        check_layers = now >= self._next_layer_check
-        try:
-            warnings, new_codes = await self.hass.async_add_executor_job(
-                self._refresh, check_layers
-            )
-        except BomFtpError as err:
-            self.consecutive_failures += 1
-            if self.consecutive_failures >= FAILURES_BEFORE_REPAIR:
-                ir.async_create_issue(
-                    self.hass,
-                    DOMAIN,
-                    refresh_issue_id(self.config_entry),
-                    is_fixable=False,
-                    severity=ir.IssueSeverity.WARNING,
-                    translation_key="refresh_failing",
-                )
-            raise UpdateFailed(f"Cannot read BoM warnings: {err}") from err
-        self.consecutive_failures = 0
-        ir.async_delete_issue(self.hass, DOMAIN, refresh_issue_id(self.config_entry))
-        if check_layers:
-            self._next_layer_check = now + LAYER_CHECK_INTERVAL
-        if new_codes is not None:
-            self._apply_resolved(new_codes)
+        warnings = list(snapshot.warnings)
         filters: dict[str, Any] = {
             "hide_final": self._hide_final,
             "event_types": self._event_types,

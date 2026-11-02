@@ -18,6 +18,13 @@ from pyftpdlib.servers import FTPServer
 class BomHandler(FTPHandler):
     """Like BoM's server, accept a wildcard in LIST (`LIST *.cap.xml`), which pyftpdlib refuses."""
 
+    # Every command received, for tests that count how often the integration talks to the server.
+    commands: list[tuple[str, str]]
+
+    def pre_process_command(self, line: str, cmd: str, arg: str | None) -> None:
+        self.commands.append((cmd, arg or ""))
+        super().pre_process_command(line, cmd, arg)
+
     def ftp_LIST(self, path: str) -> str | None:
         basedir, pattern = os.path.split(path)
         if not glob.has_magic(pattern):
@@ -40,7 +47,10 @@ class FakeBom:
         root.mkdir(parents=True, exist_ok=True)
         authorizer = DummyAuthorizer()
         authorizer.add_anonymous(str(root), perm="elr")
-        handler = type("Handler", (BomHandler,), {"authorizer": authorizer})
+        self.commands: list[tuple[str, str]] = []
+        handler = type(
+            "Handler", (BomHandler,), {"authorizer": authorizer, "commands": self.commands}
+        )
         self._server = FTPServer(("127.0.0.1", port), handler)
         self._stopping = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
