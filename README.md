@@ -25,6 +25,25 @@ reaches the sea (a few kilometres out from the coast is enough for a Sydney zone
 closer) also counts those warnings in the binary sensor, list sensor and event entity. It is off by
 default. Tsunami and tropical cyclone place warnings are not matched yet.
 
+## Entities
+
+Each location gets a warning binary sensor (on while any current warning covers it), a warning
+count, a most severe warning sensor and an event entity that fires when a warning appears or
+changes. Locations in NSW and the ACT also get today's and tomorrow's fire danger rating.
+
+### Per-warning-type sensors (disabled by default)
+
+A binary sensor per warning type, such as **Thunderstorm warning**, is on while a current warning of
+that type covers the location. Use these in automations, for example to close the blinds on a severe
+thunderstorm warning. The highest severity is in the `severity` attribute. BoM sends `unknown` for
+Severe Thunderstorm warnings, which ranks between moderate and severe.
+
+These sensors are **disabled when the entry is created**, so a location does not gain a long list of
+entities it never uses. To turn one on, open Settings, Devices & services, BoM Warnings, then the
+entry's entities (listed as disabled), pick the sensor, open its settings and switch on **Enabled**.
+It appears after about 30 seconds, with no restart. The warning type filter in the entry's options
+does not affect these sensors.
+
 ## Dev instance
 
 A throwaway Home Assistant (2026.10.4, the live version) that loads this integration straight
