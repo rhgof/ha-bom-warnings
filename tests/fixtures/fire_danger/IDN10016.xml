@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+            <region>New South Wales</region>
+            <office>NSWRO</office>
+            <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDN10016</identifier>
+        <issue-time-utc>2026-11-02T05:15:00Z</issue-time-utc>
+        <issue-time-local tz="EDT">2026-11-02T16:15:00+11:00</issue-time-local>
+        <sent-time>2026-11-02T05:15:50Z</sent-time>
+        <expiry-time>2026-11-03T17:15:00Z</expiry-time>
+        <validity-bgn-time-local tz="EDT">2026-11-02T16:15:50+11:00</validity-bgn-time-local>
+        <validity-end-time-local tz="EDT">2026-11-06T23:59:59+11:00</validity-end-time-local>
+        <next-routine-issue-time-utc>2026-11-02T18:05:00Z</next-routine-issue-time-utc>
+        <next-routine-issue-time-local tz="EDT">2026-11-03T05:05:00+11:00</next-routine-issue-time-local>
+        <status>O</status>
+        <service>WSF</service>
+        <product-type>F</product-type>
+        <phase>NEW</phase>
+    </amoc>
+    <forecast>
+        <area aac="NSW_FA001" description="New South Wales" type="region">
+            <forecast-period start-time-local="2026-11-02T16:15:50+11:00" end-time-local="2026-11-02T16:15:50+11:00" start-time-utc="2026-11-02T05:15:50Z" end-time-utc="2026-11-02T05:15:50Z">
+                <text type="fire_danger_footer">
+                    <p>Notes</p>
+                    <p>For more information about bushfires visit the NSW Rural Fire Service at http://www.rfs.nsw.gov.au</p>
+                    <p>NSW Fire Weather Districts differ from Weather Forecast Districts.</p>
+                    <p>Rural Fire Service information line: 1800 679 737</p>
+                    <p>Note: On occasion Fire Danger Ratings may not adhere to FBI thresholds above due to agency discretion in setting FDRs.</p>
+                </text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW001" description="Far North Coast" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">9</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">34</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW002" description="North Coast" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">23</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW003" description="Greater Hunter" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">18</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">36</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">41</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">26</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW004" description="Greater Sydney Region" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">28</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW005" description="Illawarra/Shoalhaven" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">20</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW006" description="Far South Coast" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">27</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW007" description="Monaro Alpine" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW008" description="The Australian Capital Territory" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">18</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW009" description="Southern Ranges" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">12</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">20</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW010" description="Central Ranges" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">19</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">26</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">27</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">21</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW011" description="New England" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">23</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW012" description="Northern Slopes" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">21</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">26</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">34</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">23</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW013" description="North Western" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">38</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">31</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">35</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">23</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW014" description="Upper Central West Plains" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">43</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">34</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">31</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW015" description="Lower Central West Plains" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">28</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">30</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">23</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">20</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW016" description="Southern Slopes" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">9</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW017" description="Eastern Riverina" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">15</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW018" description="Southern Riverina" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">25</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">28</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">21</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW019" description="Northern Riverina" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">29</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">32</element>
+                <text type="fire_danger">High</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">22</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW020" description="South Western" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">21</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">14</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+        </area>
+        <area aac="NSW_FW021" description="Far Western" type="fire-district" parent-aac="NSW_FA001">
+            <forecast-period index="1" start-time-local="2026-11-03T00:00:00+11:00" end-time-local="2026-11-04T00:00:00+11:00" start-time-utc="2026-11-02T13:00:00Z" end-time-utc="2026-11-03T13:00:00Z">
+                <element type="fire_behaviour_index">16</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="2" start-time-local="2026-11-04T00:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T13:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <element type="fire_behaviour_index">17</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="3" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <element type="fire_behaviour_index">13</element>
+                <text type="fire_danger">Moderate</text>
+            </forecast-period>
+            <forecast-period index="4" start-time-local="2026-11-06T00:00:00+11:00" end-time-local="2026-11-07T00:00:00+11:00" start-time-utc="2026-11-05T13:00:00Z" end-time-utc="2026-11-06T13:00:00Z">
+                <element type="fire_behaviour_index">11</element>
+                <text type="fire_danger">No Rating</text>
+            </forecast-period>
+        </area>
+    </forecast>
+</product>
