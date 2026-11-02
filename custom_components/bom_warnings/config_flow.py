@@ -8,15 +8,29 @@ from pathlib import Path
 from typing import Any
 
 import probatio
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
+from homeassistant.core import callback
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.selector import (
+    BooleanSelector,
+    SelectSelector,
+    SelectSelectorConfig,
+)
 
 from .const import (
     CONF_AREA_CODES,
+    CONF_EVENT_TYPES,
+    CONF_HIDE_FINAL,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_STATE,
     DOMAIN,
+    KNOWN_EVENT_TYPES,
     SPATIAL_CACHE_DIR,
 )
 from .ftp import BomFtpError, client_from_env
@@ -27,7 +41,7 @@ _LOGGER = logging.getLogger(__name__)
 _DISTRICT_MARKER = "_PW"
 
 
-def _state_of(area_codes: set[str]) -> str:
+def state_of(area_codes: set[str]) -> str:
     """The state prefix of the forecast district code, e.g. `QLD_PW011` gives `QLD`."""
     districts = sorted(code for code in area_codes if _DISTRICT_MARKER in code)
     return (districts or sorted(area_codes))[0].split("_")[0]
@@ -50,6 +64,11 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Pick the Home Assistant home location, or type coordinates."""
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> BomWarningsOptionsFlow:
+        return BomWarningsOptionsFlow()
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         return self.async_show_menu(step_id="user", menu_options=["home", "manual"])
@@ -107,7 +126,33 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
             data={
                 CONF_LATITUDE: lat,
                 CONF_LONGITUDE: lon,
-                CONF_STATE: _state_of(codes),
+                CONF_STATE: state_of(codes),
                 CONF_AREA_CODES: sorted(codes),
             },
+        )
+
+
+class BomWarningsOptionsFlow(OptionsFlowWithReload):
+    """Which warnings to show. Saving reloads the entry, so no restart is needed."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=self.add_suggested_values_to_schema(
+                probatio.Schema(
+                    {
+                        probatio.Optional(CONF_HIDE_FINAL, default=True): BooleanSelector(),
+                        probatio.Optional(CONF_EVENT_TYPES, default=[]): SelectSelector(
+                            SelectSelectorConfig(
+                                options=list(KNOWN_EVENT_TYPES),
+                                multiple=True,
+                                custom_value=True,
+                            )
+                        ),
+                    }
+                ),
+                self.config_entry.options,
+            ),
         )
