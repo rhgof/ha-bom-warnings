@@ -23,13 +23,31 @@ class FakeFtp:
         self.error = error
         self.mtimes = mtimes or {}
         self.downloads: list[tuple[str, str]] = []
+        self.fetches: list[str] = []
+        # Raise only for the wildcard listing, like a server that rejects `LIST *.cap.xml`.
+        self.wildcard_error: BomFtpError | None = None
+        # Bumped on every change so the listing line differs, as a new mtime would.
+        self._versions: dict[str, int] = {}
+
+    def put(self, name: str, data: bytes) -> None:
+        self.files[name] = data
+        self._versions[name] = self._versions.get(name, 0) + 1
+
+    def remove(self, name: str) -> None:
+        del self.files[name]
+
+    def _line(self, name: str, data: bytes) -> str:
+        minute = self._versions.get(name, 0)
+        return f"-rw-r--r-- 1 ftp ftp {len(data)} Nov  2 10:{minute:02d} {name}"
 
     def list_files(self, pattern: str) -> list[FileEntry]:
         if self.error:
             raise self.error
+        if self.wildcard_error and pattern != "*":
+            raise self.wildcard_error
         suffix = pattern.removeprefix("*")
         return [
-            FileEntry(name, len(data), f"-rw-r--r-- 1 ftp ftp {len(data)} Nov  2 10:00 {name}")
+            FileEntry(name, len(data), self._line(name, data))
             for name, data in sorted(self.files.items())
             if name.endswith(suffix)
         ]
@@ -37,6 +55,7 @@ class FakeFtp:
     def fetch(self, name: str) -> bytes | None:
         if self.error:
             raise self.error
+        self.fetches.append(name)
         if name in self.vanished:
             return None
         return self.files.get(name) or None
