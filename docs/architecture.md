@@ -132,7 +132,8 @@ Home Assistant layer:
   and can change, remove and fail files (a rejected or timed-out wildcard listing).
 - `scripts/fake_bom/`: a real local FTP server (pyftpdlib) laid out like BoM, with scenarios
   (`baseline`, `warning_appears`, `warning_updated`, `warning_cancelled`, `warning_removed`,
-  `file_empty`, `unavailable`). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
+  `file_empty`, `unavailable`, `all_types`: the baseline plus one real sample of every warning
+  type with dates shifted to now). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
   and by hand against the dev instance.
 - Home Assistant tests run through `hass` with `pytest-homeassistant-custom-component`; the
   config flow tests patch `resolve_coordinate` rather than ship shapefiles. Time is frozen because
@@ -149,7 +150,16 @@ Home Assistant layer:
   `BomFtp`'s own retries, so a brief stall no longer adds to it.
 - A warning that expires between polls stays on for up to 10 minutes.
 - The `no_area` repair issue is informational; there is no fix flow.
-- `KNOWN_EVENT_TYPES` is hand-written, not taken from live BoM data.
+- `KNOWN_EVENT_TYPES` now lists every `<event>` in the recorded CAP files (`tests/test_cap_types.py`
+  fails if a fixture uses one that is missing). It is still only what the samples show.
+- The tsunami sample is named `IDY68027_cap.xml` (underscore), so `LIST *.cap.xml` does not list it
+  and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
+- Area codes of kind MW (coastal water: surf, marine wind), TW (tsunami) and PT (cyclone zone) are
+  never matched to a location, because the shapefile layers cover only PW, ME, FW, RC and FL. The
+  binary sensor stays off for them; the state-wide count and most-severe sensors still include
+  surf and marine wind (state prefix). Cyclones match only through their PW codes.
+- The CAP event `Weather` is ambiguous: it is used for both severe weather and coastal hazard
+  warnings, so filtering on it keeps both.
 - `areas.py` does not guard against null or non-polygon shapes in a shapefile.
 - The `warning_updated` scenario does not reissue a new identifier, so it cannot produce an
   `update` event live.

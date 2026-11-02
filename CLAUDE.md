@@ -37,6 +37,10 @@ Private custom component, official sources only. General HA rules are in `../CLA
 - Lint and types: `.venv/bin/ruff check . && .venv/bin/ruff format --check .`, and
   `.venv/bin/mypy --explicit-package-bases custom_components` (bare `mypy` has no target and fails).
 - Tests use recorded fixtures only and never touch the network.
+- Fixtures: `tests/fixtures/cap/` (recorded live) and `tests/fixtures/cap_samples/` (13 unmodified
+  files from BoM's sample catalogue, one per warning type; see its README). The samples are old, so
+  tests pick a time inside each file's window, and the fake server's `all_types` scenario shifts
+  their dates (`layout.put_sample`). That date shift of real data is done only by the dev scenario.
 
 ## Fake BoM FTP (dev only)
 

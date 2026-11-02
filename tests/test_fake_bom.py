@@ -1,12 +1,15 @@
 """The fake BoM FTP server, driven through the real BomFtp client over a local socket."""
 
+import re
 from collections.abc import Iterator
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
+from custom_components.bom_warnings.cap import parse_cap
 from custom_components.bom_warnings.ftp import BomFtp, BomFtpError, FileEntry, client_from_env
-from scripts.fake_bom import scenarios
+from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
 
@@ -123,3 +126,69 @@ def test_client_from_env_defaults_to_bom() -> None:
 def test_client_from_env_rejects_bad_host() -> None:
     with pytest.raises(BomFtpError):
         client_from_env({"BOM_WARNINGS_FTP_HOST": "localhost:notaport"})
+
+
+SAMPLE_FILES = sorted(p.name for p in layout.CAP_SAMPLES.glob("ID*"))
+SHIFT_TARGET = datetime(2026, 11, 1, 8, 0, tzinfo=UTC)
+
+
+@pytest.mark.parametrize("filename", SAMPLE_FILES)
+def test_put_sample_makes_sent_one_hour_before_the_target(tmp_path: Path, filename: str) -> None:
+    (tmp_path / layout.WARNINGS).mkdir(parents=True)
+
+    target = layout.put_sample(tmp_path, filename, shift_to=SHIFT_TARGET)
+
+    shifted = parse_cap(target.read_bytes())
+    original = parse_cap((layout.CAP_SAMPLES / filename).read_bytes())
+    assert target.name == filename
+    assert shifted is not None
+    assert original is not None
+    assert shifted.sent == SHIFT_TARGET - timedelta(hours=1)
+    assert "-2026-11-01T07:00:00" in shifted.identifier
+    # Relative durations are untouched.
+    assert [i.expires - original.sent + shifted.sent for i in original.infos if i.expires] == [
+        i.expires for i in shifted.infos if i.expires
+    ]
+    assert [i.effective - original.sent + shifted.sent for i in original.infos if i.effective] == [
+        i.effective for i in shifted.infos if i.effective
+    ]
+
+
+def test_put_sample_shifts_the_year_3004_tsunami_back_without_overflow(tmp_path: Path) -> None:
+    (tmp_path / layout.WARNINGS).mkdir(parents=True)
+
+    target = layout.put_sample(tmp_path, "IDY68027_cap.xml", shift_to=SHIFT_TARGET)
+
+    assert not re.search(rb"\b3004-", target.read_bytes())
+    assert b"AusBoM-IDY68027-2026-11-01T07:00:00" in target.read_bytes()
+
+
+def test_put_sample_defaults_to_now(tmp_path: Path) -> None:
+    (tmp_path / layout.WARNINGS).mkdir(parents=True)
+    before = datetime.now(UTC)
+
+    target = layout.put_sample(tmp_path, "IDQ21013.cap.xml")
+
+    sent = parse_cap(target.read_bytes()).sent  # type: ignore[union-attr]
+    assert sent is not None
+    assert before - timedelta(hours=1, seconds=1) <= sent <= datetime.now(UTC) - timedelta(hours=1)
+
+
+def test_all_types_serves_every_sample_by_its_bom_name(fake_bom: FakeBom) -> None:
+    scenarios.apply("all_types", fake_bom.root)
+
+    listed = set(names(fake_bom))
+    assert {f for f in SAMPLE_FILES if f.endswith(".cap.xml")} <= listed
+    assert "IDQ21035.cap.xml" in listed  # the baseline is still there
+    assert client_for(fake_bom).fetch("IDY68027_cap.xml") is not None
+
+
+def test_all_types_tsunami_is_not_listed_by_the_cap_wildcard(fake_bom: FakeBom) -> None:
+    # Known gap: BoM names this file with an underscore, so `LIST *.cap.xml` misses it.
+    scenarios.apply("all_types", fake_bom.root)
+
+    assert "IDY68027_cap.xml" not in names(fake_bom)
+
+
+def test_all_types_is_registered() -> None:
+    assert "all_types" in scenarios.names()

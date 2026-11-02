@@ -10,16 +10,21 @@ SPATIAL_CACHE_DIR = "bom_warnings/spatial"
 # Options. Defaults keep today's behaviour: ended warnings hidden, every warning type shown.
 CONF_HIDE_FINAL = "hide_final_cancelled"
 CONF_EVENT_TYPES = "event_types"
-# Event names seen in BoM CAP files; the options field also accepts any other name.
+# Every `<event>` seen in recorded BoM CAP files (tests/fixtures/cap and cap_samples), sorted; the
+# options field also accepts any other name. "Weather" covers both severe weather and coastal
+# hazard warnings, so it cannot tell them apart.
 KNOWN_EVENT_TYPES = (
-    "Bushfire",
+    "Exposure",
     "Extreme Heat",
     "Fire Weather",
-    "Flood Watch",
+    "Frost",
+    "Hazardous Road Conditions",
+    "Large Coastal Surf",
     "Riverine Flood",
-    "Severe Thunderstorm",
-    "Severe Weather",
+    "Sheep Grazier Warning",
     "Thunderstorm",
     "Tropical Cyclone",
+    "Tsunami",
+    "Weather",
     "Wind",
 )
