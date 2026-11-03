@@ -13,9 +13,9 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.bom_warnings.const import DOMAIN
-from custom_components.bom_warnings.coordinator import FEED
 from custom_components.bom_warnings.diagnostics import async_get_config_entry_diagnostics
 from custom_components.bom_warnings.ftp import BomFtpError
+from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW

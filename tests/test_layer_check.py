@@ -17,9 +17,9 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import CONF_AREA_CODES, SPATIAL_CACHE_DIR
-from custom_components.bom_warnings.coordinator import FEED
 from custom_components.bom_warnings.ftp import BomFtpError
 from custom_components.bom_warnings.layer_check import LAYER_CHECK_INTERVAL
+from custom_components.bom_warnings.shared_feed import FEED
 from custom_components.bom_warnings.spatial import LAYERS, RefreshResult
 from scripts.fake_bom.server import FakeBom
 
