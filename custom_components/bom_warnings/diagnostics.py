@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 
 from . import BomWarningsConfigEntry
 from .const import CONF_LATITUDE, CONF_LONGITUDE, CONF_ZONE
-from .coordinator import FireDangerView
+from .fire_danger import FireDangerView
 
 # The unique id is the rounded coordinates or the zone's entity id, and the title is the zone name
 # or the coordinates. The radius alone says nothing about where the location is.

@@ -1,4 +1,5 @@
-"""Parser for the BoM fire danger ratings products (IDN10016 and its state equivalents).
+"""BoM fire danger ratings (IDN10016 and its state equivalents): the parser, and what an entry
+remembers between issues.
 
 No Home Assistant imports. Every state's product has the same shape: `fire-district` areas keyed
 by the same code as the fire weather district shapefile (`IDM00007`), each with four daily
@@ -9,7 +10,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, tzinfo
+from typing import Any
 from xml.etree import ElementTree as ET
 
 from .cap import parse_xml
@@ -74,6 +76,101 @@ def match_district(
         for code in sorted(wanted & product.districts.keys()):
             return product, product.districts[code]
     return None
+
+
+@dataclass(frozen=True, slots=True)
+class FireMemory:
+    """Ratings seen in earlier issues of one district, so the afternoon issue (which starts
+    tomorrow) does not erase today's. Immutable, so "did it change" is a plain comparison."""
+
+    district: str = ""
+    # In date order. A period is only ever shown on its own local date, so it expires with its day.
+    periods: tuple[FireDangerPeriod, ...] = ()
+
+    @property
+    def by_date(self) -> dict[date, FireDangerPeriod]:
+        return {p.date: p for p in self.periods}
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "district": self.district,
+            "periods": [
+                {
+                    "date": p.date.isoformat(),
+                    "level": p.level,
+                    "fire_behaviour_index": p.fire_behaviour_index,
+                }
+                for p in self.periods
+            ],
+        }
+
+    @classmethod
+    def from_dict(cls, data: object) -> FireMemory | None:
+        """Read what `to_dict` wrote. None for empty or damaged data; the next issue refills it."""
+        if not isinstance(data, Mapping):
+            return None
+        try:
+            periods = (
+                FireDangerPeriod(
+                    date.fromisoformat(item["date"]), item["level"], item["fire_behaviour_index"]
+                )
+                for item in data["periods"]
+            )
+            return cls(data["district"], tuple(sorted(periods, key=lambda p: p.date)))
+        except KeyError, TypeError, ValueError:
+            return None
+
+
+@dataclass(frozen=True, slots=True)
+class FireDangerView:
+    """One entry's fire district: the latest issue, plus days remembered from earlier issues."""
+
+    product_id: str
+    issued: datetime | None
+    district_code: str
+    district_name: str
+    # Every period of the latest issue, in date order.
+    forecast: tuple[FireDangerPeriod, ...]
+    by_date: Mapping[date, FireDangerPeriod]
+    # The product's own local offset, which decides what "today" means for its district.
+    tz: tzinfo
+
+    def local_date(self, now: datetime) -> date:
+        return now.astimezone(self.tz).date()
+
+
+def derive(
+    memory: FireMemory,
+    products: Mapping[str, FireDangerProduct],
+    area_codes: Iterable[str],
+    now: datetime,
+    default_tz: tzinfo,
+) -> tuple[FireMemory, FireDangerView | None]:
+    """This entry's fire district and what it now remembers.
+
+    With no matching district the memory is returned as it was, so a product that goes missing
+    for a while does not make the entry forget.
+    """
+    match = match_district(products, area_codes)
+    if match is None:
+        return memory, None
+    product, district = match
+    remembered = memory.by_date if memory.district == district.code else {}
+    # The latest issue wins for any day both cover.
+    remembered = {**remembered, **{p.date: p for p in district.periods}}
+    tz = product.issued.tzinfo if product.issued and product.issued.tzinfo else default_tz
+    local_today = now.astimezone(tz).date()
+    kept = {d: p for d, p in remembered.items() if d >= local_today - timedelta(days=1)}
+    view = FireDangerView(
+        product_id=product.product_id,
+        issued=product.issued,
+        district_code=district.code,
+        district_name=district.name,
+        forecast=district.periods,
+        by_date=kept,
+        tz=tz,
+    )
+    return FireMemory(district.code, tuple(kept[d] for d in sorted(kept))), view
 
 
 def normalise_level(text: str) -> str:

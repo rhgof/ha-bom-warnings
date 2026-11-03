@@ -28,13 +28,8 @@ from .const import (
     WARNING_TYPE_NOTES,
     WARNING_TYPE_SENSORS,
 )
-from .coordinator import (
-    ActiveWarning,
-    BomWarningsCoordinator,
-    FireDangerView,
-    warning_attributes,
-)
-from .fire_danger import LEVEL_KEYS, FireDangerPeriod
+from .coordinator import ActiveWarning, BomWarningsCoordinator, warning_attributes
+from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView
 from .strength import WIND_EVENT
 
 PARALLEL_UPDATES = 0
