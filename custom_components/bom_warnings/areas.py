@@ -14,6 +14,7 @@ from pathlib import Path
 
 import shapefile
 
+NAME_FIELD = "DIST_NAME"
 _DISTRICT_MARKER = "_PW"
 MARINE_MARKER = "_MW"
 # Mean Earth radius times pi / 180. The error against a true geodesic is well under 1% at the
@@ -85,10 +86,10 @@ def _near(
     return False
 
 
-def _layer_codes(path: Path, lon: float, lat: float, radius_m: float) -> set[str]:
-    codes: set[str] = set()
-    # Some layers ship a .cpg labelled "ansi 1252", which Python cannot decode. We only
-    # read the ASCII AAC field, so force an encoding rather than trusting the label.
+def _layer_areas(path: Path, lon: float, lat: float, radius_m: float) -> dict[str, str]:
+    areas: dict[str, str] = {}
+    # Some layers ship a .cpg labelled "ansi 1252", which Python cannot decode. We only read the
+    # AAC and name fields, so force an encoding rather than trusting the label.
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UserWarning)  # "encoding differs from .cpg"
         reader = shapefile.Reader(str(path), encoding="cp1252", encodingErrors="replace")
@@ -99,8 +100,11 @@ def _layer_codes(path: Path, lon: float, lat: float, radius_m: float) -> set[str
     with reader:
         names = [f[0] for f in reader.fields[1:]]
         if "AAC" not in names:
-            return codes
+            return areas
         aac_index = names.index("AAC")
+        # BoM's spatial data guide lists DIST_NAME as the district, catchment or sub-catchment
+        # name. A layer without it still resolves; its areas just have no name.
+        name_index = names.index(NAME_FIELD) if NAME_FIELD in names else None
         for item in reader.iterShapeRecords():
             west, south, east, north = item.shape.bbox
             if not (
@@ -115,24 +119,33 @@ def _layer_codes(path: Path, lon: float, lat: float, radius_m: float) -> set[str
             ):
                 code = item.record[aac_index]
                 if code:
-                    codes.add(str(code))
-    return codes
+                    name = item.record[name_index] if name_index is not None else ""
+                    areas[str(code)] = str(name or "").strip()
+    return areas
+
+
+def resolve_areas(
+    layers: Iterable[Path], *, lat: float, lon: float, radius_m: float = 0.0
+) -> dict[str, str]:
+    """Return each area, across all given shapefiles, within `radius_m` of the point, by AAC.
+
+    The value is the area's name, or an empty string when its layer has none. A radius of 0 is
+    the plain point-in-polygon test. Otherwise an area counts when the point is inside it or the
+    distance from the point to its boundary is at most the radius.
+    """
+    if radius_m < 0:
+        raise ValueError(f"radius must not be negative: {radius_m}")
+    areas: dict[str, str] = {}
+    for layer in layers:
+        path = Path(layer)
+        if not path.exists():
+            raise FileNotFoundError(path)
+        areas |= _layer_areas(path, lon, lat, radius_m)
+    return areas
 
 
 def resolve_area_codes(
     layers: Iterable[Path], *, lat: float, lon: float, radius_m: float = 0.0
 ) -> set[str]:
-    """Return the AAC of every area, across all given shapefiles, within `radius_m` of the point.
-
-    A radius of 0 is the plain point-in-polygon test. Otherwise an area counts when the point is
-    inside it or the distance from the point to its boundary is at most the radius.
-    """
-    if radius_m < 0:
-        raise ValueError(f"radius must not be negative: {radius_m}")
-    codes: set[str] = set()
-    for layer in layers:
-        path = Path(layer)
-        if not path.exists():
-            raise FileNotFoundError(path)
-        codes |= _layer_codes(path, lon, lat, radius_m)
-    return codes
+    """Return the AAC of every area within `radius_m` of the point; see `resolve_areas`."""
+    return set(resolve_areas(layers, lat=lat, lon=lon, radius_m=radius_m))

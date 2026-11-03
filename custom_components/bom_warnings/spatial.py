@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from .areas import resolve_area_codes
+from .areas import resolve_areas
 from .ftp import BomFtpClient, BomFtpError
 
 SPATIAL_DIR = "/anon/home/adfd/spatial/"
@@ -132,9 +132,10 @@ def refresh_layers(ftp: BomFtpClient, cache_dir: Path) -> RefreshResult:
 
 def resolve_coordinate(
     ftp: BomFtpClient, cache_dir: Path, *, lat: float, lon: float, radius_m: float = 0.0
-) -> set[str]:
-    """Return the area codes within `radius_m` of the point, downloading any layer not cached."""
+) -> dict[str, str]:
+    """Return the areas within `radius_m` of the point by area code, each with its name (or an
+    empty string), downloading any layer not cached."""
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
     layers = [_ensure_layer(ftp, cache_dir, layer) for layer in LAYERS]
-    return resolve_area_codes(layers, lat=lat, lon=lon, radius_m=radius_m)
+    return resolve_areas(layers, lat=lat, lon=lon, radius_m=radius_m)

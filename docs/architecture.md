@@ -18,7 +18,7 @@ entity id for a zone entry):
 | Entity | State | Reads |
 | --- | --- | --- |
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
-| `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
+| `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) and `areas` the names of the areas the location covers, in code order (see "Area names") | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
 | `sensor.<title>_<type>_warning` (one per row of `warning_types.WARNING_TYPES`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | enum level sensor: the highest level among the type's current warnings (`none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`; BoM's CAP `unknown` is shown as `unrated`). Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: the top warning's `headline`, `expires`, `product_id`, `event`, plus `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather and marine wind ones add a `note`. The marine wind one also has `strength` (the Wind row's `strength` rule, `warning_types.wind_strength`: the class read from the headline), as does each Wind entry in any `warnings` list. | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
@@ -68,12 +68,12 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | File | Role |
 | --- | --- |
 | `cap.py` | `parse_cap(bytes) -> CapWarning \| None`, and `parse_xml(bytes) -> Element \| None`, the one XML parse both CAP and fire danger use (rejects DOCTYPE/entities; None for empty, malformed or unknown-encoding input). `Phase` and `Severity` enums. Treats offset-less times as UTC. |
-| `areas.py` | `resolve_area_codes(layer paths, lat, lon, radius_m=0)`: point-in-polygon, plus any area whose boundary is within `radius_m` (bbox prefilter, flat-plane distance); shapefiles read as cp1252. `state_of(codes)`, `is_marine(code)`. |
+| `areas.py` | `resolve_areas(layer paths, lat, lon, radius_m=0)`: point-in-polygon, plus any area whose boundary is within `radius_m` (bbox prefilter, flat-plane distance), as `{AAC: name}`; the name is the layer's `DIST_NAME` field, or empty when a layer has none. `resolve_area_codes` is its codes. Shapefiles read as cp1252. `state_of(codes)`, `is_marine(code)`. |
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
-| `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
-| `location.py` | The one entry point from a coordinate to a place: `resolve_location(ftp, cache_dir, lat=, lon=, radius_m=0)` returns a frozen `ResolvedLocation(area_codes, state)`. It opens the FTP session itself, so callers never write `with ftp.session()`. A point no area covers is an empty result (empty `state`), which callers report as `no_area`. Anything that stops it being worked out (BoM unreachable, a corrupt or incomplete layer, an `OSError`) raises the one `LocationUnavailable`; any other exception propagates. Blocking: call from an executor. |
+| `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` gives `{AAC: name}` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
+| `location.py` | The one entry point from a coordinate to a place: `resolve_location(ftp, cache_dir, lat=, lon=, radius_m=0)` returns a frozen `ResolvedLocation(area_codes, state, area_names)`; `area_names` is `{code: name}` for the areas that have a name. It opens the FTP session itself, so callers never write `with ftp.session()`. A point no area covers is an empty result (empty `state`), which callers report as `no_area`. Anything that stops it being worked out (BoM unreachable, a corrupt or incomplete layer, an `OSError`) raises the one `LocationUnavailable`; any other exception propagates. Blocking: call from an executor. |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
 | `warning_types.py` | The one table of warning types. `WARNING_TYPES` has a `WarningType` row (event, icon, optional note and strength rule) for every CAP event BoM is known to send. A `SensorType` row adds the key, label and marine flag for the 12 types with a level sensor and a checklist toggle. Tsunami is a plain row: an icon but no sensor, so it falls under "Other warnings". The views derive from the table each time they are called (`sensor_types`, `type_of`, `label_of`, `type_keys`, `key_of`, `event_is_on`, `enabled_keys`, `keys_from_legacy_options`), so a test removes a type by patching `WARNING_TYPES` alone. A new type is a new row plus its name in `strings.json` and `translations/en.json`, which `tests/test_strings.py` checks. `wind_strength` is the one strength rule, read from the Wind headline. |
 | `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. A warning's strength comes from its row's `strength` rule in `warning_types.py`. |
@@ -89,7 +89,7 @@ Home Assistant layer:
 | `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location through `location.resolve_location`, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
 | `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
 | `binary_sensor.py`, `sensor.py`, `event.py` | The entities above. |
-| `diagnostics.py` | Download with coordinates, name, title, zone entity id and `unique_id` redacted (the radius stays). |
+| `diagnostics.py` | Download with coordinates, name, title, zone entity id, `unique_id` and the stored area names redacted (the radius and the area codes stay). |
 | `const.py`, `strings.json`, `translations/en.json` | Constants and text. The two JSON files must match (`tests/test_strings.py`). |
 
 ## Behaviour worth knowing
@@ -100,6 +100,17 @@ Home Assistant layer:
   builds its own, because it can run before any feed exists. A `BomFtp` is safe to share between
   threads: `session()` (one login reused across calls) belongs to the thread that opened it, and a
   call from another thread opens its own connection.
+- **Area names.** Each entry stores `area_names`, `{code: name}`, beside its `area_codes`. The names are
+  the `DIST_NAME` field of the shapefile layers (BoM's spatial data guide lists it as the district,
+  catchment or sub-catchment name; it is the one name field, but it has not been checked against
+  every real layer, so an area without one is simply left out). They come from the layers and not the
+  CAP files, because one CAP `<area>` has a single description for several district codes, so it cannot
+  say which of them matched. A warning's `area` is the names of the codes it shares with the entry, in
+  code order, each name once; `areas` on the count sensor is all the entry's names the same way. They
+  are written whenever the entry resolves: at set-up, when a zone is edited, and after a layer change,
+  and a changed name is stored even if the codes are the same. An entry without `area_names` (made
+  before they existed) sets the coordinator to resolve once on its first refresh; until that succeeds
+  it shows none, and it retries on each poll. Diagnostics redact them.
 - **Flaky server.** BoM's control login works while the passive data transfer sometimes stalls,
   then works a second later. So `TIMEOUT` is 10 s, and `list_files`, `fetch`, `modified` and
   `download` each try up to `ATTEMPTS` (3) times, `RETRY_DELAY` (1 s) apart, on a plain

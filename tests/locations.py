@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from custom_components.bom_warnings.areas import state_of
 from custom_components.bom_warnings.location import ResolvedLocation
 
 
-def location_of(*codes: str) -> ResolvedLocation:
+def location_of(*codes: str, names: Mapping[str, str] | None = None) -> ResolvedLocation:
     """The location covering exactly these area codes; no codes means no area."""
     found = set(codes)
-    return ResolvedLocation(frozenset(found), state_of(found) if found else "")
+    return ResolvedLocation(
+        frozenset(found),
+        state_of(found) if found else "",
+        {code: name for code, name in (names or {}).items() if code in found},
+    )

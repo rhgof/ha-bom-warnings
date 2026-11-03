@@ -29,6 +29,7 @@ from homeassistant.helpers.selector import (
 from . import location
 from .const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_HIDE_FINAL,
     CONF_LATITUDE,
     CONF_LONGITUDE,
@@ -168,6 +169,7 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_LONGITUDE: lon,
             CONF_STATE: found.state,
             CONF_AREA_CODES: sorted(found.area_codes),
+            CONF_AREA_NAMES: dict(found.area_names),
         }
         if CONF_ZONE in data:
             data[CONF_RADIUS] = radius_m

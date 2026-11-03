@@ -39,6 +39,7 @@ def active(
     product_id: str = "IDQ1",
     phase: Phase = Phase.NEW,
     sent: datetime | None = NOW,
+    area: str = "",
 ) -> ActiveWarning:
     return ActiveWarning(
         product_id=product_id,
@@ -49,6 +50,7 @@ def active(
         expires=LATER,
         sent=sent,
         phase=phase,
+        area=area,
     )
 
 
@@ -62,6 +64,12 @@ def test_a_lean_item_is_exactly_these_fields() -> None:
         "effective": EARLIER.isoformat(),
         "expires": LATER.isoformat(),
     }
+
+
+def test_an_item_names_the_areas_it_matched_and_only_then() -> None:
+    assert warning_attributes(active(area="Illawarra"))["area"] == "Illawarra"
+    assert warning_attributes(active(area="Illawarra"), ranked=True)["area"] == "Illawarra"
+    assert "area" not in warning_attributes(active())
 
 
 def test_a_ranked_item_is_the_lean_item_plus_level_icon_colour_and_sent() -> None:

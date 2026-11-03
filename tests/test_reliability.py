@@ -94,6 +94,10 @@ async def test_repair_issue_is_removed_with_the_entry(
     assert repair_issues(hass) == []
 
 
+@pytest.mark.parametrize("area_codes", [["QLD_ME008", "QLD_PW001"]])
+@pytest.mark.parametrize(
+    "entry_area_names", [{"QLD_ME008": "Brisbane", "QLD_PW001": "Moreton Bay"}]
+)
 async def test_diagnostics_redact_location(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -105,12 +109,13 @@ async def test_diagnostics_redact_location(
 
     # Called directly: the HTTP download path breaks under the frozen clock these tests need.
     text = str(diagnostics)
-    for secret in ("-27.47", "153.021", "-27.470,153.021", "Home"):
+    # Area names say where the location is, so they are as private as its coordinates.
+    for secret in ("-27.47", "153.021", "-27.470,153.021", "Home", "Brisbane", "Moreton Bay"):
         assert secret not in text
     assert diagnostics["entry"]["data"]["state"] == "QLD"
-    assert diagnostics["entry"]["data"]["area_codes"] == ["QLD_PW001"]
+    assert diagnostics["entry"]["data"]["area_codes"] == ["QLD_ME008", "QLD_PW001"]
     assert diagnostics["coordinator"]["last_update_success"] is True
-    assert diagnostics["coordinator"]["warnings"] == []
+    assert len(diagnostics["coordinator"]["warnings"]) == 1
 
 
 async def test_repair_issue_appears_when_bom_is_down_at_startup(

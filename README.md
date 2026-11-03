@@ -51,6 +51,18 @@ Each location gets a warning binary sensor (on while any current warning covers 
 count, a most severe warning sensor and an event entity that fires when a warning appears or
 changes. Locations in NSW and the ACT also get today's and tomorrow's fire danger rating.
 
+### Which areas a location covers
+
+The warning count sensor has an `areas` attribute: the names of the forecast districts, metro
+areas, flood catchments, fire weather districts and coastal waters the location covers, as BoM
+names them (a forecast district such as `Illawarra`). It shows even when no warning is active, so editing a zone's
+radius is visible straight away: grow it over a second district and that district's name appears;
+shrink it and the name goes. Each item in a `warnings` list also has an `area`, the names of the
+location's areas that warning covers, so a warning for a neighbouring district looks different from
+one for yours. `area` is left out when none of those areas has a name. Names come from BoM's
+shapefiles, never area codes. An entry made before this existed looks its names up once, the first
+time it loads.
+
 ### Choosing the warnings that matter
 
 Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about":

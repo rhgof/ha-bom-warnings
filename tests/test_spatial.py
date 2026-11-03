@@ -27,7 +27,7 @@ def ftp(tmp_path: Path) -> FakeFtp:
 
 def test_first_use_downloads_every_layer(ftp: FakeFtp, tmp_path: Path) -> None:
     codes = resolve_coordinate(ftp, tmp_path / "cache", lat=5, lon=5)
-    assert codes == {f"T_{layer}" for layer in LAYERS}
+    assert set(codes) == {f"T_{layer}" for layer in LAYERS}
     assert sorted(remote for remote, _ in ftp.downloads) == sorted(remote(x) for x in LAYERS)
 
 
@@ -46,15 +46,15 @@ def test_marine_layer_is_one_of_the_layers() -> None:
 
 def test_radius_reaches_areas_beside_the_point(ftp: FakeFtp, tmp_path: Path) -> None:
     cache = tmp_path / "cache"
-    assert resolve_coordinate(ftp, cache, lat=5, lon=11) == set()
+    assert resolve_coordinate(ftp, cache, lat=5, lon=11) == {}
     # One degree east of the square is about 111 km.
-    assert resolve_coordinate(ftp, cache, lat=5, lon=11, radius_m=120_000) == {
+    assert set(resolve_coordinate(ftp, cache, lat=5, lon=11, radius_m=120_000)) == {
         f"T_{layer}" for layer in LAYERS
     }
 
 
 def test_point_outside_returns_nothing(ftp: FakeFtp, tmp_path: Path) -> None:
-    assert resolve_coordinate(ftp, tmp_path / "cache", lat=50, lon=50) == set()
+    assert resolve_coordinate(ftp, tmp_path / "cache", lat=50, lon=50) == {}
 
 
 @pytest.mark.parametrize(
@@ -192,10 +192,10 @@ def test_real_shapefiles_through_cache(
     fake = FakeFtp({remote(layer): zip_real(base, layer) for layer in LAYERS})
     cache = tmp_path / "cache"
     codes = resolve_coordinate(fake, cache, lat=lat, lon=lon)
-    assert expected <= codes
+    assert expected <= set(codes)
     fake.downloads.clear()
     assert resolve_coordinate(fake, cache, lat=lat, lon=lon) == codes
     assert fake.downloads == []
-    assert codes == resolve_area_codes(
+    assert set(codes) == resolve_area_codes(
         [base / layer / f"{layer}.shp" for layer in LAYERS], lat=lat, lon=lon
     )

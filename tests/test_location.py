@@ -28,18 +28,42 @@ AREAS = {
 }
 
 
+NAMES = {
+    "IDM00001": "Moreton Bay",
+    "IDM00014": "Brisbane",
+    # The marine layer has no name here, as if a layer lacked the field's value.
+    "IDM00003": "",
+}
+
+
 @pytest.fixture
 def ftp(tmp_path: Path) -> FakeFtp:
-    return FakeFtp({remote(layer): zip_layer(tmp_path, layer, AREAS[layer]) for layer in LAYERS})
+    return FakeFtp(
+        {
+            remote(layer): zip_layer(
+                tmp_path, layer, AREAS[layer], NAMES.get(layer, f"{layer} area")
+            )
+            for layer in LAYERS
+        }
+    )
 
 
 def test_layers_cover_the_generated_areas() -> None:
     assert set(AREAS) == set(LAYERS)
 
 
-def test_point_inside_gives_its_areas_and_state(ftp: FakeFtp, tmp_path: Path) -> None:
+def test_point_inside_gives_its_areas_state_and_names(ftp: FakeFtp, tmp_path: Path) -> None:
     location = resolve_location(ftp, tmp_path / "cache", lat=5, lon=5)
-    assert location == ResolvedLocation(frozenset(AREAS.values()), "QLD")
+    assert location.area_codes == frozenset(AREAS.values())
+    assert location.state == "QLD"
+    assert location.area_names["QLD_PW011"] == "Moreton Bay"
+    assert location.area_names["QLD_ME001"] == "Brisbane"
+
+
+def test_an_area_without_a_name_has_no_entry(ftp: FakeFtp, tmp_path: Path) -> None:
+    location = resolve_location(ftp, tmp_path / "cache", lat=5, lon=5)
+    assert "QLD_MW004" in location.area_codes
+    assert "QLD_MW004" not in location.area_names
 
 
 def test_point_outside_every_area_is_empty_not_an_error(ftp: FakeFtp, tmp_path: Path) -> None:
@@ -131,7 +155,11 @@ def test_real_shapefiles_resolve_to_the_same_areas_and_state(
     assert found.state == state
     # The same answer the callers used to assemble for themselves.
     codes = resolve_coordinate(fake, cache, lat=lat, lon=lon)
-    assert found == ResolvedLocation(frozenset(codes), state_of(codes))
+    assert found == ResolvedLocation(
+        frozenset(codes),
+        state_of(set(codes)),
+        {code: name for code, name in codes.items() if name},
+    )
     # A radius only ever adds areas.
     wider = resolve_location(fake, cache, lat=lat, lon=lon, radius_m=50_000)
     assert found.area_codes <= wider.area_codes

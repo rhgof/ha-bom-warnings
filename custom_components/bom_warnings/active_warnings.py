@@ -6,9 +6,10 @@ No Home Assistant imports.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from types import MappingProxyType
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
@@ -29,6 +30,9 @@ class ActiveWarning:
     sent: datetime | None = None
     # Last, with a default, so existing constructors keep working.
     phase: Phase = Phase.UNKNOWN
+    # The names of the entry's areas this warning covers, which tell a warning for the home
+    # district from one for a neighbour. Empty when none of them has a name.
+    area: str = ""
 
     @property
     def is_current(self) -> bool:
@@ -82,6 +86,8 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
     # Only marine wind has one, so no other event gains the field.
     if (strength := warning.strength) is not None:
         attributes["strength"] = strength
+    if warning.area:
+        attributes["area"] = warning.area
     return attributes
 
 
@@ -92,14 +98,26 @@ def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
     return ended and not hide_final and (info.expires is None or info.expires > now)
 
 
-def _active(
+def _matched_names(info: Info, area_codes: frozenset[str], names: Mapping[str, str]) -> str:
+    """The names of the entry's areas that this block covers, in code order, each once."""
+    matched = sorted(info.area_codes & area_codes)
+    return "; ".join(dict.fromkeys(names[code] for code in matched if names.get(code)))
+
+
+def covering(
     warnings: list[CapWarning],
+    area_codes: frozenset[str],
     now: datetime,
-    matches: Callable[[Info], bool],
     *,
+    area_names: Mapping[str, str] = MappingProxyType({}),
     hide_final: bool = True,
     type_on: Callable[[str], bool] = lambda event: True,
 ) -> tuple[ActiveWarning, ...]:
+    """The current blocks that cover any of `area_codes`, with the names of the areas they match.
+
+    `area_names` is the entry's own name for each of its codes. A name comes from the entry's
+    layers and not the CAP file, because a CAP area description covers several districts at once.
+    """
     # Match per info block: one file can mix areas, so a warning-level match could report an
     # inactive block that happens to share the file with a matching one.
     return tuple(
@@ -112,20 +130,12 @@ def _active(
             expires=info.expires,
             sent=warning.sent,
             phase=info.phase,
+            area=_matched_names(info, area_codes, area_names),
         )
         for warning in warnings
         for info in warning.infos
-        if _shown(info, now, hide_final) and matches(info) and type_on(info.event)
+        if _shown(info, now, hide_final) and info.area_codes & area_codes and type_on(info.event)
     )
-
-
-def covering(
-    warnings: list[CapWarning],
-    area_codes: frozenset[str],
-    now: datetime,
-    **filters: Any,
-) -> tuple[ActiveWarning, ...]:
-    return _active(warnings, now, lambda info: bool(info.area_codes & area_codes), **filters)
 
 
 @dataclass(frozen=True, slots=True)
