@@ -2,12 +2,19 @@
   "domain": "bom_warnings",
   "name": "BoM Warnings",
   "codeowners": [],
+  "categories": [
+    "weather_alerts.public_warnings"
+  ],
   "config_flow": true,
-  "dependencies": ["zone"],
+  "dependencies": [
+    "zone"
+  ],
   "documentation": "https://github.com/rhgof/ha-bom-warnings",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/rhgof/ha-bom-warnings/issues",
-  "requirements": ["pyshp>=2.3"],
+  "requirements": [
+    "pyshp>=2.3"
+  ],
   "version": "0.0.1"
 }
