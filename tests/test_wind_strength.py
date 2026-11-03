@@ -21,7 +21,7 @@ from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
 from .test_binary_sensor import setup_entry
-from .test_options import layers, resolve  # noqa: F401
+from .test_options import layers  # noqa: F401
 from .test_zones import set_zone, zone_codes, zone_entry, zone_options  # noqa: F401
 
 pytestmark = pytest.mark.freeze_time(NOW)
@@ -104,7 +104,7 @@ async def test_marine_wind_sensor_and_lists_carry_the_strength(
     hass: HomeAssistant,
     zone_entry: MockConfigEntry,  # noqa: F811
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     zone_codes: list[str],  # noqa: F811
     strength: str,
 ) -> None:
@@ -137,7 +137,7 @@ async def test_marine_wind_strength_is_none_when_nothing_is_warned(
     hass: HomeAssistant,
     zone_entry: MockConfigEntry,  # noqa: F811
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     """A water zone with no wind warning: the sensor is `none` and has no strength."""
     set_zone(hass)
@@ -161,7 +161,7 @@ async def test_other_sensors_do_not_gain_a_strength(
     hass: HomeAssistant,
     zone_entry: MockConfigEntry,  # noqa: F811
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     entity_id: str,
     event: str,
 ) -> None:

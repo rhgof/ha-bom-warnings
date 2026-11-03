@@ -22,7 +22,7 @@ from scripts.fake_bom.server import FakeBom
 from .conftest import NOW
 from .test_binary_sensor import ENTITY_ID as HOME
 from .test_binary_sensor import poll, setup_entry
-from .test_options import LAYER_CHECK_DUE, layers, resolve, short_layer_interval  # noqa: F401
+from .test_options import LAYER_CHECK_DUE, layers, short_layer_interval  # noqa: F401
 from .test_reliability import repair_issues
 
 WORK = "binary_sensor.work_warning"
@@ -252,7 +252,7 @@ async def test_layers_are_checked_once_and_each_entry_re_resolves_its_own_point(
     mock_config_entry: MockConfigEntry,
     work_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     freezer: Any,
 ) -> None:
     await setup_entry(hass, mock_config_entry)
@@ -275,7 +275,7 @@ async def test_reloading_an_entry_does_not_re_resolve_after_an_earlier_layer_cha
     mock_config_entry: MockConfigEntry,
     work_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     freezer: Any,
 ) -> None:
     await setup_entry(hass, mock_config_entry)

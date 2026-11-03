@@ -33,7 +33,7 @@ from scripts.fake_bom.server import FakeBom
 from .conftest import NOW
 from .test_binary_sensor import ENTITY_ID as ANY_WARNING
 from .test_binary_sensor import poll, setup_entry
-from .test_options import layers, resolve, set_options  # noqa: F401
+from .test_options import layers, set_options  # noqa: F401
 from .test_sensor import COUNT, MOST_SEVERE
 from .test_zones import set_zone, zone_codes, zone_entry, zone_options  # noqa: F401
 
@@ -172,7 +172,7 @@ async def test_marine_wind_is_a_toggle_and_never_re_resolves(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,  # noqa: F811
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     scenarios.apply("all_types", fake_bom.root)
     set_zone(hass)
@@ -371,7 +371,7 @@ async def test_the_old_binary_type_sensors_are_removed_and_replaced_by_level_sen
 
 async def test_the_zone_step_no_longer_asks_about_coastal_waters(
     hass: HomeAssistant,
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     from homeassistant.config_entries import SOURCE_USER
 

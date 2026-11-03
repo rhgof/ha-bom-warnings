@@ -1,8 +1,8 @@
 """Entries that follow a Home Assistant zone, driven through Home Assistant.
 
-As in test_options, the shapefiles are not in the repo, so `resolve_coordinate` is the one seam
-(as the coordinator imports it) and tests say which area codes a circle resolves to. The zone
-itself is a plain state, which is all a zone is to the integration.
+As in test_options, the shapefiles are not in the repo, so `location.resolve_location` (the
+shared `resolve` fixture) is the one seam and tests say which location a circle resolves to.
+The zone itself is a plain state, which is all a zone is to the integration.
 """
 
 from typing import Any
@@ -24,12 +24,14 @@ from custom_components.bom_warnings.const import (
     DOMAIN,
     MAX_RADIUS_M,
 )
+from custom_components.bom_warnings.location import LocationUnavailable
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
+from .locations import location_of
 from .test_binary_sensor import poll, setup_entry
-from .test_options import layers, resolve, set_options  # noqa: F401
+from .test_options import layers, set_options  # noqa: F401
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
@@ -100,7 +102,7 @@ async def test_unchanged_zone_does_not_re_resolve(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
@@ -130,7 +132,7 @@ async def test_editing_the_zone_re_resolves_without_a_restart(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     change: dict[str, float],
     expected: dict[str, float],
 ) -> None:
@@ -139,7 +141,7 @@ async def test_editing_the_zone_re_resolves_without_a_restart(
     assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
 
     # The new circle also touches the thunderstorm district, which has a recorded warning.
-    resolve.return_value = {"QLD_PW001", "QLD_ME008"}
+    resolve.return_value = location_of("QLD_PW001", "QLD_ME008")
     await change_zone(hass, **change)
 
     assert resolve.call_args.kwargs == expected
@@ -156,13 +158,13 @@ async def test_shrinking_the_zone_drops_an_area(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
     assert hass.states.get(SENSOR).state == STATE_ON  # type: ignore[union-attr]
 
-    resolve.return_value = {"QLD_PW001"}
+    resolve.return_value = location_of("QLD_PW001")
     await change_zone(hass, radius=100.0)
 
     assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
@@ -173,7 +175,7 @@ async def test_zone_edited_while_home_assistant_was_down_is_picked_up_at_start(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass, lat=-33.87, lon=151.21, radius=9_000.0)
 
@@ -188,12 +190,12 @@ async def test_zone_with_no_area_raises_the_repair_and_keeps_the_codes(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
 
-    resolve.return_value = set()
+    resolve.return_value = location_of()
     await change_zone(hass, lat=-40.0, lon=100.0)
 
     found = issue(hass, zone_entry, "no_area")
@@ -208,22 +210,20 @@ async def test_failed_re_resolve_is_retried_on_the_next_poll(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     freezer: Any,
 ) -> None:
-    from custom_components.bom_warnings.ftp import BomFtpError
-
     from .test_binary_sensor import poll
 
     set_zone(hass)
     await setup_entry(hass, zone_entry)
 
-    resolve.side_effect = BomFtpError("offline")
+    resolve.side_effect = LocationUnavailable("offline")
     await change_zone(hass, radius=7_000.0)
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]
 
     resolve.side_effect = None
-    resolve.return_value = {"QLD_ME008", "QLD_PW001"}
+    resolve.return_value = location_of("QLD_ME008", "QLD_PW001")
     await poll(hass, freezer)
 
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_ME008", "QLD_PW001"]
@@ -242,7 +242,7 @@ async def test_radius_above_the_cap_is_clamped_and_explained(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     radius: float,
     stored: float,
     clamped: bool,
@@ -267,7 +267,7 @@ async def test_shrinking_an_oversized_zone_clears_the_notice(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass, radius=80_000.0)
     await setup_entry(hass, zone_entry)
@@ -285,7 +285,7 @@ async def test_deleting_the_zone_raises_a_repair_and_the_entry_keeps_working(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
@@ -307,7 +307,7 @@ async def test_recreating_the_zone_clears_the_repair(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
@@ -326,7 +326,7 @@ async def test_zone_missing_at_start_raises_the_repair(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     await setup_entry(hass, zone_entry)
 
@@ -339,7 +339,7 @@ async def test_unloaded_entry_stops_following_the_zone(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass)
     await setup_entry(hass, zone_entry)
@@ -356,7 +356,7 @@ async def test_removing_the_entry_removes_its_repairs(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     set_zone(hass, radius=80_000.0)
     await setup_entry(hass, zone_entry)
@@ -401,7 +401,7 @@ async def test_coastal_waters_in_the_circle_alert_while_their_type_is_on(
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     product_id: str,
     event: str,
     severity: str,

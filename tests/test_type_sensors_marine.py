@@ -19,7 +19,7 @@ from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
 from .test_binary_sensor import setup_entry
-from .test_options import layers, resolve, set_options  # noqa: F401
+from .test_options import layers, set_options  # noqa: F401
 from .test_zones import ZONE, set_zone, zone_codes, zone_entry, zone_options  # noqa: F401
 
 EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
@@ -84,7 +84,7 @@ async def test_marine_sensor_follows_its_toggle_without_re_resolving(
     hass: HomeAssistant,
     zone_entry: MockConfigEntry,  # noqa: F811
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
     event: str,
     key: str,
     _name: str,
