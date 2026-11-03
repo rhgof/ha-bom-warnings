@@ -43,7 +43,7 @@ LAYER_CHECK_DUE = 31
 
 @pytest.fixture(autouse=True)
 def short_layer_interval() -> Iterator[None]:
-    with patch("custom_components.bom_warnings.coordinator.LAYER_CHECK_INTERVAL", CHECK_INTERVAL):
+    with patch("custom_components.bom_warnings.layer_check.LAYER_CHECK_INTERVAL", CHECK_INTERVAL):
         yield
 
 
