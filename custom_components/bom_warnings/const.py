@@ -15,11 +15,11 @@ SPATIAL_CACHE_DIR = "bom_warnings/spatial"
 
 # Options. Defaults keep today's behaviour: ended warnings hidden, every warning type on.
 CONF_HIDE_FINAL = "hide_final_cancelled"
-# The checklist: the keys of the warning types the location cares about (the second column of
-# WARNING_TYPE_SENSORS, plus OTHER_WARNINGS). Absent means every type is on.
+# The checklist: the keys of the warning types the location cares about (the keys of
+# `warning_types.WARNING_TYPES`, plus OTHER_WARNINGS). Absent means every type is on.
 CONF_WARNING_TYPES = "warning_types"
-# Covers a warning whose CAP event has no row in WARNING_TYPE_SENSORS (tsunami, and any type BoM
-# adds later), so a new type is neither silently dropped nor impossible to turn off.
+# Covers a warning whose CAP event has no row in `warning_types.WARNING_TYPES` (tsunami, and any
+# type BoM adds later), so a new type is neither silently dropped nor impossible to turn off.
 OTHER_WARNINGS = "other_warnings"
 # The options of entries from before the checklist (config entry version 1). Only the migration
 # reads them: an event-type filter, and whether coastal waters counted.
@@ -72,26 +72,6 @@ EVENT_ICONS = {
 }
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
 
-# One level sensor per warning type: (CAP event, translation key). The key is also the name of the
-# type's toggle in the options checklist, so a type is switched on or off in one place and its
-# sensor exists only while it is on. The icon comes from EVENT_ICONS, the single place an event gets
-# one. A new type is a new row here, plus its name in strings.json. Tsunami has no zones yet (#25).
-# The marine rows (Wind, Large Coastal Surf) only ever match a location whose area codes reach a
-# coastal water zone.
-WARNING_TYPE_SENSORS = (
-    ("Thunderstorm", "thunderstorm_warning"),
-    ("Fire Weather", "fire_weather_warning"),
-    ("Extreme Heat", "extreme_heat_warning"),
-    ("Frost", "frost_warning"),
-    ("Hazardous Road Conditions", "hazardous_road_conditions_warning"),
-    ("Riverine Flood", "flood_warning"),
-    ("Sheep Grazier Warning", "sheep_grazier_warning"),
-    ("Exposure", "exposure_warning"),
-    ("Tropical Cyclone", "tropical_cyclone_warning"),
-    ("Weather", "severe_weather_warning"),
-    ("Wind", "marine_wind_warning"),
-    ("Large Coastal Surf", "hazardous_surf_warning"),
-)
 # An entity has no description field, so a type that is easy to misread says so in a `note`
 # attribute. BoM's Wind event is marine wind, which is not wind at the house. Its Weather event is
 # both the Severe Weather Warning and the Coastal Hazard Warning, and which of the two a warning is

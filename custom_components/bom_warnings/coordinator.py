@@ -23,7 +23,6 @@ from .const import (
     CONF_ZONE,
     DOMAIN,
     SPATIAL_CACHE_DIR,
-    WARNING_TYPE_SENSORS,
 )
 from .fire_danger import (
     FireDangerView,
@@ -37,7 +36,7 @@ from .spatial import (
     SpatialDataError,
     resolve_coordinate,
 )
-from .warning_types import enabled_keys, event_is_on
+from .warning_types import enabled_keys, event_is_on, sensor_types
 from .zone import ZoneFollower
 
 if TYPE_CHECKING:
@@ -196,7 +195,7 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             warnings, self._area_codes, now, hide_final=self._hide_final, type_on=self._type_on
         )
         self.by_event = {
-            event: tuple(w for w in active if w.event == event) for event, _ in WARNING_TYPE_SENSORS
+            t.event: tuple(w for w in active if w.event == t.event) for t in sensor_types()
         }
         self.states = product_states(warnings, self._area_codes, now, self._type_on)
         before = self._fire_memory

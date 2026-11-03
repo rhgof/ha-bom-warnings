@@ -20,7 +20,7 @@ entity id for a zone entry):
 | `binary_sensor.<title>_warning` | on while a current warning covers the location | `coordinator.data` |
 | `sensor.<title>_warning_count` | number of current warnings covering the location; attribute `warnings` is the ranked list (icon and colour per item) | `coordinator.data` |
 | `sensor.<title>_most_severe_warning` | headline of the top-ranked one (cut to 255 characters), or `none`; attributes are the top item's fields plus `warnings` | `coordinator.data` |
-| `sensor.<title>_<type>_warning` (one per row of `WARNING_TYPE_SENSORS`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | enum level sensor: the highest level among the type's current warnings (`none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`; BoM's CAP `unknown` is shown as `unrated`). Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: the top warning's `headline`, `expires`, `product_id`, `event`, plus `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather and marine wind ones add a `note`. The marine wind one also has `strength` (`active_warnings.wind_strength`: the class read from the Wind headline), as does each Wind entry in any `warnings` list. | `coordinator.by_event` |
+| `sensor.<title>_<type>_warning` (one per row of `warning_types.WARNING_TYPES`: thunderstorm, fire weather, extreme heat, frost, hazardous road conditions, flood, sheep grazier, exposure, tropical cyclone, severe weather, marine wind, hazardous surf) | enum level sensor: the highest level among the type's current warnings (`none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`; BoM's CAP `unknown` is shown as `unrated`). Created only for a type that is on in the options checklist; a type that is off has no sensor (its registry entry is removed when the entry loads). Attributes: the top warning's `headline`, `expires`, `product_id`, `event`, plus `warnings` (product, event, headline, severity, phase, effective, expires). Honours hide-final. The marine ones match only a location whose circle reaches a water zone. The severe weather and marine wind ones add a `note`. The marine wind one also has `strength` (`active_warnings.wind_strength`: the class read from the Wind headline), as does each Wind entry in any `warnings` list. | `coordinator.by_event` |
 | `event.<title>_warning_event` | fires `new`, `update`, `final`, `cancelled` | `states` |
 | `sensor.<title>_fire_danger_today`, `sensor.<title>_fire_danger_tomorrow` | enum: `no_rating`, `moderate`, `high`, `extreme`, `catastrophic` (unseen text: unknown). Only for entries whose stored codes include a fire district present in a fetched fire danger product. | `coordinator.fire_danger` |
 
@@ -146,7 +146,7 @@ Home Assistant layer:
   unavailable together on a failed refresh.
 - **Options (no restart):** hide final/cancelled warnings (default on) and the warning types
   checklist (`warning_types`, a list of the keys that are on; absent means all). The keys are the
-  second column of `WARNING_TYPE_SENSORS` plus `other_warnings` (any event with no row). One helper,
+  `key` of each row of `warning_types.WARNING_TYPES` plus `other_warnings` (any event with no row). One helper,
   `warning_types.event_is_on`, answers "is this event on" for the list, count, most severe, event
   entity, any-warning sensor and the per-type sensors. The options flow reloads the entry. Config
   entry version 2: `async_migrate_entry` turns the version 1 `event_types` filter and
@@ -311,7 +311,7 @@ districts):
 - The `no_area` repair issue is informational; there is no fix flow.
 - `KNOWN_EVENT_TYPES` lists every `<event>` in the recorded CAP files (`tests/test_cap_types.py`
   fails if a fixture uses one that is missing). It is only what the samples show, and the options
-  checklist no longer reads it: the toggles come from `WARNING_TYPE_SENSORS`.
+  checklist no longer reads it: the toggles come from `warning_types.WARNING_TYPES`.
 - The tsunami sample is named `IDY68027_cap.xml` (underscore), so `LIST *.cap.xml` does not list it
   and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
 - Area codes of kind TW (tsunami) and PT (cyclone place) are never matched to a location, because

@@ -17,7 +17,6 @@ from .const import (
     CONF_INCLUDE_MARINE,
     CONF_WARNING_TYPES,
     DOMAIN,
-    WARNING_TYPE_SENSORS,
 )
 from .coordinator import BomWarningsCoordinator, no_area_issue_id
 from .fire_store import FireStore
@@ -28,7 +27,7 @@ from .shared_feed import (
     async_release_feed,
     async_release_removed_entry,
 )
-from .warning_types import keys_from_legacy_options
+from .warning_types import keys_from_legacy_options, sensor_types
 from .zone import delete_zone_issues
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.EVENT, Platform.SENSOR]
@@ -112,6 +111,8 @@ def _remove_old_binary_type_sensors(hass: HomeAssistant, entry: BomWarningsConfi
     would be orphaned: remove them. The level sensors are new entities with the same unique ids."""
     registry = er.async_get(hass)
     unique_id = entry.unique_id or entry.entry_id
-    for _, key in WARNING_TYPE_SENSORS:
-        if entity_id := registry.async_get_entity_id("binary_sensor", DOMAIN, f"{unique_id}_{key}"):
+    for warning_type in sensor_types():
+        if entity_id := registry.async_get_entity_id(
+            "binary_sensor", DOMAIN, f"{unique_id}_{warning_type.key}"
+        ):
             registry.async_remove(entity_id)

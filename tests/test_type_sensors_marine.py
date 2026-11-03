@@ -13,10 +13,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import (
-    EVENT_ICONS,
-    WARNING_TYPE_SENSORS,
-)
+from custom_components.bom_warnings.const import EVENT_ICONS
+from custom_components.bom_warnings.warning_types import sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -90,7 +88,7 @@ def entity(key: str) -> str:
 def test_the_marine_types_are_in_the_table_with_a_clear_name(
     event: str, key: str, name: str
 ) -> None:
-    assert (event, key) in WARNING_TYPE_SENSORS
+    assert (event, key) in [(t.event, t.key) for t in sensor_types()]
     assert event in EVENT_ICONS
     assert load(STRINGS)["entity"]["sensor"][key]["name"] == name
 

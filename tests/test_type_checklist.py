@@ -15,6 +15,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
@@ -24,9 +25,8 @@ from custom_components.bom_warnings.const import (
     CONF_WARNING_TYPES,
     DOMAIN,
     OTHER_WARNINGS,
-    WARNING_TYPE_SENSORS,
 )
-from custom_components.bom_warnings.warning_types import TYPE_LABELS
+from custom_components.bom_warnings.warning_types import WARNING_TYPES, label_of, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -39,7 +39,7 @@ from .test_zones import set_zone, zone_codes, zone_entry, zone_options  # noqa: 
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
-TYPE_KEYS = [key for _, key in WARNING_TYPE_SENSORS]
+TYPE_KEYS = [t.key for t in sensor_types()]
 MARINE_KEYS = ["marine_wind_warning", "hazardous_surf_warning"]
 LAND_KEYS = [key for key in TYPE_KEYS if key not in MARINE_KEYS]
 THUNDERSTORM = "sensor.home_thunderstorm_warning"
@@ -72,7 +72,7 @@ async def test_the_options_form_is_one_checklist_and_the_hide_final_switch(
     assert selector.config["mode"] == "list"
     assert selector.config["multiple"] is True
     assert selector.config["options"] == [
-        {"value": key, "label": TYPE_LABELS[key]} for key in [*TYPE_KEYS, OTHER_WARNINGS]
+        {"value": key, "label": label_of(key)} for key in [*TYPE_KEYS, OTHER_WARNINGS]
     ]
 
 
@@ -204,11 +204,8 @@ async def test_other_warnings_covers_a_type_with_no_row(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Surf stands in for a type BoM adds later: it has no row, so the Other toggle governs it."""
-    without_surf = tuple(row for row in WARNING_TYPE_SENSORS if row[0] != "Large Coastal Surf")
-    for module in ("sensor", "coordinator", "warning_types"):
-        monkeypatch.setattr(
-            f"custom_components.bom_warnings.{module}.WARNING_TYPE_SENSORS", without_surf
-        )
+    without_surf = tuple(t for t in WARNING_TYPES if t.event != "Large Coastal Surf")
+    monkeypatch.setattr(warning_types, "WARNING_TYPES", without_surf)
     scenarios.apply("all_types", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
     assert "Large Coastal Surf" in events_listed(hass)
@@ -390,10 +387,9 @@ async def test_the_zone_step_no_longer_asks_about_coastal_waters(
 def test_every_choice_on_the_checklist_has_a_plain_english_label() -> None:
     """The list shows these words, so none may be a computer identifier."""
     keys = [*TYPE_KEYS, OTHER_WARNINGS]
-    assert set(TYPE_LABELS) == set(keys)
-    labels = [TYPE_LABELS[key] for key in keys]
+    labels = [label_of(key) for key in keys]
     assert len(set(labels)) == len(labels)
-    for key, label in TYPE_LABELS.items():
+    for key, label in zip(keys, labels, strict=True):
         assert label != key
         assert "_" not in label
         assert label[0].isupper()
