@@ -2,6 +2,26 @@
 
 Bureau of Meteorology warnings as Home Assistant entities and events (domain `bom_warnings`).
 
+*Unofficial, for personal use. Data from the Australian Bureau of Meteorology, © Commonwealth of
+Australia; not endorsed by the Bureau.*
+
+## Install
+
+It has been run on Home Assistant 2026.10.4 only; no other version has been tested. The host also
+needs outbound access to the Bureau's FTP server (`ftp.bom.gov.au`, port 21).
+
+**Today (the repository is private):** copy the `custom_components/bom_warnings` folder from this
+repository into the `custom_components` folder of your Home Assistant configuration (for example
+over the Samba or SSH add-on), restart Home Assistant, then go to Settings > Devices & services >
+Add integration > **BoM Warnings**. The first location you add downloads the Bureau's area boundary
+files, so allow a minute. Take a full backup first. The step-by-step checklist is in
+`docs/live-verification-c6.md`.
+
+**HACS (when the repository is public):** add this repository in HACS as a custom repository of
+type Integration, download BoM Warnings, restart Home Assistant, then add the integration as above.
+This route does not work yet: the repository is private, and the release and HACS checks are not
+set up (ticket #38).
+
 ## Locations
 
 Add a location from Settings > Devices & services. There are three kinds:
