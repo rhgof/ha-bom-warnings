@@ -21,9 +21,10 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import BomWarningsConfigEntry
+from .active_warnings import WarningState
 from .cap import Phase
 from .const import DOMAIN
-from .coordinator import BomWarningsCoordinator, WarningState
+from .coordinator import BomWarningsCoordinator
 
 PARALLEL_UPDATES = 0
 

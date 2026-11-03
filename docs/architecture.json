@@ -25,6 +25,11 @@
       "purpose": "Turns BoM files into parsed values: the incremental warnings read, fire danger products, the shapefile layer cache, and when its weekly check is due. Blocking, so callers run it in an executor. Imports nothing from Home Assistant.",
       "owns": ["feed.py", "fire_danger.py", "spatial.py", "layer_check.py"]
     },
+    "active-warnings": {
+      "layer": "readers",
+      "purpose": "What one location sees of the parsed warnings: the active warnings that cover it, the per-product states the event entity compares between refreshes, and a warning's list attributes. Imports nothing from Home Assistant.",
+      "owns": ["active_warnings.py"]
+    },
     "warning-format": {
       "layer": "foundation",
       "purpose": "The CAP 1.2 parser and its types (CapWarning, Info, Phase, Severity).",

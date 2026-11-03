@@ -13,13 +13,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bom_warnings.active_warnings import ActiveWarning
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import (
     CONF_HIDE_FINAL,
     CONF_WARNING_TYPES,
     WARNING_TYPE_SENSORS,
 )
-from custom_components.bom_warnings.coordinator import ActiveWarning
 from custom_components.bom_warnings.sensor import LEVEL_OPTIONS, highest_level
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
