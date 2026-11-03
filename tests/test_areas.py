@@ -98,6 +98,8 @@ def test_real_bom_shapefiles(name, lat, lon, expected_flood, expected_district):
         ({"NSW_ME001", "NSW_PW002"}, "NSW"),
         # The forecast district decides when codes straddle a border.
         ({"QLD_ME008", "NSW_PW002"}, "NSW"),
+        # And when the district code sorts after the other state's code.
+        ({"NSW_ME001", "QLD_PW011"}, "QLD"),
         ({"VIC_FW001"}, "VIC"),
     ],
 )

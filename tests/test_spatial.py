@@ -17,7 +17,7 @@ from custom_components.bom_warnings.spatial import (
     resolve_coordinate,
 )
 from tests.fake_ftp import FakeFtp
-from tests.shapefiles import remote, zip_layer
+from tests.shapefiles import remote, zip_layer, zip_real
 
 
 @pytest.fixture
@@ -174,14 +174,6 @@ def test_missing_remote_layer_is_a_failure(ftp: FakeFtp, cached: Path) -> None:
 SPATIAL = os.environ.get("BOM_SPATIAL_DIR")
 
 
-def _zip_real(base: Path, layer: str) -> bytes:
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w") as archive:
-        for part in (base / layer).iterdir():
-            archive.write(part, part.name)
-    return buffer.getvalue()
-
-
 @pytest.mark.skipif(not SPATIAL, reason="set BOM_SPATIAL_DIR to the unzipped BoM shapefiles")
 @pytest.mark.parametrize(
     ("lat", "lon", "expected"),
@@ -197,7 +189,7 @@ def test_real_shapefiles_through_cache(
     tmp_path: Path, lat: float, lon: float, expected: set[str]
 ) -> None:
     base = Path(SPATIAL)
-    fake = FakeFtp({remote(layer): _zip_real(base, layer) for layer in LAYERS})
+    fake = FakeFtp({remote(layer): zip_real(base, layer) for layer in LAYERS})
     cache = tmp_path / "cache"
     codes = resolve_coordinate(fake, cache, lat=lat, lon=lon)
     assert expected <= codes
