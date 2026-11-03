@@ -5,11 +5,11 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -18,8 +18,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
+from .active_warnings import ActiveWarning, WarningState, covering, product_states
 from .areas import state_of
-from .cap import CapWarning, Info, Phase, Severity
+from .cap import CapWarning
 from .const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
@@ -51,7 +52,6 @@ from .spatial import (
     refresh_layers,
     resolve_coordinate,
 )
-from .strength import wind_strength
 from .warning_types import enabled_keys, event_is_on
 from .zone import ZoneFollower
 
@@ -70,144 +70,6 @@ REFRESH_ISSUE_ID = "refresh_failing"
 
 def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
     return f"no_area_{entry.entry_id}"
-
-
-@dataclass(frozen=True, slots=True)
-class ActiveWarning:
-    """One current `<info>` block that covers the entry's location."""
-
-    product_id: str
-    event: str
-    headline: str
-    severity: Severity
-    effective: datetime | None
-    expires: datetime | None
-    sent: datetime | None = None
-    # Last, with a default, so existing constructors keep working.
-    phase: Phase = Phase.UNKNOWN
-
-    @property
-    def is_current(self) -> bool:
-        """False for a cancelled or final warning, which `hide_final=False` lists for reference."""
-        return self.phase not in _ENDED
-
-    @property
-    def strength(self) -> str | None:
-        """The class of a marine wind warning (strong, gale, storm), read from its headline."""
-        return wind_strength(self.event, self.headline)
-
-
-_ENDED = (Phase.CANCELLED, Phase.FINAL)
-
-
-def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
-    """One warning as the list attributes of the binary sensors and the type sensors show it."""
-    attributes: dict[str, Any] = {
-        "product_id": warning.product_id,
-        "event": warning.event,
-        "headline": warning.headline,
-        "severity": str(warning.severity),
-        "phase": str(warning.phase),
-        "effective": warning.effective.isoformat() if warning.effective else None,
-        "expires": warning.expires.isoformat() if warning.expires else None,
-    }
-    # Only marine wind has one, so no other event gains the field.
-    if (strength := warning.strength) is not None:
-        attributes["strength"] = strength
-    return attributes
-
-
-def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
-    if info.is_active(now):
-        return True
-    ended = info.phase in _ENDED
-    return ended and not hide_final and (info.expires is None or info.expires > now)
-
-
-def _active(
-    warnings: list[CapWarning],
-    now: datetime,
-    matches: Callable[[Info], bool],
-    *,
-    hide_final: bool = True,
-    type_on: Callable[[str], bool] = lambda event: True,
-) -> tuple[ActiveWarning, ...]:
-    # Match per info block: one file can mix areas, so a warning-level match could report an
-    # inactive block that happens to share the file with a matching one.
-    return tuple(
-        ActiveWarning(
-            product_id=warning.product_id,
-            event=info.event,
-            headline=info.headline,
-            severity=info.severity,
-            effective=info.effective,
-            expires=info.expires,
-            sent=warning.sent,
-            phase=info.phase,
-        )
-        for warning in warnings
-        for info in warning.infos
-        if _shown(info, now, hide_final) and matches(info) and type_on(info.event)
-    )
-
-
-def _covering(
-    warnings: list[CapWarning],
-    area_codes: frozenset[str],
-    now: datetime,
-    **filters: Any,
-) -> tuple[ActiveWarning, ...]:
-    return _active(warnings, now, lambda info: bool(info.area_codes & area_codes), **filters)
-
-
-@dataclass(frozen=True, slots=True)
-class WarningState:
-    """What the event entity compares between refreshes: one product, whatever its phase.
-
-    `data` only holds active warnings, so a cancelled or final one vanishes from it. This keeps
-    those too, so the transition can be seen.
-    """
-
-    product_id: str
-    identifier: str
-    phase: Phase
-    event: str
-    headline: str
-    severity: Severity
-
-
-def _states(
-    warnings: list[CapWarning],
-    area_codes: frozenset[str],
-    now: datetime,
-    type_on: Callable[[str], bool] = lambda event: True,
-) -> dict[str, WarningState]:
-    states: dict[str, WarningState] = {}
-    for warning in warnings:
-        # Finished blocks stay in; a block that merely expired without a cancel is not news.
-        covering: list[Info] = [
-            info
-            for info in warning.infos
-            if info.area_codes & area_codes
-            and (info.phase in _ENDED or info.is_active(now))
-            # A type that is off applies; hide_final deliberately does not, because a final
-            # or cancelled transition is exactly what the event entity reports.
-            and type_on(info.event)
-        ]
-        if not covering:
-            continue
-        # One file can hold several blocks (e.g. extreme and severe heatwave); the most severe
-        # one stands for the product, so a product raises one event per transition.
-        info = max(covering, key=lambda i: list(Severity).index(i.severity))
-        states[warning.product_id] = WarningState(
-            product_id=warning.product_id,
-            identifier=warning.identifier,
-            phase=info.phase,
-            event=info.event,
-            headline=info.headline,
-            severity=info.severity,
-        )
-    return states
 
 
 @dataclass(frozen=True, slots=True)
@@ -546,18 +408,17 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
                 self._apply_resolved(new_codes)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
-        covering = _covering(
+        active = covering(
             warnings, self._area_codes, now, hide_final=self._hide_final, type_on=self._type_on
         )
         self.by_event = {
-            event: tuple(w for w in covering if w.event == event)
-            for event, _ in WARNING_TYPE_SENSORS
+            event: tuple(w for w in active if w.event == event) for event, _ in WARNING_TYPE_SENSORS
         }
-        self.states = _states(warnings, self._area_codes, now, self._type_on)
+        self.states = product_states(warnings, self._area_codes, now, self._type_on)
         before = self._fire_memory
         self._fire_memory, self.fire_danger = derive(
             before, snapshot.fire_danger, self._area_codes, now, dt_util.get_default_time_zone()
         )
         if self._fire_memory != before:
             await self._async_save_remembered()
-        return covering
+        return active

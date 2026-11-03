@@ -16,6 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import BomWarningsConfigEntry
+from .active_warnings import ActiveWarning, warning_attributes
 from .const import (
     DEFAULT_EVENT_ICON,
     DEFAULT_FIRE_DANGER_ICON,
@@ -28,7 +29,7 @@ from .const import (
     WARNING_TYPE_NOTES,
     WARNING_TYPE_SENSORS,
 )
-from .coordinator import ActiveWarning, BomWarningsCoordinator, warning_attributes
+from .coordinator import BomWarningsCoordinator
 from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView
 from .strength import WIND_EVENT
 
