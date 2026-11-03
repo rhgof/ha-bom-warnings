@@ -19,7 +19,6 @@ from scripts.fake_bom.server import FakeBom
 from .conftest import NOW
 from .test_binary_sensor import ENTITY_ID as ANY_WARNING
 from .test_binary_sensor import poll, setup_entry
-from .test_strings import STRINGS, load
 from .test_warning_types import entry_at
 
 EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
@@ -75,33 +74,6 @@ def rows() -> list[tuple[str, str]]:
 
 def table_entity_ids() -> list[str]:
     return [sensor_id(key) for _, key in rows()]
-
-
-def test_the_table_has_a_row_for_every_land_and_marine_type_and_thunderstorm() -> None:
-    events = {event for event, _ in rows()}
-    assert events == {*LAND_IDS, "Thunderstorm", "Wind", "Large Coastal Surf"}
-    # Tsunami has no zones yet (#25).
-    assert "Tsunami" not in events
-
-
-def test_every_row_has_a_distinct_key_a_name_and_an_icon() -> None:
-    names = load(STRINGS)["entity"]["sensor"]
-    keys = [key for _, key in rows()]
-    assert len(set(keys)) == len(keys)
-    for event, key in rows():
-        assert names[key]["name"].strip(), key
-        assert event in EVENT_ICONS, event
-    assert len({names[key]["name"] for key in keys}) == len(keys)
-
-
-@pytest.mark.parametrize(
-    ("event", "key", "name"),
-    [(event, key, name) for event, key, name, _, _ in LAND_TYPES],
-    ids=LAND_IDS,
-)
-def test_each_land_type_is_named_for_what_it_is(event: str, key: str, name: str) -> None:
-    assert (event, key) in rows()
-    assert load(STRINGS)["entity"]["sensor"][key]["name"] == name
 
 
 async def test_every_sensor_is_created_enabled_and_the_state_count_is_bounded(

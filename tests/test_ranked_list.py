@@ -240,10 +240,6 @@ async def test_each_event_gets_its_icon(
     assert icons == {EVENT_ICONS[event]}
 
 
-def test_every_known_event_type_has_an_icon() -> None:
-    assert DEFAULT_EVENT_ICON not in EVENT_ICONS.values()
-
-
 def test_colours_are_one_hex_per_level_in_ranking_order() -> None:
     assert list(LEVEL_COLORS) == ["minor", "moderate", "unknown", "severe", "extreme"]
     assert all(len(c) == 7 and c.startswith("#") for c in LEVEL_COLORS.values())

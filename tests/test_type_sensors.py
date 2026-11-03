@@ -22,7 +22,6 @@ from custom_components.bom_warnings.const import (
     CONF_HIDE_FINAL,
     CONF_WARNING_TYPES,
 )
-from custom_components.bom_warnings.warning_types import sensor_types
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -235,14 +234,6 @@ async def test_a_type_that_is_off_has_no_sensor_and_is_not_counted(
     assert hass.states.get("sensor.home_frost_warning").state == NONE  # type: ignore[union-attr]
     assert hass.states.get(ANY_WARNING).state == STATE_OFF  # type: ignore[union-attr]
     assert hass.states.get("sensor.home_warning_count").state == "0"  # type: ignore[union-attr]
-
-
-async def test_every_row_of_the_table_has_a_distinct_key_and_event() -> None:
-    keys = [t.key for t in sensor_types()]
-    events = [t.event for t in sensor_types()]
-    assert len(set(keys)) == len(keys)
-    assert len(set(events)) == len(events)
-    assert ("Thunderstorm", "thunderstorm_warning") in [(t.event, t.key) for t in sensor_types()]
 
 
 async def test_the_sensor_is_a_level_sensor_not_a_safety_binary_sensor(

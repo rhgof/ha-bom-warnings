@@ -74,6 +74,7 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
+| `warning_types.py` | The one table of warning types. `WARNING_TYPES` has a `WarningType` row (event, icon, optional note and strength rule) for every CAP event BoM is known to send. A `SensorType` row adds the key, label and marine flag for the 12 types with a level sensor and a checklist toggle. Tsunami is a plain row: an icon but no sensor, so it falls under "Other warnings". The views derive from the table each time they are called (`sensor_types`, `type_of`, `label_of`, `type_keys`, `key_of`, `event_is_on`, `enabled_keys`, `keys_from_legacy_options`), so a test removes a type by patching `WARNING_TYPES` alone. A new type is a new row plus its name in `strings.json` and `translations/en.json`, which `tests/test_strings.py` checks. `wind_strength` is the one strength rule, read from the Wind headline. |
 | `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. A warning's strength comes from its row's `strength` rule in `warning_types.py`. |
 
 Home Assistant layer:
@@ -244,6 +245,15 @@ Home Assistant layer:
   and the ranked list kept `level: unknown` with the same colour and icon. The one difference was
   the event entity, which had fired a live `new` event on the old instance while the copy, started
   later, correctly fired nothing at startup. The event entity's payload is covered by the HA tests.
+- The warning-type table (`warning_types.WARNING_TYPES`, with icons, notes and the strength rule in
+  its rows) was checked the same way on 3 November 2026: a copy of the dev config on another port,
+  running the new code against BoM's real server, compared with the instance still running the old
+  code. 31 entities were identical, among them the marine wind sensor (icon, note and `strength`
+  attribute), the Severe Weather sensor (its note), a real Severe heatwave warning at Cairns and a
+  real Severe Thunderstorm warning at Sydney, which the type sensor calls `unrated`. The one
+  difference was again the event entity: the old instance had fired a live `update` that the copy,
+  started later, restored as an earlier event. The options form's labels are covered by the HA
+  tests, not compared live.
 
 ## Fire danger ratings
 
