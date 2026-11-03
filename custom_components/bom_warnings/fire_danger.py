@@ -8,6 +8,7 @@ by the same code as the fire weather district shapefile (`IDM00007`), each with 
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, tzinfo
@@ -15,6 +16,9 @@ from typing import Any
 from xml.etree import ElementTree as ET
 
 from .cap import parse_xml
+from .ftp import BomFtpClient, BomFtpError
+
+_LOGGER = logging.getLogger(__name__)
 
 # One product per state, keyed by the prefix of the district code (`NSW_FW004`). The ACT has no
 # product of its own: BoM publishes it in the NSW one as `NSW_FW008`. Adding a state is one line.
@@ -220,3 +224,42 @@ def parse_fire_danger(data: bytes) -> FireDangerProduct | None:
         issued=_timestamp(root.findtext("amoc/issue-time-local")),
         districts=districts,
     )
+
+
+class FireDangerReader:
+    """Keeps the parsed fire danger products and fetches one only when its listing line changes.
+
+    This step is optional: it never raises, so a failure here cannot reach the warnings refresh.
+    Whatever goes wrong, the previous parse (or none) stays.
+    """
+
+    def __init__(self, ftp: BomFtpClient) -> None:
+        self._ftp = ftp
+        # Product id -> (listing line it was fetched under, parsed product).
+        self._seen: dict[str, tuple[str, FireDangerProduct]] = {}
+
+    def _refresh_one(self, product_id: str) -> None:
+        name = f"{product_id}.xml"
+        try:
+            entries = self._ftp.list_files(name)
+            entry = next((e for e in entries if e.name == name), None)
+            known = self._seen.get(product_id)
+            if entry is None or (known and known[0] == entry.raw):
+                return
+            data = self._ftp.fetch(name)
+        except BomFtpError as err:
+            _LOGGER.debug("Could not read fire danger product %s: %s", product_id, err)
+            return
+        if (product := parse_fire_danger(data or b"")) is None:
+            # Not recorded under this line, so the next refresh tries the file again.
+            _LOGGER.debug("Fire danger product %s is empty or unreadable", product_id)
+            return
+        self._seen[product_id] = (entry.raw, product)
+
+    def refresh(self, product_ids: Iterable[str]) -> dict[str, FireDangerProduct]:
+        """Blocking, so run it in an executor. Returns the latest parse of each wanted product."""
+        wanted = set(product_ids)
+        self._seen = {pid: seen for pid, seen in self._seen.items() if pid in wanted}
+        for product_id in sorted(wanted):
+            self._refresh_one(product_id)
+        return {pid: product for pid, (_, product) in self._seen.items()}

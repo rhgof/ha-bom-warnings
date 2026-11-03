@@ -4,8 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.bom_warnings.feed import FireDangerReader
-from custom_components.bom_warnings.fire_danger import fire_product_ids
+from custom_components.bom_warnings.fire_danger import FireDangerReader, fire_product_ids
 from custom_components.bom_warnings.ftp import BomFtpError, BomFtpRejectedError
 
 from .fake_ftp import FakeFtp
