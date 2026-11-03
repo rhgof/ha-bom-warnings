@@ -11,7 +11,8 @@ patching `WARNING_TYPES` alone.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+import re
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
@@ -21,6 +22,34 @@ from .const import (
     CONF_WARNING_TYPES,
     OTHER_WARNINGS,
 )
+
+# The marine wind strength class, read from the headline.
+_CLASSES = {
+    "strong": "strong",
+    "gale force": "gale",
+    "gale": "gale",
+    "storm force": "storm",
+    "storm": "storm",
+    "hurricane force": "hurricane",
+    "hurricane": "hurricane",
+}
+_HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
+
+
+def wind_strength(headline: str) -> str | None:
+    """The strength class of a Wind warning's headline, or None.
+
+    Known classes are lowercase and stable (`strong`, `gale`, `storm`, `hurricane`). Wording this
+    code does not know keeps its class text as written, so a new class is shown and not lost. A
+    cancellation and a headline with no class have no strength.
+    """
+    match = _HEADLINE.match(headline.strip())
+    if match is None:
+        return None
+    text = match.group("class").strip()
+    if text.lower().startswith("cancellation"):
+        return None
+    return _CLASSES.get(text.lower(), text)
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +62,8 @@ class WarningType:
     # An entity has no description field, so a type that is easy to misread says so in a `note`
     # attribute.
     note: str | None = None
+    # Reads a class out of a warning's headline, for the one type that names its strength there.
+    strength: Callable[[str], str | None] | None = None
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -105,6 +136,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="marine_wind_warning",
         label="Marine wind",
         note=_WIND_NOTE,
+        strength=wind_strength,
         marine=True,
     ),
     SensorType(
