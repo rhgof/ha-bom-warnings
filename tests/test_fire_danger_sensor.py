@@ -35,11 +35,7 @@ TOMORROW = "sensor.home_fire_danger_tomorrow"
 FIRE_FILE = "IDN10016.xml"
 # Local (AEDT, +11:00) wall-clock times, written as UTC because that is what the clock holds.
 AFTER_THE_16_15_ISSUE = "2026-11-02 06:00:00+00:00"  # 17:00 on 2 Nov
-BEFORE_MIDNIGHT = "2026-11-02 12:59:00+00:00"  # 23:59 on 2 Nov
-AT_LOCAL_MIDNIGHT = "2026-11-02 13:00:00+00:00"  # 00:00 on 3 Nov
 AFTER_THE_05_05_ISSUE = "2026-11-02 18:30:00+00:00"  # 05:30 on 3 Nov
-LAST_COVERED_DAY = "2026-11-05 23:00:00+00:00"  # 10:00 on 6 Nov
-PRODUCT_EXPIRED = "2026-11-06 23:00:00+00:00"  # 10:00 on 7 Nov
 
 
 def served(fake_bom: FakeBom) -> Path:
@@ -71,35 +67,6 @@ def state_of(hass: HomeAssistant, entity_id: str) -> Any:
 def freeze(freezer: Any) -> Any:
     freezer.move_to("2026-11-02 06:00:00+00:00")
     return freezer
-
-
-@pytest.mark.parametrize("area_codes", [["NSW_FW001"]])
-@pytest.mark.parametrize(
-    ("now", "today", "tomorrow"),
-    [
-        (AFTER_THE_16_15_ISSUE, STATE_UNKNOWN, "no_rating"),
-        (BEFORE_MIDNIGHT, STATE_UNKNOWN, "no_rating"),
-        (AT_LOCAL_MIDNIGHT, "no_rating", "moderate"),
-        (AFTER_THE_05_05_ISSUE, "no_rating", "moderate"),
-        (LAST_COVERED_DAY, "moderate", STATE_UNKNOWN),
-        (PRODUCT_EXPIRED, STATE_UNKNOWN, STATE_UNKNOWN),
-    ],
-    ids=["after_16_15", "before_midnight", "midnight", "after_05_05", "last_day", "expired"],
-)
-async def test_periods_are_assigned_by_their_date_against_the_local_date(
-    hass: HomeAssistant,
-    fake_bom: FakeBom,
-    mock_config_entry: MockConfigEntry,
-    freezer: Any,
-    now: str,
-    today: str,
-    tomorrow: str,
-) -> None:
-    freezer.move_to(now)
-    await setup_entry(hass, mock_config_entry)
-
-    assert state_of(hass, TODAY).state == today
-    assert state_of(hass, TOMORROW).state == tomorrow
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW004"]])
@@ -308,24 +275,6 @@ async def test_entities_go_unavailable_not_missing_when_the_district_leaves_the_
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW001"]])
-async def test_todays_rating_is_remembered_after_the_afternoon_issue_drops_it(
-    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
-) -> None:
-    freezer.move_to(AFTER_THE_05_05_ISSUE)
-    await setup_entry(hass, mock_config_entry)
-    assert state_of(hass, TODAY).state == "no_rating"
-
-    # The afternoon issue starts tomorrow, so it has no period for the 3rd. Its 4th is No Rating.
-    reissue(fake_bom, one_day_later(served(fake_bom).read_bytes()))
-    freezer.move_to("2026-11-03 06:00:00+00:00")
-    await poll(hass, freezer)
-
-    assert [p["date"] for p in state_of(hass, TODAY).attributes["forecast"]][0] == "2026-11-04"
-    assert state_of(hass, TODAY).state == "no_rating"
-    assert state_of(hass, TOMORROW).state == "no_rating"
-
-
-@pytest.mark.parametrize("area_codes", [["NSW_FW001"]])
 @pytest.mark.parametrize(
     ("restart_at", "today", "tomorrow"),
     [
@@ -361,17 +310,16 @@ async def test_the_remembered_rating_survives_a_reload_until_the_end_of_its_loca
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW004"]])
-async def test_a_restored_rating_never_outlives_its_day_and_is_pruned_from_storage(
+async def test_what_is_remembered_is_saved_and_pruned_in_storage_after_a_restart(
     hass: HomeAssistant,
     hass_storage: dict[str, Any],
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     freezer: Any,
 ) -> None:
-    # NSW_FW004 is Moderate on the 3rd and 4th, High on the 5th (the capture).
+    # What is shown on each day is tested without Home Assistant; this is the storage wiring.
     freezer.move_to(AFTER_THE_05_05_ISSUE)
     await setup_entry(hass, mock_config_entry)
-    assert state_of(hass, TODAY).state == "moderate"
     stored = hass_storage[f"bom_warnings.fire_danger.{mock_config_entry.entry_id}"]["data"]
     assert [p["date"] for p in stored["periods"]] == [
         "2026-11-03",
@@ -380,12 +328,11 @@ async def test_a_restored_rating_never_outlives_its_day_and_is_pruned_from_stora
         "2026-11-06",
     ]
 
-    # Down for two days: the 3rd must not be shown on the 5th, nor kept in storage.
+    # Down for two days: the 3rd must not be kept in storage on the 5th.
     freezer.move_to("2026-11-05 00:30:00+00:00")  # 11:30 on 5 Nov
     await hass.config_entries.async_reload(mock_config_entry.entry_id)
     await hass.async_block_till_done()
 
-    assert state_of(hass, TODAY).state == "high"
     stored = hass_storage[f"bom_warnings.fire_danger.{mock_config_entry.entry_id}"]["data"]
     assert [p["date"] for p in stored["periods"]][0] == "2026-11-04"
 
