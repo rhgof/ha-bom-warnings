@@ -121,14 +121,15 @@ Home Assistant layer:
 - **Ranking.** Both sensors read only warnings covering the location (never the whole state, which
   would list, say, a western NSW sheep graziers alert for a Sydney home). `rank_warnings` in
   `sensor.py` sorts by level, most recent `sent`, undated last, then product id. Level order is
-  minor < moderate < unknown < severe < extreme: CAP `unknown` is what BoM sends for Severe Weather
-  and Severe Thunderstorm, so it must outrank a minor flood. The list holds current warnings, then
+  minor < moderate < unknown < severe < extreme, defined once as `SEVERITY_ORDER` in
+  `active_warnings.py` (CAP `unknown` is what BoM sends for Severe Weather and Severe Thunderstorm,
+  so it must outrank a minor flood). The list holds current warnings, then
   (with `hide_final_cancelled` off) ended ones, marked by `phase`. Each item has `level`, an `icon`
   chosen per CAP event (`EVENT_ICONS`, default `DEFAULT_EVENT_ICON`) and a hex `color` per level
   (`LEVEL_COLORS`), all in `const.py`. The two sensors' `icon` follows the top warning, or
   `NO_WARNING_ICON`. The binary sensor is unchanged. `docs/dashboard.md` has card examples. The
-  event entity still orders a product's blocks with the enum order (unknown lowest); it only picks
-  one block per product, and was left alone.
+  event entity picks one block per product with the same order, so the block that stands for a
+  product is the one the ranked list puts first.
 - **Layer changes.** Weekly (`layer_check.LAYER_CHECK_INTERVAL`), in a background task started
   after a successful warnings refresh, on the feed's second client, the feed compares each layer's
   server `MDTM` with the cached one. The feed holds a `LayerSchedule`, whose next check is set when

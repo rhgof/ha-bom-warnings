@@ -44,9 +44,8 @@ KNOWN_EVENT_TYPES = (
     "Wind",
 )
 
-# Ranking level of a warning, lowest first, with its colour. The levels are CAP severities, but
-# `unknown` sits between moderate and severe: BoM sends it for Severe Weather and Severe
-# Thunderstorm warnings, which must not rank below a minor flood. Colours run yellow to purple.
+# The colour of each level, which are the CAP severities. The order that ranks them is
+# `active_warnings.SEVERITY_ORDER`, not the order here. Colours run yellow to purple.
 LEVEL_COLORS = {
     "minor": "#FDD835",
     "moderate": "#FB8C00",
