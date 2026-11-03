@@ -11,11 +11,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
@@ -42,6 +40,7 @@ from .fire_danger import (
     derive,
     fire_product_ids,
 )
+from .fire_store import FireStore
 from .ftp import BomFtp, BomFtpError, client_from_env
 from .spatial import (
     LAYERS,
@@ -65,11 +64,6 @@ UPDATE_INTERVAL = timedelta(minutes=10)
 FAILURES_BEFORE_REPAIR = 3
 # One issue for the whole integration: the refresh is shared, so its failure is too.
 REFRESH_ISSUE_ID = "refresh_failing"
-FIRE_STORE_VERSION = 1
-
-
-def fire_store_key(entry: ConfigEntry) -> str:
-    return f"{DOMAIN}.fire_danger.{entry.entry_id}"
 
 
 def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
@@ -479,23 +473,15 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self.fire_danger: FireDangerView | None = None
         # Persisted, so a restart in the afternoon keeps today's rating too.
         self._fire_memory = FireMemory()
-        self._fire_store: Store[dict[str, Any]] = Store(
-            hass, FIRE_STORE_VERSION, fire_store_key(config_entry)
-        )
+        self._fire_store = FireStore(hass, config_entry)
 
     async def async_load_remembered(self) -> None:
         """Restore the remembered fire danger periods; call before the first refresh."""
-        stored = await self._fire_store.async_load()
-        if not stored:
-            return
-        if (restored := FireMemory.from_dict(stored)) is None:
-            # A damaged file is replaced by the next save; the next issue refills it.
-            _LOGGER.debug("Ignoring unreadable remembered fire danger data")
-            return
-        self._fire_memory = restored
+        if (restored := await self._fire_store.async_load()) is not None:
+            self._fire_memory = restored
 
     async def _async_save_remembered(self) -> None:
-        await self._fire_store.async_save(self._fire_memory.to_dict())
+        await self._fire_store.async_save(self._fire_memory)
 
     @property
     def consecutive_failures(self) -> int:
