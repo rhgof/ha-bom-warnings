@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -25,7 +26,7 @@ from homeassistant.helpers.selector import (
     SelectSelectorMode,
 )
 
-from .areas import state_of
+from . import location
 from .const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
@@ -40,15 +41,7 @@ from .const import (
     SPATIAL_CACHE_DIR,
 )
 from .ftp import BomFtpError, client_from_env
-from .spatial import SpatialDataError, resolve_coordinate
 from .warning_types import enabled_keys, label_of, type_keys
-
-
-def _resolve(cache_dir: Path, lat: float, lon: float, radius_m: float) -> set[str]:
-    """Blocking: runs in an executor."""
-    ftp = client_from_env(os.environ)
-    with ftp.session():
-        return resolve_coordinate(ftp, cache_dir, lat=lat, lon=lon, radius_m=radius_m)
 
 
 class _LocationError(Exception):
@@ -156,19 +149,25 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
         cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
         try:
-            codes = await self.hass.async_add_executor_job(_resolve, cache_dir, lat, lon, radius_m)
-        except (BomFtpError, SpatialDataError, OSError) as err:
+            # Built here so an invalid dev host override (a BomFtpError) is a connection problem.
+            ftp = client_from_env(os.environ)
+            found = await self.hass.async_add_executor_job(
+                partial(
+                    location.resolve_location, ftp, cache_dir, lat=lat, lon=lon, radius_m=radius_m
+                )
+            )
+        except (location.LocationUnavailable, BomFtpError) as err:
             raise _LocationError("cannot_connect") from err
         except Exception as err:
             raise _LocationError("unknown") from err
-        if not codes:
+        if not found.area_codes:
             raise _LocationError("no_area")
         data: dict[str, Any] = {
             **(extra or {}),
             CONF_LATITUDE: lat,
             CONF_LONGITUDE: lon,
-            CONF_STATE: state_of(codes),
-            CONF_AREA_CODES: sorted(codes),
+            CONF_STATE: found.state,
+            CONF_AREA_CODES: sorted(found.area_codes),
         }
         if CONF_ZONE in data:
             data[CONF_RADIUS] = radius_m
