@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -29,6 +31,8 @@ class FakeFtp:
         self.downloads: list[tuple[str, str]] = []
         self.fetches: list[str] = []
         self.listings: list[str] = []
+        self.sessions_started = 0
+        self.sessions_open = 0
         # Raise only for the wildcard listing: a BomFtpRejectedError is a server refusing
         # `LIST *.cap.xml`, a plain BomFtpError is a timeout.
         self.wildcard_error: BomFtpError | None = None
@@ -81,3 +85,12 @@ class FakeFtp:
             raise self.error
         self.downloads.append((remote_path, local_path))
         Path(local_path).write_bytes(self.files.get(remote_path, b""))
+
+    @contextmanager
+    def session(self) -> Iterator[FakeFtp]:
+        self.sessions_started += 1
+        self.sessions_open += 1
+        try:
+            yield self
+        finally:
+            self.sessions_open -= 1
