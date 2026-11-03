@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from datetime import UTC, datetime
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
@@ -16,8 +14,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import BomWarningsConfigEntry
-from .active_warnings import SEVERITY_ORDER, ActiveWarning, warning_attributes
-from .cap import Severity
+from .active_warnings import (
+    LEVEL_OPTIONS,
+    STATE_NONE,
+    ActiveWarning,
+    current_then_ended,
+    highest_level,
+    level_of,
+    rank_warnings,
+    warning_attributes,
+)
 from .const import (
     DEFAULT_EVENT_ICON,
     DEFAULT_FIRE_DANGER_ICON,
@@ -36,56 +42,13 @@ from .strength import WIND_EVENT
 
 PARALLEL_UPDATES = 0
 
-_LEVEL_RANK = {severity.value: rank for rank, severity in enumerate(SEVERITY_ORDER)}
-_EPOCH = datetime.min.replace(tzinfo=UTC)
-
-STATE_NONE = "none"
-# The states of a type sensor, lowest first: the severity order, with BoM's CAP severity `unknown`
-# (sent for Severe Thunderstorm and Severe Weather warnings) called `unrated`, because `unknown` is
-# Home Assistant's own no-value state and must not be a state of ours.
-LEVEL_OPTIONS = [
-    STATE_NONE,
-    *("unrated" if severity is Severity.UNKNOWN else severity.value for severity in SEVERITY_ORDER),
-]
-
-
-def _level(warning: ActiveWarning) -> str:
-    return warning.severity.value
-
-
-def highest_level(warnings: Iterable[ActiveWarning]) -> str:
-    """The top level among the warnings still in force, or `none`."""
-    current = rank_warnings(w for w in warnings if w.is_current)
-    if not current:
-        return STATE_NONE
-    level = _level(current[0])
-    return "unrated" if level == "unknown" else level
-
 
 def _icon(warning: ActiveWarning) -> str:
     return EVENT_ICONS.get(warning.event, DEFAULT_EVENT_ICON)
 
 
-def rank_warnings(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
-    """Most severe first; ties go to the most recently issued, undated last, then product id."""
-    return sorted(
-        warnings,
-        key=lambda w: (
-            -_LEVEL_RANK[_level(w)],
-            w.sent is None,
-            -(w.sent or _EPOCH).timestamp(),
-            w.product_id,
-        ),
-    )
-
-
-def _current_then_ended(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
-    ranked = rank_warnings(warnings)
-    return [w for w in ranked if w.is_current] + [w for w in ranked if not w.is_current]
-
-
 def _item(warning: ActiveWarning) -> dict[str, Any]:
-    level = _level(warning)
+    level = level_of(warning)
     item = {
         "product_id": warning.product_id,
         "event": warning.event,
@@ -166,7 +129,7 @@ class _WarningSensor(CoordinatorEntity[BomWarningsCoordinator], SensorEntity):
 
     @property
     def _ranked(self) -> list[ActiveWarning]:
-        return _current_then_ended(self.coordinator.data)
+        return current_then_ended(self.coordinator.data)
 
     @property
     def _top(self) -> ActiveWarning | None:

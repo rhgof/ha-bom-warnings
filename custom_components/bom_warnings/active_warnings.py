@@ -6,9 +6,9 @@ No Home Assistant imports.
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
@@ -163,3 +163,47 @@ def product_states(
             severity=info.severity,
         )
     return states
+
+
+_LEVEL_RANK = {severity.value: rank for rank, severity in enumerate(SEVERITY_ORDER)}
+_EPOCH = datetime.min.replace(tzinfo=UTC)
+
+STATE_NONE = "none"
+# The states of a type sensor, lowest first: the severity order, with BoM's CAP severity `unknown`
+# (sent for Severe Thunderstorm and Severe Weather warnings) called `unrated`, because `unknown` is
+# Home Assistant's own no-value state and must not be a state of ours.
+LEVEL_OPTIONS = [
+    STATE_NONE,
+    *("unrated" if severity is Severity.UNKNOWN else severity.value for severity in SEVERITY_ORDER),
+]
+
+
+def level_of(warning: ActiveWarning) -> str:
+    return warning.severity.value
+
+
+def rank_warnings(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
+    """Most severe first; ties go to the most recently issued, undated last, then product id."""
+    return sorted(
+        warnings,
+        key=lambda w: (
+            -_LEVEL_RANK[level_of(w)],
+            w.sent is None,
+            -(w.sent or _EPOCH).timestamp(),
+            w.product_id,
+        ),
+    )
+
+
+def highest_level(warnings: Iterable[ActiveWarning]) -> str:
+    """The top level among the warnings still in force, or `none`."""
+    current = rank_warnings(w for w in warnings if w.is_current)
+    if not current:
+        return STATE_NONE
+    level = level_of(current[0])
+    return "unrated" if level == "unknown" else level
+
+
+def current_then_ended(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
+    ranked = rank_warnings(warnings)
+    return [w for w in ranked if w.is_current] + [w for w in ranked if not w.is_current]
