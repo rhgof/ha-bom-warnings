@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
@@ -305,10 +305,7 @@ class FireDangerSensor(_WarningSensor):
     @property
     def _period(self) -> FireDangerPeriod | None:
         view = self._view
-        if view is None:
-            return None
-        day = view.local_date(dt_util.utcnow()) + timedelta(days=self._day_offset)
-        return view.by_date.get(day)
+        return view.period(self._day_offset, dt_util.utcnow()) if view else None
 
     @property
     def _level(self) -> str | None:
