@@ -47,8 +47,8 @@
     },
     "vocabulary": {
       "layer": "foundation",
-      "purpose": "Constants, the warning type table and checklist rules, and the marine wind strength class. Pure data and small rules that every other domain reads.",
-      "owns": ["const.py", "warning_types.py", "strength.py"]
+      "purpose": "Constants and the warning type table and checklist rules. Pure data and small rules that every other domain reads.",
+      "owns": ["const.py", "warning_types.py"]
     }
   },
   "constructedOnlyIn": [

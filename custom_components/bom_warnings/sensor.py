@@ -19,52 +19,23 @@ from .active_warnings import (
     STATE_NONE,
     ActiveWarning,
     current_then_ended,
+    event_icon,
     highest_level,
-    level_of,
-    rank_warnings,
+    type_attributes,
     warning_attributes,
 )
 from .const import (
-    DEFAULT_EVENT_ICON,
     DEFAULT_FIRE_DANGER_ICON,
     DOMAIN,
-    EVENT_ICONS,
     FIRE_DANGER_COLORS,
     FIRE_DANGER_ICONS,
-    LEVEL_COLORS,
     NO_WARNING_ICON,
-    WARNING_TYPE_NOTES,
     WARNING_TYPE_SENSORS,
 )
 from .coordinator import BomWarningsCoordinator
 from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView
-from .strength import WIND_EVENT
 
 PARALLEL_UPDATES = 0
-
-
-def _icon(warning: ActiveWarning) -> str:
-    return EVENT_ICONS.get(warning.event, DEFAULT_EVENT_ICON)
-
-
-def _item(warning: ActiveWarning) -> dict[str, Any]:
-    level = level_of(warning)
-    item = {
-        "product_id": warning.product_id,
-        "event": warning.event,
-        "severity": str(warning.severity),
-        "level": level,
-        "icon": _icon(warning),
-        "color": LEVEL_COLORS[level],
-        "headline": warning.headline,
-        "phase": str(warning.phase),
-        "sent": warning.sent.isoformat() if warning.sent else None,
-        "effective": warning.effective.isoformat() if warning.effective else None,
-        "expires": warning.expires.isoformat() if warning.expires else None,
-    }
-    if (strength := warning.strength) is not None:
-        item["strength"] = strength
-    return item
 
 
 async def async_setup_entry(
@@ -138,7 +109,7 @@ class _WarningSensor(CoordinatorEntity[BomWarningsCoordinator], SensorEntity):
     @property
     def icon(self) -> str:
         top = self._top
-        return _icon(top) if top else NO_WARNING_ICON
+        return event_icon(top.event) if top else NO_WARNING_ICON
 
 
 class WarningCountSensor(_WarningSensor):
@@ -151,7 +122,7 @@ class WarningCountSensor(_WarningSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"warnings": [_item(w) for w in self._ranked]}
+        return {"warnings": [warning_attributes(w, ranked=True) for w in self._ranked]}
 
 
 class MostSevereWarningSensor(_WarningSensor):
@@ -172,7 +143,8 @@ class MostSevereWarningSensor(_WarningSensor):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         top = self._top
-        return {**(_item(top) if top else {}), "warnings": [_item(w) for w in self._ranked]}
+        ranked = [warning_attributes(w, ranked=True) for w in self._ranked]
+        return {**(warning_attributes(top, ranked=True) if top else {}), "warnings": ranked}
 
 
 # Translation key by day offset from the local date.
@@ -215,33 +187,16 @@ class WarningTypeSensor(_WarningSensor):
         return self.coordinator.by_event.get(self._event, ())
 
     @property
-    def _top_current(self) -> ActiveWarning | None:
-        current = rank_warnings(w for w in self._warnings if w.is_current)
-        return current[0] if current else None
-
-    @property
     def native_value(self) -> str:
         return highest_level(self._warnings)
 
     @property
     def icon(self) -> str:
-        return EVENT_ICONS.get(self._event, DEFAULT_EVENT_ICON)
+        return event_icon(self._event)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        top = self._top_current
-        attributes: dict[str, Any] = {
-            "headline": top.headline if top else None,
-            "expires": top.expires.isoformat() if top and top.expires else None,
-            "product_id": top.product_id if top else None,
-            "event": top.event if top else None,
-            "warnings": [warning_attributes(w) for w in self._warnings],
-        }
-        if self._event == WIND_EVENT:
-            attributes["strength"] = top.strength if top else None
-        if note := WARNING_TYPE_NOTES.get(self._event):
-            attributes["note"] = note
-        return attributes
+        return type_attributes(self._event, self._warnings)
 
 
 class FireDangerSensor(_WarningSensor):

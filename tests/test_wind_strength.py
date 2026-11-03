@@ -13,8 +13,8 @@ import pytest
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bom_warnings.active_warnings import wind_strength
 from custom_components.bom_warnings.cap import parse_cap
-from custom_components.bom_warnings.strength import wind_strength
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
