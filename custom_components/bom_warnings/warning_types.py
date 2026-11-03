@@ -25,9 +25,21 @@ from .const import (
 
 @dataclass(frozen=True, slots=True)
 class WarningType:
-    # The CAP `<event>` this type is.
+    """A CAP event BoM is known to send."""
+
+    # The CAP `<event>`.
     event: str
-    # The type sensor's translation key, and the name of its toggle in the options checklist.
+    icon: str
+    # An entity has no description field, so a type that is easy to misread says so in a `note`
+    # attribute.
+    note: str | None = None
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class SensorType(WarningType):
+    """An event with a level sensor and a toggle in the options checklist."""
+
+    # The sensor's translation key, and the name of its toggle in the options checklist.
     key: str
     # The words the checklist shows. Given with each choice instead of looked up in the
     # translations, because the options dialog does not always load a selector's translations and
@@ -37,32 +49,86 @@ class WarningType:
     marine: bool = False
 
 
-# In the order the options form lists them and the sensors are created.
-WARNING_TYPES = (
-    WarningType("Thunderstorm", "thunderstorm_warning", "Thunderstorm"),
-    WarningType("Fire Weather", "fire_weather_warning", "Fire weather"),
-    WarningType("Extreme Heat", "extreme_heat_warning", "Extreme heat"),
-    WarningType("Frost", "frost_warning", "Frost"),
-    WarningType(
-        "Hazardous Road Conditions",
-        "hazardous_road_conditions_warning",
-        "Hazardous road conditions",
+# BoM's Wind event is marine wind, which is not wind at the house. Its Weather event is both the
+# Severe Weather Warning and the Coastal Hazard Warning, and which of the two a warning is can only
+# be told from its headline, so it is no automation trigger.
+_WIND_NOTE = (
+    "Marine wind only: BoM's Wind event is for coastal and local waters, not wind at "
+    "your house. Damaging winds on land arrive as the Severe weather warning."
+)
+_WEATHER_NOTE = (
+    "For display. BoM's Weather event covers both Severe Weather Warnings and Coastal"
+    " Hazard Warnings, so it is not a good automation trigger."
+)
+
+# In the order the options form lists them and the sensors are created, then the events that have
+# an icon but no sensor.
+WARNING_TYPES: tuple[WarningType, ...] = (
+    SensorType(
+        "Thunderstorm",
+        "mdi:weather-lightning-rainy",
+        key="thunderstorm_warning",
+        label="Thunderstorm",
     ),
-    WarningType("Riverine Flood", "flood_warning", "Flood"),
-    WarningType("Sheep Grazier Warning", "sheep_grazier_warning", "Sheep grazier"),
-    WarningType("Exposure", "exposure_warning", "Exposure"),
-    WarningType("Tropical Cyclone", "tropical_cyclone_warning", "Tropical cyclone"),
-    WarningType("Weather", "severe_weather_warning", "Severe weather"),
-    WarningType("Wind", "marine_wind_warning", "Marine wind", marine=True),
-    WarningType("Large Coastal Surf", "hazardous_surf_warning", "Hazardous surf", marine=True),
+    SensorType("Fire Weather", "mdi:fire-alert", key="fire_weather_warning", label="Fire weather"),
+    SensorType(
+        "Extreme Heat", "mdi:thermometer-alert", key="extreme_heat_warning", label="Extreme heat"
+    ),
+    SensorType("Frost", "mdi:snowflake-alert", key="frost_warning", label="Frost"),
+    SensorType(
+        "Hazardous Road Conditions",
+        "mdi:car-brake-alert",
+        key="hazardous_road_conditions_warning",
+        label="Hazardous road conditions",
+    ),
+    SensorType("Riverine Flood", "mdi:home-flood", key="flood_warning", label="Flood"),
+    SensorType(
+        "Sheep Grazier Warning", "mdi:sheep", key="sheep_grazier_warning", label="Sheep grazier"
+    ),
+    SensorType("Exposure", "mdi:snowflake-thermometer", key="exposure_warning", label="Exposure"),
+    SensorType(
+        "Tropical Cyclone",
+        "mdi:weather-hurricane",
+        key="tropical_cyclone_warning",
+        label="Tropical cyclone",
+    ),
+    SensorType(
+        "Weather",
+        "mdi:cloud-alert",
+        key="severe_weather_warning",
+        label="Severe weather",
+        note=_WEATHER_NOTE,
+    ),
+    SensorType(
+        "Wind",
+        "mdi:weather-windy",
+        key="marine_wind_warning",
+        label="Marine wind",
+        note=_WIND_NOTE,
+        marine=True,
+    ),
+    SensorType(
+        "Large Coastal Surf",
+        "mdi:waves-arrow-up",
+        key="hazardous_surf_warning",
+        label="Hazardous surf",
+        marine=True,
+    ),
+    # No zones yet (#25), so no sensor or toggle: it falls under "Other warnings".
+    WarningType("Tsunami", "mdi:tsunami"),
 )
 
 _OTHER_LABEL = "Other warnings"
 
 
-def sensor_types() -> tuple[WarningType, ...]:
+def sensor_types() -> tuple[SensorType, ...]:
     """The types with a level sensor and a checklist toggle."""
-    return WARNING_TYPES
+    return tuple(t for t in WARNING_TYPES if isinstance(t, SensorType))
+
+
+def type_of(event: str) -> WarningType | None:
+    """The row for a CAP event, or None for an event BoM has not sent before."""
+    return next((t for t in WARNING_TYPES if t.event == event), None)
 
 
 def label_of(key: str) -> str:

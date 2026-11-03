@@ -13,8 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import EVENT_ICONS
-from custom_components.bom_warnings.warning_types import sensor_types
+from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -23,6 +22,8 @@ from .test_binary_sensor import setup_entry
 from .test_options import layers, resolve, set_options  # noqa: F401
 from .test_strings import STRINGS, load
 from .test_zones import ZONE, set_zone, zone_codes, zone_entry, zone_options  # noqa: F401
+
+EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
