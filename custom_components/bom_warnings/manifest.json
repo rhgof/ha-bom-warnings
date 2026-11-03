@@ -1,10 +1,10 @@
 {
   "domain": "bom_warnings",
   "name": "BoM Warnings",
-  "codeowners": [],
   "categories": [
     "weather_alerts.public_warnings"
   ],
+  "codeowners": [],
   "config_flow": true,
   "dependencies": [
     "zone"
