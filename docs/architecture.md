@@ -38,7 +38,7 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
 (/anon/home/adfd/spatial/)  (<config>/bom_warnings/spatial)       (config flow, and on layer change)
 ```
 
-1. `SharedFeed` (`coordinator.py`) is the only thing that polls. One refresh runs in an executor
+1. `SharedFeed` (`shared_feed.py`) is the only thing that polls. One refresh runs in an executor
    inside a single FTP session and does only `WarningReader.refresh()`. Its result is
    `FeedSnapshot(warnings, layer_generation)`: every current warning nationwide. After a
    successful refresh, if the shapefile layer check is due, it is started as a background task
@@ -49,7 +49,8 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
    (`BomFtpRejectedError`) it falls back to `LIST *`; a timeout does not, it fails the refresh. An empty, vanished (550) or unparseable file is skipped, and a changed file whose
    re-fetch fails keeps its previous parse.
 3. Each entry's `BomWarningsCoordinator` never polls. It listens to the feed and re-derives its
-   own view with `_covering` / `_states`, using its area codes and options.
+   own view with `covering` / `product_states` (`active_warnings.py`), using its area codes and
+   options.
 4. Entities read the entry coordinator.
 5. Fire danger (`FireDangerReader` in `fire_danger.py`) is a separate, optional step in the same FTP
    session, run after the warnings read. For each product some entry needs (a stored `_FW` code
@@ -72,13 +73,16 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
+| `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
+| `active_warnings.py` | What one location sees of the parsed warnings. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), `product_states(...)` gives the per-product `WarningState`s the event entity compares, and `warning_attributes` builds a warning's list attributes. |
 
 Home Assistant layer:
 
 | File | Role |
 | --- | --- |
 | `__init__.py` | Entry setup/unload/remove. `PLATFORMS = [BINARY_SENSOR, EVENT, SENSOR]`. `runtime_data = BomWarningsData(coordinator)`. |
-| `coordinator.py` | `SharedFeed`, `BomWarningsCoordinator`, feed lifecycle helpers, `ActiveWarning`, `WarningState`. |
+| `shared_feed.py` | `SharedFeed` and `FeedSnapshot`, the `FEED` key, and the lifecycle helpers (acquire, abandon, release, release-removed, shutdown). The layer check's async wiring (executor job, background task, new snapshot) lives here; its timing rules are in `layer_check.py`. |
+| `coordinator.py` | `BomWarningsCoordinator`: listens to the feed, re-resolves the entry's location, and derives its warnings and fire danger. |
 | `fire_store.py` | `FireStore`: loads, saves and removes one entry's `FireMemory` in Home Assistant storage. The only place that knows the storage key, version and shape. |
 | `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
 | `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
@@ -125,10 +129,10 @@ Home Assistant layer:
   `NO_WARNING_ICON`. The binary sensor is unchanged. `docs/dashboard.md` has card examples. The
   event entity still orders a product's blocks with the enum order (unknown lowest); it only picks
   one block per product, and was left alone.
-- **Layer changes.** Weekly (`LAYER_CHECK_INTERVAL`), in a background task started after a
-  successful warnings refresh, on the feed's second client, the feed compares each layer's server
-  `MDTM` with the cached one. The next check is set when it is scheduled, so it cannot start
-  twice. Its errors are logged at debug and never fail a refresh or count towards the repair
+- **Layer changes.** Weekly (`layer_check.LAYER_CHECK_INTERVAL`), in a background task started
+  after a successful warnings refresh, on the feed's second client, the feed compares each layer's
+  server `MDTM` with the cached one. The feed holds a `LayerSchedule`, whose next check is set when
+  the check is started, so it cannot start twice. Its errors are logged at debug and never fail a refresh or count towards the repair
   issue. A check that reached the server records its time in `<spatial cache>/.last_layer_check`,
   so a restart within a week does not repeat it; a missing, corrupt or old record means check
   after the first refresh, and a check where every layer failed is not recorded, so it retries on
@@ -223,6 +227,14 @@ Home Assistant layer:
   after that.
 - `scripts/ha-dev.sh` runs a throwaway Home Assistant on `127.0.0.1:8124` (README "Dev instance");
   `docs/live-verification-c1.md` has the walkthrough and the recorded result.
+- The split of the coordinator (shared feed, layer schedule, active warnings) was checked on the dev
+  instance on 3 November 2026, from a copy of its config on another port, against the fake BoM
+  server serving the shapefile zips (not BoM's real server, not a browser). With the layer-check
+  record removed, the first refresh ran one layer check and wrote the record. Both entries kept
+  their area codes and fire districts, their sensors and events were written, and no repair issue
+  appeared. A restart left the record unchanged, so no second check ran. Removing one entry and then
+  the last one deleted their stored fire ratings, removed their entities and logged no error from
+  this integration.
 
 ## Fire danger ratings
 

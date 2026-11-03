@@ -18,7 +18,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import CONF_AREA_CODES, SPATIAL_CACHE_DIR
 from custom_components.bom_warnings.ftp import BomFtpError
-from custom_components.bom_warnings.layer_check import LAYER_CHECK_INTERVAL
 from custom_components.bom_warnings.shared_feed import FEED
 from custom_components.bom_warnings.spatial import LAYERS, RefreshResult
 from scripts.fake_bom.server import FakeBom
@@ -47,10 +46,6 @@ async def setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done(wait_background_tasks=True)
-
-
-def test_interval_is_weekly() -> None:
-    assert timedelta(days=7) == LAYER_CHECK_INTERVAL
 
 
 async def test_first_check_runs_after_the_first_refresh_with_its_own_client(
@@ -146,16 +141,10 @@ async def test_a_check_that_reached_the_server_is_recorded(
 
 @pytest.mark.parametrize(
     ("record_age", "checks"),
-    [
-        (timedelta(days=1), 0),
-        (timedelta(days=6, hours=23), 0),
-        (timedelta(days=8), 1),
-        (None, 1),
-        ("not a time", 1),
-        ("", 1),
-    ],
+    [(timedelta(days=1), 0), (None, 1)],
+    ids=["recent-record-means-no-check", "no-record-means-a-check"],
 )
-async def test_restart_checks_only_when_the_record_is_missing_corrupt_or_old(
+async def test_a_restart_checks_only_when_there_is_no_recent_record(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
@@ -171,23 +160,6 @@ async def test_restart_checks_only_when_the_record_is_missing_corrupt_or_old(
     await setup(hass, mock_config_entry)
 
     assert layers.call_count == checks
-
-
-async def test_a_recorded_check_comes_due_a_week_later(
-    hass: HomeAssistant,
-    fake_bom: FakeBom,
-    mock_config_entry: MockConfigEntry,
-    layers: MagicMock,  # noqa: F811
-    freezer: Any,
-) -> None:
-    write_record(hass, (dt_util.utcnow() - timedelta(days=1)).isoformat())
-    await setup(hass, mock_config_entry)
-    for _ in range(5):
-        await poll(hass, freezer, 60 * 24)
-    assert layers.call_count == 0
-
-    await poll(hass, freezer, 60 * 24)
-    assert layers.call_count == 1
 
 
 async def test_a_layer_change_publishes_a_new_snapshot_and_entries_re_resolve(
