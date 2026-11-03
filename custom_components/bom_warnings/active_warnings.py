@@ -6,13 +6,14 @@ No Home Assistant imports.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+import re
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
-from .strength import wind_strength
+from .const import DEFAULT_EVENT_ICON, EVENT_ICONS, LEVEL_COLORS, WARNING_TYPE_NOTES
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,8 +56,11 @@ SEVERITY_ORDER = (
 )
 
 
-def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
-    """One warning as the list attributes of the binary sensors and the type sensors show it."""
+def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[str, Any]:
+    """One warning as the list attributes entities show it.
+
+    The ranked list adds the level, icon, colour and sent time to the fields every list has.
+    """
     attributes: dict[str, Any] = {
         "product_id": warning.product_id,
         "event": warning.event,
@@ -66,6 +70,14 @@ def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
         "effective": warning.effective.isoformat() if warning.effective else None,
         "expires": warning.expires.isoformat() if warning.expires else None,
     }
+    if ranked:
+        level = level_of(warning)
+        attributes |= {
+            "level": level,
+            "icon": event_icon(warning.event),
+            "color": LEVEL_COLORS[level],
+            "sent": warning.sent.isoformat() if warning.sent else None,
+        }
     # Only marine wind has one, so no other event gains the field.
     if (strength := warning.strength) is not None:
         attributes["strength"] = strength
@@ -207,3 +219,62 @@ def highest_level(warnings: Iterable[ActiveWarning]) -> str:
 def current_then_ended(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
     ranked = rank_warnings(warnings)
     return [w for w in ranked if w.is_current] + [w for w in ranked if not w.is_current]
+
+
+def event_icon(event: str) -> str:
+    return EVENT_ICONS.get(event, DEFAULT_EVENT_ICON)
+
+
+def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
+    """The attributes of one type's level sensor: its top warning's fields, then every warning.
+
+    The top warning is the highest-ranked one still in force. Only marine wind carries a strength,
+    and only some types a note.
+    """
+    current = rank_warnings(w for w in warnings if w.is_current)
+    top = current[0] if current else None
+    attributes: dict[str, Any] = {
+        "headline": top.headline if top else None,
+        "expires": top.expires.isoformat() if top and top.expires else None,
+        "product_id": top.product_id if top else None,
+        "event": top.event if top else None,
+        "warnings": [warning_attributes(w) for w in warnings],
+    }
+    if event == WIND_EVENT:
+        attributes["strength"] = top.strength if top else None
+    if note := WARNING_TYPE_NOTES.get(event):
+        attributes["note"] = note
+    return attributes
+
+
+# The marine wind strength class, read from the headline.
+WIND_EVENT = "Wind"
+
+_CLASSES = {
+    "strong": "strong",
+    "gale force": "gale",
+    "gale": "gale",
+    "storm force": "storm",
+    "storm": "storm",
+    "hurricane force": "hurricane",
+    "hurricane": "hurricane",
+}
+_HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
+
+
+def wind_strength(event: str, headline: str) -> str | None:
+    """The strength class of a Wind warning, or None.
+
+    Known classes are lowercase and stable (`strong`, `gale`, `storm`, `hurricane`). Wording this
+    code does not know keeps its class text as written, so a new class is shown and not lost. A
+    cancellation, a headline with no class, and any event other than Wind have no strength.
+    """
+    if event != WIND_EVENT:
+        return None
+    match = _HEADLINE.match(headline.strip())
+    if match is None:
+        return None
+    text = match.group("class").strip()
+    if text.lower().startswith("cancellation"):
+        return None
+    return _CLASSES.get(text.lower(), text)
