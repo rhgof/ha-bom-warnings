@@ -3,7 +3,7 @@
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -15,6 +15,7 @@ from custom_components.bom_warnings.const import (
     CONF_STATE,
     DOMAIN,
 )
+from custom_components.bom_warnings.location import ResolvedLocation
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -81,3 +82,28 @@ def mock_config_entry(area_codes: list[str], entry_options: dict[str, Any]) -> M
             CONF_AREA_CODES: area_codes,
         },
     )
+
+
+@pytest.fixture
+def resolved_codes() -> set[str]:
+    """What the shapefiles say about the point; parametrize to change it."""
+    return {"QLD_PW011", "QLD_ME008", "QLD_RC167"}
+
+
+@pytest.fixture
+def resolved_state() -> str:
+    return "QLD"
+
+
+@pytest.fixture
+def resolve(resolved_codes: set[str], resolved_state: str) -> Iterator[MagicMock]:
+    """The one seam for locating a point: `location.resolve_location` as callers reach it.
+
+    The shapefiles are not in the repo, so tests decide what a point resolves to. How codes become a
+    state is the resolver's rule and is tested there, so the state is given, not derived.
+    """
+    found = ResolvedLocation(frozenset(resolved_codes), resolved_state if resolved_codes else "")
+    with patch(
+        "custom_components.bom_warnings.location.resolve_location", return_value=found
+    ) as mock:
+        yield mock

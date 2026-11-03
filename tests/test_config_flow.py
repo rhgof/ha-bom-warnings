@@ -1,8 +1,8 @@
 """The config flow, driven through Home Assistant.
 
-The shapefiles are not in the repo, so the one seam is `resolve_coordinate` as the flow imports
-it: tests decide which area codes a point resolves to. Everything else (the FTP client built from
-the environment, the executor hop, the entry) is real, against the fake BoM server.
+The shapefiles are not in the repo, so the one seam is `location.resolve_location` (the shared
+`resolve` fixture): tests decide which location a point resolves to. Everything else (the FTP client
+built from the environment, the executor hop, the entry) is real, against the fake BoM server.
 """
 
 from collections.abc import Iterator
@@ -26,26 +26,15 @@ from custom_components.bom_warnings.const import (
     DOMAIN,
     MAX_RADIUS_M,
 )
-from custom_components.bom_warnings.ftp import BomFtpError
-from custom_components.bom_warnings.spatial import SpatialDataError
+from custom_components.bom_warnings.location import LocationUnavailable, ResolvedLocation
 from scripts.fake_bom.server import FakeBom
 
 BRISBANE = {CONF_LATITUDE: -27.4698, CONF_LONGITUDE: 153.0251}
 
 
-@pytest.fixture
-def resolved_codes() -> set[str]:
-    """What the shapefiles say about the point; parametrize to change it."""
-    return {"QLD_PW011", "QLD_ME008", "QLD_RC167"}
-
-
-@pytest.fixture
-def resolve(fake_bom: FakeBom, resolved_codes: set[str]) -> Iterator[MagicMock]:
-    with patch(
-        "custom_components.bom_warnings.config_flow.resolve_coordinate",
-        return_value=resolved_codes,
-    ) as mock:
-        yield mock
+@pytest.fixture(autouse=True)
+def no_network(fake_bom: FakeBom) -> None:
+    """A call that escapes the `resolve` mock reaches the fake server, never BoM."""
 
 
 @pytest.fixture(autouse=True)
@@ -116,7 +105,7 @@ async def test_manual_location_with_no_area(hass: HomeAssistant, resolve: MagicM
     assert result["errors"] == {"base": "no_area"}
 
     # The user can correct the coordinates in the same flow.
-    resolve.return_value = {"NSW_PW001"}
+    resolve.return_value = ResolvedLocation(frozenset({"NSW_PW001"}), "NSW")
     result = await hass.config_entries.flow.async_configure(result["flow_id"], BRISBANE)
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_STATE] == "NSW"
@@ -130,11 +119,8 @@ async def test_home_location_with_no_area_aborts(hass: HomeAssistant, resolve: M
     assert result["reason"] == "no_area"
 
 
-@pytest.mark.parametrize(
-    "error", [BomFtpError("down"), SpatialDataError("corrupt"), OSError("disk")]
-)
-async def test_cannot_connect(hass: HomeAssistant, resolve: MagicMock, error: Exception) -> None:
-    resolve.side_effect = error
+async def test_cannot_connect(hass: HomeAssistant, resolve: MagicMock) -> None:
+    resolve.side_effect = LocationUnavailable("down")
 
     result = await start_manual(hass, BRISBANE)
 
@@ -166,19 +152,14 @@ async def test_duplicate_location_is_rejected(hass: HomeAssistant, resolve: Magi
 
 
 @pytest.mark.parametrize(
-    ("resolved_codes", "state"),
-    [
-        ({"QLD_PW011", "QLD_ME008"}, "QLD"),
-        ({"ACT_PW001"}, "ACT"),
-        ({"NSW_RC031"}, "NSW"),  # no forecast district: fall back to any area's prefix
-    ],
+    ("resolved_codes", "resolved_state"), [({"ACT_PW001"}, "ACT"), ({"NSW_RC031"}, "NSW")]
 )
-async def test_state_comes_from_the_forecast_district(
-    hass: HomeAssistant, resolve: MagicMock, state: str
+async def test_state_is_the_one_the_resolver_found(
+    hass: HomeAssistant, resolve: MagicMock, resolved_state: str
 ) -> None:
     result = await start_manual(hass, BRISBANE)
 
-    assert result["data"][CONF_STATE] == state
+    assert result["data"][CONF_STATE] == resolved_state
 
 
 def set_zone(
@@ -319,7 +300,7 @@ async def test_zone_that_disappeared_shows_an_error(
 
 @pytest.mark.parametrize(
     ("error", "key"),
-    [(BomFtpError("down"), "cannot_connect"), (RuntimeError("boom"), "unknown")],
+    [(LocationUnavailable("down"), "cannot_connect"), (RuntimeError("boom"), "unknown")],
 )
 async def test_zone_errors_use_the_standard_keys(
     hass: HomeAssistant, resolve: MagicMock, error: Exception, key: str
