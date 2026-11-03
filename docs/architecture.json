@@ -17,8 +17,8 @@
     },
     "runtime": {
       "layer": "runtime",
-      "purpose": "The stateful Home Assistant wiring: the shared feed that polls, the per-entry coordinator that filters it, the zone follower, and the store for remembered fire danger ratings. The coordinator is the file the architecture review wants split.",
-      "owns": ["coordinator.py", "zone.py", "fire_store.py"]
+      "purpose": "The stateful Home Assistant wiring: the shared feed that polls, with the rules for creating, joining, leaving and shutting it down; the per-entry coordinator that filters it; the zone follower; and the store for remembered fire danger ratings.",
+      "owns": ["coordinator.py", "shared_feed.py", "zone.py", "fire_store.py"]
     },
     "feeds": {
       "layer": "readers",

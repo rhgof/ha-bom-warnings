@@ -1,9 +1,9 @@
 """Options and layer-change handling, driven through Home Assistant.
 
-The shapefiles are not in the repo, so layer changes are injected at two seams, as the
-coordinator imports them: `refresh_layers` reports which layers changed and `resolve_coordinate`
-says which area codes the stored point now resolves to. Everything else is real, against the
-fake BoM server.
+The shapefiles are not in the repo, so layer changes are injected at two seams, where they are
+imported: `refresh_layers` (in the shared feed) reports which layers changed and
+`resolve_coordinate` (in the coordinator) says which area codes the stored point now resolves to.
+Everything else is real, against the fake BoM server.
 """
 
 from collections.abc import Iterator
@@ -51,7 +51,7 @@ def short_layer_interval() -> Iterator[None]:
 def layers() -> Iterator[MagicMock]:
     """`refresh_layers`: by default nothing changed."""
     with patch(
-        "custom_components.bom_warnings.coordinator.refresh_layers",
+        "custom_components.bom_warnings.shared_feed.refresh_layers",
         return_value=RefreshResult(),
     ) as mock:
         yield mock
