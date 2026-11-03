@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20809-2026-11-03T09:46:32+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T09:46:32+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <references>CAP.Message@bom.gov.au,AusBoM-IDQ20809-2026-11-03T03:10:58+00:00,2026-11-03T03:10:58+00:00</references>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Minor</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T09:46:32+00:00</effective>
+    <expires>2026-11-04T12:46:32+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Minor Flood Warning for Warrill Creek, Warrill Creek at Kalbar, Warrill Creek at Harrisville and Warrill Creek at Amberley</headline>
+    <description>Minor flooding is possible with forecast thunderstorm activity along Warrill Creek.
+
+No observations are currently available for the Warrill Creek at Kalbar. With forecast rainfall, the Warrill Creek at Kalbar may exceed the minor flood level (6.00 m) overnight Tuesday into Wednesday.
+
+The Warrill Creek at Harrisville is currently at 0.80 m and steady, below the minor flood level. With forecast rainfall, the Warrill Creek at Harrisville may exceed the minor flood level (3.00 m) in the early hours of Wednesday.
+
+The Warrill Creek at Amberley is currently at 1.44 m and steady, below the minor flood level. With forecast rainfall, the Warrill Creek at Amberley may exceed the minor flood level (4.00 m) Wednesday morning.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Warrill Creek, Warrill Creek at Kalbar, Warrill Creek at Harrisville and Warrill Creek at Amberley</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC162</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS022</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS023</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS024</value>
+      </geocode>
+    </area>
+  </info>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Minor</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T09:46:32+00:00</effective>
+    <expires>2026-11-04T12:46:32+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Minor Flood Warning for Bremer River, Bremer River at Rosewood, Bremer River at Five Mile Bridge and Bremer River at Walloon</headline>
+    <description>Minor flooding is possible with forecast thunderstorm activity along the Bremer River.
+
+The Bremer River at Rosewood is currently at 0.62 m and steady, below the minor flood level. With forecast rainfall, the Bremer River at Rosewood may exceed the minor flood level (4.00 m) in the early hours of Wednesday.
+
+The Bremer River at Five Mile Bridge is currently at 0.10 m and steady, below the minor flood level. With forecast rainfall, the Bremer River at Five Mile Bridge may exceed the minor flood level (3.50 m) in the early hours of Wednesday.
+
+The Bremer River at Walloon is currently at 1.64 m and steady, below the minor flood level. With forecast rainfall, the Bremer River at Walloon may exceed the minor flood level (5.00 m) early Wednesday morning.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Bremer River, Bremer River at Rosewood, Bremer River at Five Mile Bridge and Bremer River at Walloon</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC161</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS025</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS142</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS026</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

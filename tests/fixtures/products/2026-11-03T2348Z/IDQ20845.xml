@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20845</identifier>
+        <issue-time-utc>2026-11-03T23:22:51Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T09:22:51+10:00</issue-time-local>
+        <sent-time>2026-11-03T23:22:51Z</sent-time>
+        <expiry-time>2026-11-07T02:22:51Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T09:22:51+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-07T12:22:51+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Moderate Flood Warning for the Warrego River (QLD)</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 11:00 AM AEST on Thursday 05 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC031" description="Warrego River (QLD)" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                
+				<element type="warning_sequence">18</element>
+                <text type="warning_situation">
+				<p>MINOR FLOODING EASING SLOWLY AT CUNNAMULLA BRIDGE </p>
+<p>MODERATE FLOODING LIKELY AT ROCKY FROM WEDNESDAY AFTERNOON</p>
+
+				<p/>
+				<p>A flood peak is downstream of Cunnamulla Bridge and approaching Rocky as the flood waters flow downstream. </p>
+<p/>
+<p>Another flood peak has passed Wallen and is approaching Cunnamulla Bridge. This flood peak is likely to cause extended elevated river levels at both Cunnamulla Bridge and Rocky.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Moderate</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC031" phase="UPD" type="FLW" severity="MOD" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                <area-list>
+                    <area aac="QLD_RC122" phase="UPD" description="Warrego River downstream of Charleville" type="river-basin"/>
+                    <area aac="QLD_RS092" phase="UPD" description="Warrego River at Cunnamulla Bridge" type="river-site"/>
+                    <area aac="QLD_RS093" phase="UPD" description="Warrego River at Rocky" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Moderate flooding is likely along the lower Warrego River between Cunnamulla Bridge and Rocky. </text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS092" description="Warrego River at Cunnamulla Bridge" type="river-site" parent-aac="QLD_RC122">
+                    <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                        <text type="flood_status">No current river level observations are available for the Warrego River at Cunnamulla Bridge. However, based on river levels at the nearby automatic gauge, the river level at Cunnamulla Bridge is estimated to have peaked at around the moderate flood level during Tuesday and to be easing slowly just below the moderate flood level, with minor flooding.</text>
+                        <text type="warning_prediction">The Warrego River at Cunnamulla Bridge is likely to remain above the minor flood level (6.00 m) for the remainder of the week.</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z"/>
+                </area>                <area aac="QLD_RS093" description="Warrego River at Rocky" type="river-site" parent-aac="QLD_RC122">
+                    <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                        <text type="flood_status">No current river level observations are available for the Warrego River at Rocky. The river level is estimated to be near the moderate flood level and rising slowly.</text>
+                        <text type="warning_prediction">The Warrego River at Rocky is likely to peak around the moderate flood level (4.00 m) from Wednesday afternoon.</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0335" description="Warrego River at Lochinvar" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Lochinvar</element>
+                    <element type="obs_site_latitude">-25.4697</element>
+                    <element type="obs_site_longitude">146.8431</element>
+                    <element type="obs_river_height">1.08</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0340" description="Hoganthulla Creek at Wetlands" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Hoganthulla Creek at Wetlands</element>
+                    <element type="obs_site_latitude">-25.5954</element>
+                    <element type="obs_site_longitude">147.1182</element>
+                    <element type="obs_river_height">0.49</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0829" description="Warrego River at Augathella" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Augathella</element>
+                    <element type="obs_site_latitude">-25.7944</element>
+                    <element type="obs_site_longitude">146.5847</element>
+                    <element type="obs_river_height">1.46</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0341" description="Nive River at Biddenham" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Nive River at Biddenham</element>
+                    <element type="obs_site_latitude">-25.8042</element>
+                    <element type="obs_site_longitude">146.4244</element>
+                    <element type="obs_river_height">1.50</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">8:09 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0342" description="Warrego River at The 27 Mile Garden" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at The 27 Mile Garden</element>
+                    <element type="obs_site_latitude">-26.0808</element>
+                    <element type="obs_site_longitude">146.4172</element>
+                    <element type="obs_river_height">1.33</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:19 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0348" description="Bradley Creek at Raceview" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Bradley Creek at Raceview</element>
+                    <element type="obs_site_latitude">-26.4083</element>
+                    <element type="obs_site_longitude">146.4042</element>
+                    <element type="obs_river_height">0.15</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:23 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1032" description="Bradley Creek at Lower Bradleys" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Bradley Creek at Lower Bradleys</element>
+                    <element type="obs_site_latitude">-26.3736</element>
+                    <element type="obs_site_longitude">146.3397</element>
+                    <element type="obs_river_height">0.30</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:31 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0883" description="Warrego River at Charleville" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Charleville</element>
+                    <element type="obs_site_latitude">-26.4025</element>
+                    <element type="obs_site_longitude">146.2378</element>
+                    <element type="obs_river_height">1.33</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:37 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0838" description="Ward River at Binnowee" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Ward River at Binnowee</element>
+                    <element type="obs_site_latitude">-26.4842</element>
+                    <element type="obs_site_longitude">146.0861</element>
+                    <element type="obs_river_height">2.91</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0886" description="Warrego River at Bakers Bend" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Bakers Bend</element>
+                    <element type="obs_site_latitude">-26.7053</element>
+                    <element type="obs_site_longitude">146.1089</element>
+                    <element type="obs_river_height">3.26</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:25 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0832" description="Warrego River at Wyandra" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Wyandra</element>
+                    <element type="obs_site_latitude">-27.25</element>
+                    <element type="obs_site_longitude">145.9667</element>
+                    <element type="obs_river_height">4.56</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0841" description="Warrego River at Wallen" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Wallen</element>
+                    <element type="obs_site_latitude">-27.6319</element>
+                    <element type="obs_site_longitude">145.8328</element>
+                    <element type="obs_river_height">5.22</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0320" description="Warrego River at Cunnamulla Bridge" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Cunnamulla Bridge</element>
+                    <element type="obs_site_latitude">-28.0714</element>
+                    <element type="obs_site_longitude">145.6775</element>
+                    <element type="obs_river_height">6.98</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0836" description="Warrego River at Cunnamulla Weir" type="river-obs-site" parent-aac="QLD_RC031">
+                <forecast-period start-time-local="2026-11-04T09:22:51+10:00" end-time-local="2026-11-07T12:22:51+10:00" start-time-utc="2026-11-03T23:22:51Z" end-time-utc="2026-11-07T02:22:51Z">
+                    <element type="obs_site_description">Warrego River at Cunnamulla Weir</element>
+                    <element type="obs_site_latitude">-28.1167</element>
+                    <element type="obs_site_longitude">145.6833</element>
+                    <element type="obs_river_height">6.69</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

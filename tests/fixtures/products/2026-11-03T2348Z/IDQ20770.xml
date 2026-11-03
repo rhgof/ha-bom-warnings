@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20770</identifier>
+        <issue-time-utc>2026-11-03T22:25:53Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T08:25:53+10:00</issue-time-local>
+        <sent-time>2026-11-03T22:25:53Z</sent-time>
+        <expiry-time>2026-11-05T01:25:53Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T08:25:53+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-05T11:25:53+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+			
+            <text type="warning_title">Final Flood Warning for the Boyne and Burnett Rivers</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC017" description="Burnett River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>FLOODING IS NO LONGER EXPECTED AT DUNOLLIE, MUNDUBBERA, AND GAYNDAH</p>
+
+				<p/>
+				<p>Flooding is no longer expected along the Boyne and Burnett Rivers at Dunollie, Mundubbera, and Gayndah. Thunderstorms remain possible during Wednesday but forecast rainfall totals are not expected to significantly affect river levels.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC017" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                <area-list>
+                    <area aac="QLD_RC073" phase="FIN" description="Burnett River to Mundubbera" type="river-basin"/>
+                    <area aac="QLD_RS082" phase="FIN" description="Burnett River at Mundubbera" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Burnett River to Mundubbera. </text>
+            </hazard>            <hazard index="2" parent-aac="QLD_RC017" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                <area-list>
+                    <area aac="QLD_RC074" phase="FIN" description="Stuart and Boyne Rivers" type="river-basin"/>
+                    <area aac="QLD_RS042" phase="FIN" description="Boyne River at Dunollie" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Stuart and Boyne Rivers. </text>
+            </hazard>            <hazard index="3" parent-aac="QLD_RC017" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                <area-list>
+                    <area aac="QLD_RC076" phase="FIN" description="Burnett River downstream of Mundubbera to Paradise Dam" type="river-basin"/>
+                    <area aac="QLD_RS087" phase="FIN" description="Burnett River at Gayndah" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Burnett River downstream of Mundubbera to Paradise Dam.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS082" description="Burnett River at Mundubbera" type="river-site" parent-aac="QLD_RC073">
+                    <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                        <text type="flood_status">The Burnett River at Mundubbera is currently at 5.52 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Burnett River at Mundubbera is expected to remain below the minor flood level (7.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z"/>
+                </area>                <area aac="QLD_RS042" description="Boyne River at Dunollie" type="river-site" parent-aac="QLD_RC074">
+                    <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                        <text type="flood_status">No observations are currently available for the Boyne River at Dunollie. The river level is estimated to be below the minor flood level.</text>
+                        <text type="warning_prediction">The Boyne River at Dunollie is expected to remain below the minor flood level (2.50 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z"/>
+                </area>                <area aac="QLD_RS087" description="Burnett River at Gayndah" type="river-site" parent-aac="QLD_RC076">
+                    <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                        <text type="flood_status">No observations are currently available for the Burnett River at Gayndah. The river level is estimated to be below the minor flood level.</text>
+                        <text type="warning_prediction">The Burnett River at Gayndah is expected to remain below the minor flood level (5.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0595" description="Three Moon Creek at Cania Dam (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Three Moon Creek at Cania Dam (HW)</element>
+                    <element type="obs_site_latitude">-24.65</element>
+                    <element type="obs_site_longitude">150.9831</element>
+                    <element type="obs_river_height">-15.05</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0576" description="Three Moon Creek at Monto" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Three Moon Creek at Monto</element>
+                    <element type="obs_site_latitude">-24.8658</element>
+                    <element type="obs_site_longitude">151.1086</element>
+                    <element type="obs_river_height">0.28</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0158" description="Three Moon Creek at Abercorn" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Three Moon Creek at Abercorn</element>
+                    <element type="obs_site_latitude">-25.1292</element>
+                    <element type="obs_site_longitude">151.1306</element>
+                    <element type="obs_river_height">2.00</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:22 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0157" description="Burnett River at Ceratodus" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Ceratodus</element>
+                    <element type="obs_site_latitude">-25.2831</element>
+                    <element type="obs_site_longitude">151.145</element>
+                    <element type="obs_river_height">1.63</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0582" description="Nogo River at Wuruma Dam (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Nogo River at Wuruma Dam (HW)</element>
+                    <element type="obs_site_latitude">-25.1994</element>
+                    <element type="obs_site_longitude">150.9894</element>
+                    <element type="obs_river_height">-0.57</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0858" description="Burnett River at Eidsvold" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Eidsvold</element>
+                    <element type="obs_site_latitude">-25.4022</element>
+                    <element type="obs_site_longitude">151.1033</element>
+                    <element type="obs_river_height">0.76</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0160" description="Burnett River at Marriages" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Marriages</element>
+                    <element type="obs_site_latitude">-25.56</element>
+                    <element type="obs_site_longitude">151.1839</element>
+                    <element type="obs_river_height">0.89</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0952" description="Auburn River at Flagstone Bridge" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Auburn River at Flagstone Bridge</element>
+                    <element type="obs_site_latitude">-25.66</element>
+                    <element type="obs_site_longitude">151.1769</element>
+                    <element type="obs_river_height">0.64</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:14 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0713" description="Boyne River at Boondooma Dam (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Boyne River at Boondooma Dam (HW)</element>
+                    <element type="obs_site_latitude">-26.0969</element>
+                    <element type="obs_site_longitude">151.4331</element>
+                    <element type="obs_river_height">-1.03</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0937" description="Boyne River at Derra" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Boyne River at Derra</element>
+                    <element type="obs_site_latitude">-25.6733</element>
+                    <element type="obs_site_longitude">151.2436</element>
+                    <element type="obs_river_height">0.42</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0956" description="Burnett River at Mundubbera" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Mundubbera</element>
+                    <element type="obs_site_latitude">-25.5936</element>
+                    <element type="obs_site_longitude">151.3</element>
+                    <element type="obs_river_height">5.52</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:11 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0630" description="Barker Creek at Bjelke-Petersen Dam (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Barker Creek at Bjelke-Petersen Dam (HW)</element>
+                    <element type="obs_site_latitude">-26.3053</element>
+                    <element type="obs_site_longitude">151.9781</element>
+                    <element type="obs_river_height">-0.30</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0768" description="Barambah Creek at Joe Sippel Weir (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Barambah Creek at Joe Sippel Weir (HW)</element>
+                    <element type="obs_site_latitude">-26.2703</element>
+                    <element type="obs_site_longitude">152.0058</element>
+                    <element type="obs_river_height">0.14</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0974" description="Barambah Creek at Joe Sippel Weir (TW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Barambah Creek at Joe Sippel Weir (TW)</element>
+                    <element type="obs_site_latitude">-26.2694</element>
+                    <element type="obs_site_longitude">152.0064</element>
+                    <element type="obs_river_height">2.04</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:30 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0225" description="Barambah Creek at Stonelands" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Barambah Creek at Stonelands</element>
+                    <element type="obs_site_latitude">-26.0467</element>
+                    <element type="obs_site_longitude">151.725</element>
+                    <element type="obs_river_height">1.75</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:35 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0159" description="Burnett River at Gayndah Flume" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Gayndah Flume</element>
+                    <element type="obs_site_latitude">-25.6217</element>
+                    <element type="obs_site_longitude">151.6031</element>
+                    <element type="obs_river_height">0.12</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0615" description="Burnett River at Mt Lawless" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Mt Lawless</element>
+                    <element type="obs_site_latitude">-25.545</element>
+                    <element type="obs_site_longitude">151.655</element>
+                    <element type="obs_river_height">1.10</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0598" description="Burnett River at Paradise Dam (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Paradise Dam (HW)</element>
+                    <element type="obs_site_latitude">-25.3511</element>
+                    <element type="obs_site_longitude">151.9194</element>
+                    <element type="obs_river_height">-0.09</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0617" description="Burnett River at Walla" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Walla</element>
+                    <element type="obs_site_latitude">-25.135</element>
+                    <element type="obs_site_longitude">151.9806</element>
+                    <element type="obs_river_height">3.81</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:04 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0613" description="Burnett River at Ned Churchward Weir (HW)" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Ned Churchward Weir (HW)</element>
+                    <element type="obs_site_latitude">-25.0514</element>
+                    <element type="obs_site_longitude">152.0997</element>
+                    <element type="obs_river_height">19.33</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">7:23 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0161" description="Burnett River at Bundaberg" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Burnett River at Bundaberg</element>
+                    <element type="obs_site_latitude">-24.8639</element>
+                    <element type="obs_site_longitude">152.3503</element>
+                    <element type="obs_river_height">0.00</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:13 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1041" description="Bundaberg Port Tide" type="river-obs-site" parent-aac="QLD_RC017">
+                <forecast-period start-time-local="2026-11-04T08:25:53+10:00" end-time-local="2026-11-05T11:25:53+10:00" start-time-utc="2026-11-03T22:25:53Z" end-time-utc="2026-11-05T01:25:53Z">
+                    <element type="obs_site_description">Bundaberg Port Tide</element>
+                    <element type="obs_site_latitude">-24.7719</element>
+                    <element type="obs_site_longitude">152.3808</element>
+                    <element type="obs_river_height">1.63</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:03 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

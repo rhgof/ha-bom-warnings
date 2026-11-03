@@ -1,0 +1,468 @@
+{
+  "captured_at": "2026-11-03T23:49:31.451999+00:00",
+  "source": "ftp://ftp.bom.gov.au/anon/gen/fwo/",
+  "max_bytes": 400000,
+  "files": [
+    {
+      "name": "IDD21013.cap.xml",
+      "size": 3947,
+      "listing": "-rw-rw-r--    1 1050     1502         3947 Nov 03 04:00 IDD21013.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN20400.cap.xml",
+      "size": 3704,
+      "listing": "-rw-rw-r--    1 1050     1502         3704 Nov 03 23:29 IDN20400.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN20400.txt",
+      "size": 1166,
+      "listing": "-rw-rw-r--    1 1050     1502         1166 Nov 03 23:29 IDN20400.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN20400.xml",
+      "size": 5113,
+      "listing": "-rw-rw-r--    1 1050     1502         5113 Nov 03 23:29 IDN20400.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN29000.cap.xml",
+      "size": 2552,
+      "listing": "-rw-rw-r--    1 1050     1502         2552 Nov 03 23:28 IDN29000.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN29000.txt",
+      "size": 953,
+      "listing": "-rw-rw-r--    1 1050     1502          953 Nov 03 23:28 IDN29000.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN29000.xml",
+      "size": 3654,
+      "listing": "-rw-rw-r--    1 1050     1502         3654 Nov 03 23:28 IDN29000.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36631.cap.xml",
+      "size": 2947,
+      "listing": "-rw-rw-r--    1 1050     1502         2947 Nov 03 01:41 IDN36631.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36631.txt",
+      "size": 2552,
+      "listing": "-rw-rw-r--    1 1050     1502         2552 Nov 03 01:41 IDN36631.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36631.xml",
+      "size": 9210,
+      "listing": "-rw-rw-r--    1 1050     1502         9210 Nov 03 01:41 IDN36631.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36632.cap.xml",
+      "size": 2530,
+      "listing": "-rw-rw-r--    1 1050     1502         2530 Nov 03 01:47 IDN36632.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36632.txt",
+      "size": 2443,
+      "listing": "-rw-rw-r--    1 1050     1502         2443 Nov 03 01:47 IDN36632.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN36632.xml",
+      "size": 10042,
+      "listing": "-rw-rw-r--    1 1050     1502        10042 Nov 03 01:47 IDN36632.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20770.cap.xml",
+      "size": 6404,
+      "listing": "-rw-rw-r--    1 1050     1502         6404 Nov 03 22:27 IDQ20770.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20770.txt",
+      "size": 4616,
+      "listing": "-rw-rw-r--    1 1050     1502         4616 Nov 03 22:27 IDQ20770.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20770.xml",
+      "size": 28781,
+      "listing": "-rw-rw-r--    1 1050     1502        28781 Nov 03 22:27 IDQ20770.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20790.cap.xml",
+      "size": 2779,
+      "listing": "-rw-rw-r--    1 1050     1502         2779 Nov 03 22:11 IDQ20790.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20790.txt",
+      "size": 4304,
+      "listing": "-rw-rw-r--    1 1050     1502         4304 Nov 03 22:11 IDQ20790.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20790.xml",
+      "size": 29804,
+      "listing": "-rw-rw-r--    1 1050     1502        29804 Nov 03 22:11 IDQ20790.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20800.cap.xml",
+      "size": 2459,
+      "listing": "-rw-rw-r--    1 1050     1502         2459 Nov 03 22:38 IDQ20800.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20800.txt",
+      "size": 2829,
+      "listing": "-rw-rw-r--    1 1050     1502         2829 Nov 03 22:38 IDQ20800.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20800.xml",
+      "size": 16012,
+      "listing": "-rw-rw-r--    1 1050     1502        16012 Nov 03 22:38 IDQ20800.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20809.cap.xml",
+      "size": 6013,
+      "listing": "-rw-rw-r--    1 1050     1502         6013 Nov 03 09:48 IDQ20809.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20809.txt",
+      "size": 4451,
+      "listing": "-rw-rw-r--    1 1050     1502         4451 Nov 03 09:48 IDQ20809.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20809.xml",
+      "size": 18938,
+      "listing": "-rw-rw-r--    1 1050     1502        18938 Nov 03 09:48 IDQ20809.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20815.cap.xml",
+      "size": 2469,
+      "listing": "-rw-rw-r--    1 1050     1502         2469 Nov 03 23:14 IDQ20815.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20815.txt",
+      "size": 3450,
+      "listing": "-rw-rw-r--    1 1050     1502         3450 Nov 03 23:14 IDQ20815.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20815.xml",
+      "size": 22343,
+      "listing": "-rw-rw-r--    1 1050     1502        22343 Nov 03 23:14 IDQ20815.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20827.cap.xml",
+      "size": 2352,
+      "listing": "-rw-rw-r--    1 1050     1502         2352 Nov 03 23:01 IDQ20827.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20827.txt",
+      "size": 3334,
+      "listing": "-rw-rw-r--    1 1050     1502         3334 Nov 03 23:01 IDQ20827.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20827.xml",
+      "size": 20562,
+      "listing": "-rw-rw-r--    1 1050     1502        20562 Nov 03 23:02 IDQ20827.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20829.cap.xml",
+      "size": 3161,
+      "listing": "-rw-rw-r--    1 1050     1502         3161 Nov 03 02:32 IDQ20829.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20829.txt",
+      "size": 3589,
+      "listing": "-rw-rw-r--    1 1050     1502         3589 Nov 03 02:32 IDQ20829.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20829.xml",
+      "size": 17798,
+      "listing": "-rw-rw-r--    1 1050     1502        17798 Nov 03 02:32 IDQ20829.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20831.cap.xml",
+      "size": 3031,
+      "listing": "-rw-rw-r--    1 1050     1502         3031 Nov 03 03:34 IDQ20831.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20831.txt",
+      "size": 3653,
+      "listing": "-rw-rw-r--    1 1050     1502         3653 Nov 03 03:34 IDQ20831.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20831.xml",
+      "size": 17740,
+      "listing": "-rw-rw-r--    1 1050     1502        17740 Nov 03 03:34 IDQ20831.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20835.cap.xml",
+      "size": 2470,
+      "listing": "-rw-rw-r--    1 1050     1502         2470 Nov 03 21:39 IDQ20835.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20835.txt",
+      "size": 4076,
+      "listing": "-rw-rw-r--    1 1050     1502         4076 Nov 03 21:39 IDQ20835.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20835.xml",
+      "size": 26314,
+      "listing": "-rw-rw-r--    1 1050     1502        26314 Nov 03 21:39 IDQ20835.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20840.cap.xml",
+      "size": 2606,
+      "listing": "-rw-rw-r--    1 1050     1502         2606 Nov 03 00:20 IDQ20840.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20840.txt",
+      "size": 2893,
+      "listing": "-rw-rw-r--    1 1050     1502         2893 Nov 03 00:20 IDQ20840.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20840.xml",
+      "size": 13536,
+      "listing": "-rw-rw-r--    1 1050     1502        13536 Nov 03 00:20 IDQ20840.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20845.cap.xml",
+      "size": 3280,
+      "listing": "-rw-rw-r--    1 1050     1502         3280 Nov 03 23:24 IDQ20845.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20845.txt",
+      "size": 3906,
+      "listing": "-rw-rw-r--    1 1050     1502         3906 Nov 03 23:24 IDQ20845.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20845.xml",
+      "size": 19538,
+      "listing": "-rw-rw-r--    1 1050     1502        19538 Nov 03 23:24 IDQ20845.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20850.cap.xml",
+      "size": 2327,
+      "listing": "-rw-rw-r--    1 1050     1502         2327 Nov 03 23:44 IDQ20850.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20850.txt",
+      "size": 2095,
+      "listing": "-rw-rw-r--    1 1050     1502         2095 Nov 03 23:44 IDQ20850.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20850.xml",
+      "size": 6980,
+      "listing": "-rw-rw-r--    1 1050     1502         6980 Nov 03 23:44 IDQ20850.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20855.cap.xml",
+      "size": 4568,
+      "listing": "-rw-rw-r--    1 1050     1502         4568 Nov 03 01:09 IDQ20855.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20855.txt",
+      "size": 2981,
+      "listing": "-rw-rw-r--    1 1050     1502         2981 Nov 03 01:09 IDQ20855.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20855.xml",
+      "size": 11064,
+      "listing": "-rw-rw-r--    1 1050     1502        11064 Nov 03 01:09 IDQ20855.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20860.cap.xml",
+      "size": 5208,
+      "listing": "-rw-rw-r--    1 1050     1502         5208 Nov 03 02:45 IDQ20860.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20860.txt",
+      "size": 3584,
+      "listing": "-rw-rw-r--    1 1050     1502         3584 Nov 03 02:45 IDQ20860.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ20860.xml",
+      "size": 13381,
+      "listing": "-rw-rw-r--    1 1050     1502        13381 Nov 03 02:45 IDQ20860.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDQ21013.cap.xml",
+      "size": 2984,
+      "listing": "-rw-rw-r--    1 1050     1502         2984 Nov 03 04:29 IDQ21013.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDS20201.cap.xml",
+      "size": 3011,
+      "listing": "-rw-rw-r--    1 1050     1502         3011 Nov 03 23:00 IDS20201.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDS20201.txt",
+      "size": 1163,
+      "listing": "-rw-rw-r--    1 1050     1502         1163 Nov 03 23:00 IDS20201.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDS20201.xml",
+      "size": 4580,
+      "listing": "-rw-rw-r--    1 1050     1502         4580 Nov 03 23:00 IDS20201.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDT20100.cap.xml",
+      "size": 4347,
+      "listing": "-rw-rw-r--    1 1050     1502         4347 Nov 03 23:00 IDT20100.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDT20100.txt",
+      "size": 1319,
+      "listing": "-rw-rw-r--    1 1050     1502         1319 Nov 03 23:00 IDT20100.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDT20100.xml",
+      "size": 6102,
+      "listing": "-rw-rw-r--    1 1050     1502         6102 Nov 03 23:00 IDT20100.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDV20600.cap.xml",
+      "size": 4020,
+      "listing": "-rw-rw-r--    1 1050     1502         4020 Nov 03 23:00 IDV20600.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDV20600.txt",
+      "size": 1236,
+      "listing": "-rw-rw-r--    1 1050     1502         1236 Nov 03 23:00 IDV20600.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDV20600.xml",
+      "size": 5565,
+      "listing": "-rw-rw-r--    1 1050     1502         5565 Nov 03 23:00 IDV20600.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDV29000.cap.xml",
+      "size": 3592,
+      "listing": "-rw-rw-r--    1 1050     1502         3592 Nov 03 23:29 IDV29000.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDV29000.txt",
+      "size": 932,
+      "listing": "-rw-rw-r--    1 1050     1502          932 Nov 03 23:29 IDV29000.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDV29000.xml",
+      "size": 4090,
+      "listing": "-rw-rw-r--    1 1050     1502         4090 Nov 03 23:29 IDV29000.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDW20100.cap.xml",
+      "size": 3437,
+      "listing": "-rw-rw-r--    1 1050     1502         3437 Nov 03 23:01 IDW20100.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDW20100.txt",
+      "size": 1183,
+      "listing": "-rw-rw-r--    1 1050     1502         1183 Nov 03 23:01 IDW20100.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDW20100.xml",
+      "size": 4831,
+      "listing": "-rw-rw-r--    1 1050     1502         4831 Nov 03 23:01 IDW20100.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDW21013.cap.xml",
+      "size": 3630,
+      "listing": "-rw-rw-r--    1 1050     1502         3630 Nov 03 04:00 IDW21013.cap.xml",
+      "status": "saved"
+    }
+  ],
+  "directory_files": 5266,
+  "products": [
+    "IDD21013",
+    "IDN20400",
+    "IDN29000",
+    "IDN36631",
+    "IDN36632",
+    "IDQ20770",
+    "IDQ20790",
+    "IDQ20800",
+    "IDQ20809",
+    "IDQ20815",
+    "IDQ20827",
+    "IDQ20829",
+    "IDQ20831",
+    "IDQ20835",
+    "IDQ20840",
+    "IDQ20845",
+    "IDQ20850",
+    "IDQ20855",
+    "IDQ20860",
+    "IDQ21013",
+    "IDS20201",
+    "IDT20100",
+    "IDV20600",
+    "IDV29000",
+    "IDW20100",
+    "IDW21013"
+  ]
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20770-2026-11-03T22:25:53+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T22:25:53+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Unknown</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T22:25:53+00:00</effective>
+    <expires>2026-11-05T01:25:53+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Flood Warning for Burnett River to Mundubbera and Burnett River at Mundubbera</headline>
+    <description>Flooding is no longer expected along the Burnett River to Mundubbera.
+
+The Burnett River at Mundubbera is currently at 5.52 m and steady, below the minor flood level. The Burnett River at Mundubbera is expected to remain below the minor flood level (7.00 m).</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Burnett River to Mundubbera and Burnett River at Mundubbera</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC073</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS082</value>
+      </geocode>
+    </area>
+  </info>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Unknown</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T22:25:53+00:00</effective>
+    <expires>2026-11-05T01:25:53+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Flood Warning for Stuart and Boyne Rivers and Boyne River at Dunollie</headline>
+    <description>Flooding is no longer expected along the Stuart and Boyne Rivers.
+
+No observations are currently available for the Boyne River at Dunollie. The river level is estimated to be below the minor flood level. The Boyne River at Dunollie is expected to remain below the minor flood level (2.50 m).</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Stuart and Boyne Rivers and Boyne River at Dunollie</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC074</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS042</value>
+      </geocode>
+    </area>
+  </info>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Unknown</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T22:25:53+00:00</effective>
+    <expires>2026-11-05T01:25:53+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Flood Warning for Burnett River downstream of Mundubbera to Paradise Dam and Burnett River at Gayndah</headline>
+    <description>Flooding is no longer expected along the Burnett River downstream of Mundubbera to Paradise Dam.
+
+No observations are currently available for the Burnett River at Gayndah. The river level is estimated to be below the minor flood level. The Burnett River at Gayndah is expected to remain below the minor flood level (5.00 m).</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Burnett River downstream of Mundubbera to Paradise Dam and Burnett River at Gayndah</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC076</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS087</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

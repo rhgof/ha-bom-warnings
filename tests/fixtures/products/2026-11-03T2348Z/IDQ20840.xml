@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20840</identifier>
+        <issue-time-utc>2026-11-03T00:18:54Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-03T10:18:54+10:00</issue-time-local>
+        <sent-time>2026-11-03T00:18:54Z</sent-time>
+        <expiry-time>2026-11-06T03:18:54Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-03T10:18:54+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-06T13:18:54+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Final Flood Warning for the Lower Moonie River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC029" description="Moonie River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                
+				<element type="warning_sequence">11</element>
+                <text type="warning_situation">
+				<p>NINDIGULLY BELOW MINOR FLOOD LEVEL, NO FURTHER FLOODING EXPECTED</p>
+
+				<p/>
+				<p>The Moonie River at Nindigully has fallen below the minor flood level and is expected to continue easing. No further flooding is expected.</p>
+<p/>
+<p>Further showers and storms remain possible during Tuesday, however these are not expected to cause additional flooding at this stage. The situation will be monitored and warnings will restart if required.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC029" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                <area-list>
+                    <area aac="QLD_RC119" phase="FIN" description="Moonie River downstream of Flinton" type="river-basin"/>
+                    <area aac="QLD_RS006" phase="FIN" description="Moonie River at Nindigully" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">No further flooding is expected along the Moonie River downstream of Flinton.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS006" description="Moonie River at Nindigully" type="river-site" parent-aac="QLD_RC119">
+                    <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                        <text type="flood_status">The Moonie River at Nindigully is currently at 2.15 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Moonie River at Nindigully is expected to continue easing and remain below the minor flood level (2.20 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0298" description="Moonie River at Kinkora" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Kinkora</element>
+                    <element type="obs_site_latitude">-27.8344</element>
+                    <element type="obs_site_longitude">149.6842</element>
+                    <element type="obs_river_height">0.38</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0287" description="Moonie River at Flinton Town" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Flinton Town</element>
+                    <element type="obs_site_latitude">-27.8967</element>
+                    <element type="obs_site_longitude">149.5586</element>
+                    <element type="obs_river_height">0.98</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0825" description="Moonie River at Flinton" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Flinton</element>
+                    <element type="obs_site_latitude">-27.8944</element>
+                    <element type="obs_site_longitude">149.5267</element>
+                    <element type="obs_river_height">2.07</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0305" description="Teelba Creek at Teelba" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Teelba Creek at Teelba</element>
+                    <element type="obs_site_latitude">-27.7642</element>
+                    <element type="obs_site_longitude">149.3972</element>
+                    <element type="obs_river_height">0.37</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0874" description="Moonie River at Warrie Station" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Warrie Station</element>
+                    <element type="obs_site_latitude">-28.0949</element>
+                    <element type="obs_site_longitude">148.9736</element>
+                    <element type="obs_river_height">1.10</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:00 pm Mon 02/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0337" description="Moonie River at Nindigully" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Nindigully</element>
+                    <element type="obs_site_latitude">-28.3542</element>
+                    <element type="obs_site_longitude">148.8222</element>
+                    <element type="obs_river_height">2.15</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0295" description="Moonie River at Nindigully TM" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Nindigully TM</element>
+                    <element type="obs_site_latitude">-28.4167</element>
+                    <element type="obs_site_longitude">148.8333</element>
+                    <element type="obs_river_height">2.44</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0826" description="Moonie River at Thallon Bridge" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Thallon Bridge</element>
+                    <element type="obs_site_latitude">-28.6328</element>
+                    <element type="obs_site_longitude">148.8564</element>
+                    <element type="obs_river_height">2.35</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Mon 02/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0296" description="Moonie River at Fenton" type="river-obs-site" parent-aac="QLD_RC029">
+                <forecast-period start-time-local="2026-11-03T10:18:54+10:00" end-time-local="2026-11-06T13:18:54+10:00" start-time-utc="2026-11-03T00:18:54Z" end-time-utc="2026-11-06T03:18:54Z">
+                    <element type="obs_site_description">Moonie River at Fenton</element>
+                    <element type="obs_site_latitude">-28.9417</element>
+                    <element type="obs_site_longitude">148.74</element>
+                    <element type="obs_river_height">2.25</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

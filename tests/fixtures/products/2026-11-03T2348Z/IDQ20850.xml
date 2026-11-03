@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20850</identifier>
+        <issue-time-utc>2026-11-03T23:42:26Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T09:42:26+10:00</issue-time-local>
+        <sent-time>2026-11-03T23:42:26Z</sent-time>
+        <expiry-time>2026-11-07T02:42:26Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T09:42:26+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-07T12:42:26+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+			
+            <text type="warning_title">Final Flood Warning for the Lower Paroo River (QLD)</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC032" description="Paroo River (QLD)" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z">
+                
+				<element type="warning_sequence">6</element>
+                <text type="warning_situation">
+				<p>MINOR FLOODING HAS EASED AT HUNGERFORD</p>
+
+				<p/>
+				<p>The main flood peak along the lower Paroo River is now downstream of Hungerford, where the river level fell below the minor flood level overnight Tuesday into Wednesday.</p>
+
+				<p>Further downstream, a Minor Flood Warning remains current for the Paroo River (NSW).</p>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC032" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z">
+                <area-list>
+                    <area aac="QLD_RC124" phase="FIN" description="Paroo River downstream of Eulo" type="river-basin"/>
+                    <area aac="QLD_RS108" phase="FIN" description="Paroo River at Hungerford" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding has eased at Hungerford.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS108" description="Paroo River at Hungerford" type="river-site" parent-aac="QLD_RC124">
+                    <forecast-period start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z">
+                        <text type="flood_status">The Paroo River at Hungerford is currently at 0.95 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Paroo River at Hungerford is expected to remain below the minor flood level (1.00 m).</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0833" description="Paroo River at Caiwarro" type="river-obs-site" parent-aac="QLD_RC032">
+                <forecast-period start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z">
+                    <element type="obs_site_description">Paroo River at Caiwarro</element>
+                    <element type="obs_site_latitude">-28.6833</element>
+                    <element type="obs_site_longitude">144.7833</element>
+                    <element type="obs_river_height">1.29</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="NSW_RO0229" description="Paroo River at Hungerford" type="river-obs-site" parent-aac="QLD_RC032">
+                <forecast-period start-time-local="2026-11-04T09:42:26+10:00" end-time-local="2026-11-07T12:42:26+10:00" start-time-utc="2026-11-03T23:42:26Z" end-time-utc="2026-11-07T02:42:26Z">
+                    <element type="obs_site_description">Paroo River at Hungerford</element>
+                    <element type="obs_site_latitude">-28.9972</element>
+                    <element type="obs_site_longitude">144.4094</element>
+                    <element type="obs_river_height">0.95</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:10 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

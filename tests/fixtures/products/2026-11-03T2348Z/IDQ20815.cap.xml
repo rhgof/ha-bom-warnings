@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20815-2026-11-03T23:12:57+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T23:12:57+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <references>CAP.Message@bom.gov.au,AusBoM-IDQ20815-2026-11-03T04:36:58+00:00,2026-11-03T04:36:58+00:00</references>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Unknown</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T23:12:57+00:00</effective>
+    <expires>2026-11-05T02:12:57+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Flood Warning for Logan River to Yarrahappini and Logan River at Beaudesert</headline>
+    <description>Flooding is no longer expected along the Logan River to Yarrahappini.
+
+The Logan River at Beaudesert is currently at 0.57 m and steady, below the minor flood level. The Logan River at Beaudesert is expected to remain below the minor flood level (7.00 m).</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Logan River to Yarrahappini and Logan River at Beaudesert</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC098</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS012</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

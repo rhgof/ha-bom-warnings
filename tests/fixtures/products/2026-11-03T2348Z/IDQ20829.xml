@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20829</identifier>
+        <issue-time-utc>2026-11-03T02:30:36Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-03T12:30:36+10:00</issue-time-local>
+        <sent-time>2026-11-03T02:30:36Z</sent-time>
+        <expiry-time>2026-11-06T05:30:36Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-03T12:30:36+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-06T15:30:36+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Moderate Flood Warning for the Lower Condamine River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 01:00 PM AEST on Wednesday 04 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC168" description="Lower Condamine River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                
+				<element type="warning_sequence">8</element>
+                <text type="warning_situation">
+				<p>MODERATE FLOODING EASING AT CHINCHILLA WEIR</p>
+<p>MINOR FLOOD PEAK POSSIBLE AT CONDAMINE DURING WEDNESDAY EVENING</p>
+
+				<p/>
+				<p>Rainfall during last week across the Upper Condamine River catchment has caused river level rises and minor to major flooding along the Condamine River. The flood peak is now passing Chinchilla Weir. Further downstream at Condamine a minor flood peak is possible during Wednesday evening. </p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Moderate</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC168" phase="UPD" type="FLW" severity="MOD" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                <area-list>
+                    <area aac="QLD_RC170" phase="UPD" description="Condamine River downstream of Oakey Creek to Cotswold" type="river-basin"/>
+                    <area aac="QLD_RS067" phase="UPD" description="Condamine River at Chinchilla Weir TW" type="river-site"/>
+                    <area aac="QLD_RS112" phase="UPD" description="Condamine River at Condamine" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Moderate flooding is occurring along the Condamine River downstream of Oakey Creek to Cotswold. </text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS067" description="Condamine River at Chinchilla Weir TW" type="river-site" parent-aac="QLD_RC170">
+                    <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                        <text type="flood_status">The Condamine River at Chinchilla Weir TW peaked at 8.49 m around 09:45 pm Monday, with moderate flooding. The river is currently at 8.21 m and falling, with moderate flooding.</text>
+                        <text type="warning_prediction">The Condamine River at Chinchilla Weir TW is likely to fall below the moderate flood level (8.00 m) Tuesday afternoon. The river is likely to remain above the minor flood level (6.00 m) during Thursday 05 November. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z"/>
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z"/>
+                </area>                <area aac="QLD_RS112" description="Condamine River at Condamine" type="river-site" parent-aac="QLD_RC170">
+                    <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                        <text type="flood_status">The Condamine River at Condamine is currently at 5.50 m and rising, above the minor flood level (5.00 m).</text>
+                        <text type="warning_prediction">The Condamine River at Condamine may peak near 6.70 m Wednesday evening, with minor flooding. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z"/>
+                </area>      
+  
+            <area aac="QLD_RO1009" description="Myall Creek at Clydesdale" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Myall Creek at Clydesdale</element>
+                    <element type="obs_site_latitude">-27.1939</element>
+                    <element type="obs_site_longitude">151.4864</element>
+                    <element type="obs_river_height">-0.72</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:42 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1063" description="Myall Creek at Moffatt" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Myall Creek at Moffatt</element>
+                    <element type="obs_site_latitude">-27.0969</element>
+                    <element type="obs_site_longitude">151.3978</element>
+                    <element type="obs_river_height">-0.60</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:35 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0816" description="Myall Creek at Dalby" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Myall Creek at Dalby</element>
+                    <element type="obs_site_latitude">-27.1833</element>
+                    <element type="obs_site_longitude">151.2661</element>
+                    <element type="obs_river_height">0.25</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:07 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0819" description="Condamine River at Loudoun Weir" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Loudoun Weir</element>
+                    <element type="obs_site_latitude">-27.225</element>
+                    <element type="obs_site_longitude">151.1856</element>
+                    <element type="obs_river_height">2.28</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1086" description="Condamine River at Ranges Bridge" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Ranges Bridge</element>
+                    <element type="obs_site_latitude">-27.1215</element>
+                    <element type="obs_site_longitude">151.0919</element>
+                    <element type="obs_river_height">2.83</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:38 am Thu 29/10/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1017" description="Jandowae Creek at Jandowae" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Jandowae Creek at Jandowae</element>
+                    <element type="obs_site_latitude">-26.7794</element>
+                    <element type="obs_site_longitude">151.1086</element>
+                    <element type="obs_river_height">1.22</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:08 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1020" description="Cooranga Creek at Warra" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Cooranga Creek at Warra</element>
+                    <element type="obs_site_latitude">-26.9283</element>
+                    <element type="obs_site_longitude">150.9181</element>
+                    <element type="obs_river_height">-0.42</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:32 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0867" description="Condamine River at Brigalow Bridge" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Brigalow Bridge</element>
+                    <element type="obs_site_latitude">-26.9044</element>
+                    <element type="obs_site_longitude">150.7831</element>
+                    <element type="obs_river_height">6.05</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:20 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0278" description="Condamine River at Chinchilla Weir TW" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Chinchilla Weir TW</element>
+                    <element type="obs_site_latitude">-26.8</element>
+                    <element type="obs_site_longitude">150.575</element>
+                    <element type="obs_river_height">8.21</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1023" description="Condamine River at Condamine" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Condamine</element>
+                    <element type="obs_site_latitude">-26.9267</element>
+                    <element type="obs_site_longitude">150.1314</element>
+                    <element type="obs_river_height">5.50</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:08 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0291" description="Condamine River at Cotswold" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Condamine River at Cotswold</element>
+                    <element type="obs_site_latitude">-27.0833</element>
+                    <element type="obs_site_longitude">149.7833</element>
+                    <element type="obs_river_height">6.67</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:15 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1019" description="Charleys Creek at Burncluith Bridge" type="river-obs-site" parent-aac="QLD_RC168">
+                <forecast-period start-time-local="2026-11-03T12:30:36+10:00" end-time-local="2026-11-06T15:30:36+10:00" start-time-utc="2026-11-03T02:30:36Z" end-time-utc="2026-11-06T05:30:36Z">
+                    <element type="obs_site_description">Charleys Creek at Burncluith Bridge</element>
+                    <element type="obs_site_latitude">-26.6717</element>
+                    <element type="obs_site_longitude">150.7206</element>
+                    <element type="obs_river_height">0.02</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:17 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

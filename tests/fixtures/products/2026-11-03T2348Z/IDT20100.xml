@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+            <region>Tasmania</region>
+            <office>TASRO</office>
+            <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDT20100</identifier>
+        <issue-time-utc>2026-11-03T23:00:00Z</issue-time-utc>
+        <issue-time-local tz="EDT">2026-11-04T10:00:00+11:00</issue-time-local>
+        <sent-time>2026-11-03T23:00:04Z</sent-time>
+        <expiry-time>2026-11-05T13:00:00Z</expiry-time>
+        <validity-bgn-time-local tz="EDT">2026-11-04T10:00:00+11:00</validity-bgn-time-local>
+        <validity-end-time-local tz="EDT">2026-11-05T23:59:59+11:00</validity-end-time-local>
+        <next-routine-issue-time-utc>2026-11-04T05:05:00Z</next-routine-issue-time-utc>
+        <next-routine-issue-time-local tz="EDT">2026-11-04T16:05:00+11:00</next-routine-issue-time-local>
+        <status>O</status>
+        <service>WSM</service>
+        <sub-service>WMS</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+            <text type="warning_title">Marine Wind Warning Summary for Tasmania</text>
+            <text type="postamble">Check the latest Coastal Waters Forecast or Local Waters Forecast at http://www.bom.gov.au/tas/forecasts/map.shtml for information on wind, wave and weather conditions for these coastal zones.</text>
+            <text type="warning_next_issue">The next marine wind warning summary will be issued by 4:05 pm EDT Wednesday.</text>
+        </warning-info>
+        <!---->
+        <!--locale[TAS_FA001, allow-output=yes]-->
+        <!--hazards-exist="yes" non-warning-info-elements-exist="yes"-->
+        <area aac="TAS_FA001" description="Tasmania" type="region">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+            <!--locale[TAS_FA001]/period[variable]-->
+            <!--non-warning-info-elements-exist='yes'-->
+            <forecast-period start-time-local="2026-11-04T10:00:00+11:00" end-time-local="2026-11-08T00:00:00+11:00" start-time-utc="2026-11-03T23:00:00Z" end-time-utc="2026-11-07T13:00:00Z">
+                <warning-summary type="marine_forecast">
+                    <p>Strong Wind Warning for Wednesday for Far North West Coast</p>
+                    <p>Strong Wind Warning for Thursday for Far North West Coast, Central North Coast, Banks Strait and Franklin Sound, East of Flinders Island, Upper East Coast, Lower East Coast, South East Coast, South West Coast and Central West Coast</p>
+                </warning-summary>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <!--locale[TAS_FA001]/period[day0]-->
+            <forecast-period index="0" start-time-local="2026-11-04T10:00:00+11:00" end-time-local="2026-11-05T00:00:00+11:00" start-time-utc="2026-11-03T23:00:00Z" end-time-utc="2026-11-04T13:00:00Z">
+                <hazard index="1" parent-aac="TAS_FA001" phase="REN" type="MWW" severity="STR" urgency="UNK" certainty="UNK">
+                    <area-list>
+                        <area aac="TAS_MW001" phase="REN" description="Far North West Coast: Sandy Cape to Stanley" type="coast"/>
+                    </area-list>
+                    <priority>W</priority>
+                    <text type="warning_phenomena">Strong Wind Warning</text>
+                    <text type="warning_areas">Far North West Coast</text>
+                </hazard>
+            </forecast-period>
+            <!--locale[TAS_FA001]/period[day1]-->
+            <forecast-period index="1" start-time-local="2026-11-05T00:00:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-04T13:00:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <hazard index="1" parent-aac="TAS_FA001" phase="UPD" type="MWW" severity="STR" urgency="UNK" certainty="UNK">
+                    <area-list>
+                        <area aac="TAS_MW001" phase="REN" description="Far North West Coast: Sandy Cape to Stanley" type="coast"/>
+                        <area aac="TAS_MW002" phase="REN" description="Central North Coast: Stanley to Northern Tip of Flinders Island" type="coast"/>
+                        <area aac="TAS_MW009" phase="REN" description="Banks Strait and Franklin Sound" type="coast"/>
+                        <area aac="TAS_MW003" phase="REN" description="East of Flinders Island: Northern Tip of Flinders Island to St Helens Point" type="coast"/>
+                        <area aac="TAS_MW004" phase="REN" description="Upper East Coast: St Helens Point to Wineglass Bay" type="coast"/>
+                        <area aac="TAS_MW005" phase="NEW" description="Lower East Coast: Wineglass Bay to Tasman Island" type="coast"/>
+                        <area aac="TAS_MW006" phase="REN" description="South East Coast: Tasman Island to South East Cape" type="coast"/>
+                        <area aac="TAS_MW007" phase="REN" description="South West Coast: South East Cape to Low Rocky Point" type="coast"/>
+                        <area aac="TAS_MW008" phase="REN" description="Central West Coast: Low Rocky Point to Sandy Cape" type="coast"/>
+                    </area-list>
+                    <priority>W</priority>
+                    <text type="warning_phenomena">Strong Wind Warning</text>
+                    <text type="warning_areas">Far North West Coast, Central North Coast, Banks Strait and Franklin Sound, East of Flinders Island, Upper East Coast, Lower East Coast, South East Coast, South West Coast and Central West Coast</text>
+                </hazard>
+            </forecast-period>
+        </area>
+    </warning>
+</product>

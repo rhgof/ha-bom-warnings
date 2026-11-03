@@ -1,0 +1,71 @@
+IDQ20835
+Australian Government Bureau of Meteorology
+
+Final Flood Warning for the Macintyre Brook
+
+Issued at 7:37 am AEST on Wednesday 4 November 2026
+Flood Warning Number: 2
+
+
+FLOODING NO LONGER EXPECTED AT INGLEWOOD BRIDGE
+
+Flooding is no longer expected along Macintyre Brook at Inglewood Bridge after peaking
+well below the minor flood level early Wednesday morning. As these flows travel
+downstream, small river level rises are expected along the Macintyre River at Boggabilla
+and Goondiwindi late this week but are expected to remain well below minor flood levels.
+
+Macintyre Brook:
+Flooding is no longer expected along Macintyre Brook.
+
+The Macintyre Brook at Inglewood Bridge is currently at 3.40 m and falling, below the
+minor flood level. The Macintyre Brook at Inglewood Bridge is expected to remain below the
+minor flood level (5.00 m).
+
+Safety Advice:
+* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay
+informed.
+* For local emergency management warnings and advice visit
+www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening
+emergencies, call 000 (triple zero) immediately.
+
+Next issue:
+This is a final warning. No further warnings will be issued for this event.
+
+Latest River Heights:
+Location                                    River Height   Tendency Time of Observation
+Severn River at Ashford                       0.78 m       Steady   8:15 am Wed 04/11/26
+Quart Pot Creek at Stanthorpe                 0.65 m       Steady   7:00 am Wed 04/11/26
+Pike Creek at Glenlyon Dam HW                 23.86 m      Steady   7:00 am Wed 04/11/26
+Dumaresq River at Bonshaw                     3.77 m       Falling  7:15 am Wed 04/11/26
+Dumaresq River at Texas                       2.27 m       Rising   7:25 am Wed 04/11/26
+Macintyre Brook at Barongarook                1.54 m       Steady   6:49 am Wed 04/11/26
+Macintyre Brook at Coolmunda Dam HG           0.11 m       Steady   7:00 am Wed 04/11/26
+Macintyre Brook at Inglewood Bridge           3.40 m       Falling  7:26 am Wed 04/11/26
+Macintyre Brook at Booba Sands                2.28 m       Steady   7:00 am Wed 04/11/26
+Dumaresq River at Bengalla                    4.47 m       Steady   2:01 pm Wed 28/10/26
+Macintyre River at New Kildonan               2.06 m       Steady   7:00 am Wed 04/11/26
+Macintyre River at Boggabilla                 1.46 m       Steady   7:15 am Wed 04/11/26
+Macintyre River at Goondiwindi                2.03 m       Steady   7:00 am Wed 04/11/26
+Callandoon Creek at Oonavale                  1.10 m       Steady   7:00 am Wed 04/11/26
+Macintyre River at Terrewah                   3.65 m       Falling  7:15 am Wed 04/11/26
+Weir River at O'Connor                        2.95 m       Rising   7:09 am Wed 04/11/26
+Weir River at Retreat Bridge                  -0.20 m      Steady   7:00 am Wed 04/11/26
+Weir River at Gunn Bridge (DNRM)              0.47 m       Steady   7:00 am Wed 04/11/26
+Yarrill Creek at Medpark Bridge               0.92 m       Steady   7:00 am Wed 04/11/26
+Weir River at Giddi Giddi South               1.55 m       Steady   6:00 am Wed 04/11/26
+Weir River at Talwood                         2.20 m       Steady   9:00 am Sun 01/11/26
+Weir River at Jericho                         1.83 m       Steady   12:00 am Wed 04/11/26
+Barwon River at Mungindi                      3.93 m       Steady   8:15 am Wed 04/11/26
+
+This advice is also available by dialling 1300 659 219. Warning, rainfall and river
+information are available at http://www.bom.gov.au/australia/flood.
+
+Copyright Commonwealth of Australia 2011, Bureau of Meteorology (ABN 92 637 533
+532).  Users of these web pages are deemed to have read and accepted the
+conditions described in the Copyright, Disclaimer, and Privacy statements
+(http://www.bom.gov.au/other/copyright.shtml).

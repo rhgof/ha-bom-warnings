@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20855</identifier>
+        <issue-time-utc>2026-11-03T01:06:58Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-03T11:06:58+10:00</issue-time-local>
+        <sent-time>2026-11-03T01:06:58Z</sent-time>
+        <expiry-time>2026-11-06T04:06:58Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-03T11:06:58+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-06T14:06:58+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+			
+            <text type="warning_title">Moderate Flood Warning for the Bulloo River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 11:30 AM AEST on Wednesday 04 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC033" description="Bulloo River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                
+				<element type="warning_sequence">15</element>
+                <text type="warning_situation">
+				<p>MODERATE FLOODING POSSIBLE AT THARGOMINDAH OVER WEEKEND</p>
+<p>MINOR FLOODING EASING AT QUILPIE</p>
+
+				<p/>
+				<p>In the upper Bulloo River catchment, minor flooding is easing at Quilpie after a moderate flood peak early Monday morning. The flood peak is now arriving at Autumnvale and will approach Thargomindah over the weekend and into early next week. Minor flooding is possible at Thargomindah from about Friday and moderate flooding is possible over the weekend.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Moderate</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC033" phase="UPD" type="FLW" severity="MIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                <area-list>
+                    <area aac="QLD_RC125" phase="UPD" description="Bulloo River to Quilpie" type="river-basin"/>
+                    <area aac="QLD_RS094" phase="UPD" description="Bulloo River at Quilpie" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding is easing along the Bulloo River at Quilpie.</text>
+            </hazard>            <hazard index="2" parent-aac="QLD_RC033" phase="UPD" type="FLW" severity="MOD" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                <area-list>
+                    <area aac="QLD_RC126" phase="UPD" description="Bulloo River downstream of Quilpie" type="river-basin"/>
+                    <area aac="QLD_RS076" phase="UPD" description="Bulloo River at Thargomindah" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Moderate flooding is possible along the Bulloo River downstream of Quilpie. </text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS094" description="Bulloo River at Quilpie" type="river-site" parent-aac="QLD_RC125">
+                    <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                        <text type="flood_status">The Bulloo River at Quilpie is currently at 3.97 m and falling, with minor flooding.</text>
+                        <text type="warning_prediction">The Bulloo River at Quilpie is expected to continue easing, and may remain above the minor flood level (3.00 m) into Wednesday. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z"/>
+                </area>                <area aac="QLD_RS076" description="Bulloo River at Thargomindah" type="river-site" parent-aac="QLD_RC126">
+                    <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                        <text type="flood_status">The Bulloo River at Thargomindah is currently at 3.44 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Bulloo River at Thargomindah is expected to rise slowly over the next few days as flood waters arrive. The river level may exceed the minor flood level (4.00 m) from about Friday and may exceed the moderate flood level (4.50 m) over the weekend. Forecasts will be refined as upstream peaks are observed.</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z"/>
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0354" description="Blackwater Creek at Adavale" type="river-obs-site" parent-aac="QLD_RC033">
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                    <element type="obs_site_description">Blackwater Creek at Adavale</element>
+                    <element type="obs_site_latitude">-25.9094</element>
+                    <element type="obs_site_longitude">144.5989</element>
+                    <element type="obs_river_height">0.88</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0845" description="Bulloo River at Quilpie" type="river-obs-site" parent-aac="QLD_RC033">
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                    <element type="obs_site_description">Bulloo River at Quilpie</element>
+                    <element type="obs_site_latitude">-26.6167</element>
+                    <element type="obs_site_longitude">144.2833</element>
+                    <element type="obs_river_height">3.97</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0843" description="Bulloo River at Autumnvale" type="river-obs-site" parent-aac="QLD_RC033">
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                    <element type="obs_site_description">Bulloo River at Autumnvale</element>
+                    <element type="obs_site_latitude">-27.7633</element>
+                    <element type="obs_site_longitude">143.9192</element>
+                    <element type="obs_river_height">4.42</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0356" description="Bulloo River at Thargomindah" type="river-obs-site" parent-aac="QLD_RC033">
+                <forecast-period start-time-local="2026-11-03T11:06:58+10:00" end-time-local="2026-11-06T14:06:58+10:00" start-time-utc="2026-11-03T01:06:58Z" end-time-utc="2026-11-06T04:06:58Z">
+                    <element type="obs_site_description">Bulloo River at Thargomindah</element>
+                    <element type="obs_site_latitude">-27.9947</element>
+                    <element type="obs_site_longitude">143.8278</element>
+                    <element type="obs_river_height">3.44</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">10:50 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

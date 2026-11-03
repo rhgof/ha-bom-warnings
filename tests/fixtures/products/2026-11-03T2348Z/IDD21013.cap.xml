@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDD21013-2026-11-03T04:00:27+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-03T04:00:27+00:00</sent>
+    <status>Actual</status>
+    <msgType>Alert</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>AusBoM,IDD21013,2026-11-02T03:27:21+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Shelter</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Extreme</severity>
+        <certainty>Observed</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-03T04:00:27+00:00</effective>
+        <expires>2026-11-04T04:00:27+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Extreme heatwave warning for Northern Territory</headline>
+        <description>
+        Maximum temperatures in the mid to high thirties over the Tiwi Islands and Daly district, to low forties over the Arnhem and Carpentaria districts and overnight minimum temperatures in the mid to high twenties.
+
+Severe to Extreme heatwave conditions building and peaking over the mid to latter part of the week, with extreme heatwave conditions easing slightly into the weekend. 
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Northern Territory: Tiwi and Arnhem Districts.
+            </areaDesc>
+            <geocode>
+                <valueName>http://www.iso.org/iso/country_codes.html</valueName>
+                <value>AU-NT</value>
+            </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>NT_PW002</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>NT_PW003</value>
+              </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Shelter</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Severe</severity>
+        <certainty>Observed</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-03T04:00:27+00:00</effective>
+        <expires>2026-11-04T04:00:27+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe heatwave warning for Northern Territory</headline>
+        <description>
+        Severe heatwave conditions are expected to affect Northern Territory from Tuesday 03 November 2026 to Friday 06 November 2026
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Northern Territory: Daly and Carpentaria Districts.
+            </areaDesc>
+            <geocode>
+                <valueName>http://www.iso.org/iso/country_codes.html</valueName>
+                <value>AU-NT</value>
+            </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>NT_PW001</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>NT_PW004</value>
+              </geocode>
+        </area>
+    </info>
+</alert>

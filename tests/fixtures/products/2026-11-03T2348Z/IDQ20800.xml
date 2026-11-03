@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20800</identifier>
+        <issue-time-utc>2026-11-03T22:36:34Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T08:36:34+10:00</issue-time-local>
+        <sent-time>2026-11-03T22:36:34Z</sent-time>
+        <expiry-time>2026-11-05T01:36:34Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T08:36:34+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-05T11:36:34+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Final Flood Warning for the Stanley River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC022" description="Upper Brisbane River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>FLOODING NO LONGER EXPECTED ALONG STANLEY RIVER AT WOODFORD</p>
+
+				<p/>
+				<p>Flooding is no longer expected along the Stanley River at Woodford. No significant rainfall is forecast for the next few days.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC022" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                <area-list>
+                    <area aac="QLD_RC093" phase="FIN" description="Stanley River to Somerset Dam" type="river-basin"/>
+                    <area aac="QLD_RS018" phase="FIN" description="Stanley River at Woodford" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Stanley River.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS018" description="Stanley River at Woodford" type="river-site" parent-aac="QLD_RC093">
+                    <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                        <text type="flood_status">The Stanley River at Woodford is currently at 1.97 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Stanley River at Woodford is expected to remain below the minor flood level (5.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0627" description="Stanley River at Peachester" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Stanley River at Peachester</element>
+                    <element type="obs_site_latitude">-26.8385</element>
+                    <element type="obs_site_longitude">152.8416</element>
+                    <element type="obs_river_height">0.63</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0753" description="Stanley River at Woodford" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Stanley River at Woodford</element>
+                    <element type="obs_site_latitude">-26.9352</element>
+                    <element type="obs_site_longitude">152.761</element>
+                    <element type="obs_river_height">1.97</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0771" description="Kilcoy Creek at Kilcoy Weir (DS)" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Kilcoy Creek at Kilcoy Weir (DS)</element>
+                    <element type="obs_site_latitude">-26.92</element>
+                    <element type="obs_site_longitude">152.5819</element>
+                    <element type="obs_river_height">0.78</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0680" description="Stanley River at Somerset Dam" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Stanley River at Somerset Dam</element>
+                    <element type="obs_site_latitude">-27.1169</element>
+                    <element type="obs_site_longitude">152.555</element>
+                    <element type="obs_river_height">96.96</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">6:30 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0625" description="Cooyar Creek" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Cooyar Creek</element>
+                    <element type="obs_site_latitude">-26.7417</element>
+                    <element type="obs_site_longitude">152.1367</element>
+                    <element type="obs_river_height">1.12</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0686" description="Brisbane River at Devon Hills" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Brisbane River at Devon Hills</element>
+                    <element type="obs_site_latitude">-26.8997</element>
+                    <element type="obs_site_longitude">152.3208</element>
+                    <element type="obs_river_height">1.00</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:08 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0626" description="Emu Creek at Boat Mountain" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Emu Creek at Boat Mountain</element>
+                    <element type="obs_site_latitude">-26.9789</element>
+                    <element type="obs_site_longitude">152.2847</element>
+                    <element type="obs_river_height">0.63</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0798" description="Maronghi Creek at Glendale" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Maronghi Creek at Glendale</element>
+                    <element type="obs_site_latitude">-26.9781</element>
+                    <element type="obs_site_longitude">152.3336</element>
+                    <element type="obs_river_height">1.04</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0670" description="Brisbane River at Gregor Creek" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Brisbane River at Gregor Creek</element>
+                    <element type="obs_site_latitude">-26.9906</element>
+                    <element type="obs_site_longitude">152.4042</element>
+                    <element type="obs_river_height">1.14</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:55 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0673" description="Cressbrook Creek at Cressbrook Dam" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Cressbrook Creek at Cressbrook Dam</element>
+                    <element type="obs_site_latitude">-27.2653</element>
+                    <element type="obs_site_longitude">152.195</element>
+                    <element type="obs_river_height"></element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time"></element>
+                    <element type="obs_river_height_tendency"></element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0215" description="Cressbrook Creek at Rosentreters Bridge" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Cressbrook Creek at Rosentreters Bridge</element>
+                    <element type="obs_site_latitude">-27.1383</element>
+                    <element type="obs_site_longitude">152.3294</element>
+                    <element type="obs_river_height">1.16</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1057" description="Brisbane River at Wivenhoe Dam HG" type="river-obs-site" parent-aac="QLD_RC022">
+                <forecast-period start-time-local="2026-11-04T08:36:34+10:00" end-time-local="2026-11-05T11:36:34+10:00" start-time-utc="2026-11-03T22:36:34Z" end-time-utc="2026-11-05T01:36:34Z">
+                    <element type="obs_site_description">Brisbane River at Wivenhoe Dam HG</element>
+                    <element type="obs_site_latitude">-27.3944</element>
+                    <element type="obs_site_longitude">152.6097</element>
+                    <element type="obs_river_height">65.06</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">8:06 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

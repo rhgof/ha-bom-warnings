@@ -1,0 +1,84 @@
+IDQ20770
+Australian Government Bureau of Meteorology
+
+Final Flood Warning for the Boyne and Burnett Rivers
+
+Issued at 8:25 am AEST on Wednesday 4 November 2026
+Flood Warning Number: 2
+
+
+FLOODING IS NO LONGER EXPECTED AT DUNOLLIE, MUNDUBBERA, AND GAYNDAH
+
+Flooding is no longer expected along the Boyne and Burnett Rivers at Dunollie, Mundubbera,
+and Gayndah. Thunderstorms remain possible during Wednesday but forecast rainfall totals
+are not expected to significantly affect river levels.
+
+Burnett River to Mundubbera:
+Flooding is no longer expected along the Burnett River to Mundubbera.
+
+The Burnett River at Mundubbera is currently at 5.52 m and steady, below the minor flood
+level. The Burnett River at Mundubbera is expected to remain below the minor flood level
+(7.00 m).
+
+Stuart and Boyne Rivers:
+Flooding is no longer expected along the Stuart and Boyne Rivers.
+
+No observations are currently available for the Boyne River at Dunollie. The river level
+is estimated to be below the minor flood level. The Boyne River at Dunollie is expected to
+remain below the minor flood level (2.50 m).
+
+Burnett River downstream of Mundubbera to Paradise Dam:
+Flooding is no longer expected along the Burnett River downstream of Mundubbera to
+Paradise Dam.
+
+No observations are currently available for the Burnett River at Gayndah. The river level
+is estimated to be below the minor flood level. The Burnett River at Gayndah is expected
+to remain below the minor flood level (5.00 m).
+
+Safety Advice:
+* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay
+informed.
+* For local emergency management warnings and advice visit
+www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening
+emergencies, call 000 (triple zero) immediately.
+
+Next issue:
+This is a final warning. No further warnings will be issued for this event.
+
+Latest River Heights:
+Location                                    River Height   Tendency Time of Observation
+Three Moon Creek at Cania Dam (HW)            -15.05 m     Steady   8:00 am Wed 04/11/26
+Three Moon Creek at Monto                     0.28 m       Steady   7:00 am Wed 04/11/26
+Three Moon Creek at Abercorn                  2.00 m       Steady   5:22 am Wed 04/11/26
+Burnett River at Ceratodus                    1.63 m       Steady   7:00 am Wed 04/11/26
+Nogo River at Wuruma Dam (HW)                 -0.57 m      Steady   8:00 am Wed 04/11/26
+Burnett River at Eidsvold                     0.76 m       Steady   7:00 am Wed 04/11/26
+Burnett River at Marriages                    0.89 m       Steady   7:00 am Wed 04/11/26
+Auburn River at Flagstone Bridge              0.64 m       Steady   8:14 am Wed 04/11/26
+Boyne River at Boondooma Dam (HW)             -1.03 m      Steady   8:00 am Wed 04/11/26
+Boyne River at Derra                          0.42 m       Steady   7:00 am Wed 04/11/26
+Burnett River at Mundubbera                   5.52 m       Steady   8:11 am Wed 04/11/26
+Barker Creek at Bjelke-Petersen Dam (HW)      -0.30 m      Steady   8:00 am Wed 04/11/26
+Barambah Creek at Joe Sippel Weir (HW)        0.14 m       Steady   8:00 am Wed 04/11/26
+Barambah Creek at Joe Sippel Weir (TW)        2.04 m       Steady   7:30 am Wed 04/11/26
+Barambah Creek at Stonelands                  1.75 m       Steady   7:35 am Wed 04/11/26
+Burnett River at Gayndah Flume                0.12 m       Steady   7:00 am Wed 04/11/26
+Burnett River at Mt Lawless                   1.10 m       Steady   7:00 am Wed 04/11/26
+Burnett River at Paradise Dam (HW)            -0.09 m      Steady   8:00 am Wed 04/11/26
+Burnett River at Walla                        3.81 m       Steady   8:04 am Wed 04/11/26
+Burnett River at Ned Churchward Weir (HW)   19.33 mAHD     Steady   7:23 am Wed 04/11/26
+Burnett River at Bundaberg                    0.00 m       Falling  8:13 am Wed 04/11/26
+Bundaberg Port Tide                           1.63 m       Falling  8:03 am Wed 04/11/26
+
+This advice is also available by dialling 1300 659 219. Warning, rainfall and river
+information are available at http://www.bom.gov.au/australia/flood.
+
+Copyright Commonwealth of Australia 2011, Bureau of Meteorology (ABN 92 637 533
+532).  Users of these web pages are deemed to have read and accepted the
+conditions described in the Copyright, Disclaimer, and Privacy statements
+(http://www.bom.gov.au/other/copyright.shtml).

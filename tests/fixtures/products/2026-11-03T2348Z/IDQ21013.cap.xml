@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDQ21013-2026-11-03T04:29:32+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-03T04:29:32+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>AusBoM,IDQ21013,2026-11-02T03:17:04+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Extreme Heat</event>
+        <responseType>Shelter</responseType>
+        <urgency>Immediate</urgency>
+        <severity>Severe</severity>
+        <certainty>Observed</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>extremeHeat</value>
+        </eventCode>
+        <effective>2026-11-03T04:29:32+00:00</effective>
+        <expires>2026-11-04T10:29:32+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe heatwave warning for Queensland</headline>
+        <description>
+          Areas over inland parts will see maximum temperatures in the high thirties to low forties and overnight minimum temperatures in the mid twenties. 
+
+Areas closer to the coast will see maximum temperatures in the low to high thirties with overnight minimum temperatures in the low to mid twenties. 
+
+Severe heatwave conditions are expected to intensify and persist into the weekend. Locations likely to be impacted include Aurukun, Kowanyama, Pormpuraaw and Weipa.
+        </description>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Queensland: Peninsula, Gulf Country, Northern Goldfields and Upper Flinders, North Tropical Coast and Tablelands, Herbert and Lower Burdekin and Central Coast and Whitsundays Districts.
+            </areaDesc>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW001</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW002</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW003</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW004</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW005</value>
+              </geocode>
+              <geocode>
+                  <valueName>AMOC-AreaCode</valueName>
+                  <value>QLD_PW006</value>
+              </geocode>
+        </area>
+    </info>
+</alert>

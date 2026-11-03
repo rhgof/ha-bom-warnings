@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20855-2026-11-03T01:06:58+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T01:06:58+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Minor</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T01:06:58+00:00</effective>
+    <expires>2026-11-06T04:06:58+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Minor Flood Warning for Bulloo River to Quilpie and Bulloo River at Quilpie</headline>
+    <description>Minor flooding is easing along the Bulloo River at Quilpie.
+
+The Bulloo River at Quilpie is currently at 3.97 m and falling, with minor flooding. The Bulloo River at Quilpie is expected to continue easing, and may remain above the minor flood level (3.00 m) into Wednesday.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Bulloo River to Quilpie and Bulloo River at Quilpie</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC125</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS094</value>
+      </geocode>
+    </area>
+  </info>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Moderate</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T01:06:58+00:00</effective>
+    <expires>2026-11-06T04:06:58+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Moderate Flood Warning for Bulloo River downstream of Quilpie and Bulloo River at Thargomindah</headline>
+    <description>Moderate flooding is possible along the Bulloo River downstream of Quilpie.
+
+The Bulloo River at Thargomindah is currently at 3.44 m and steady, below the minor flood level. The Bulloo River at Thargomindah is expected to rise slowly over the next few days as flood waters arrive. The river level may exceed the minor flood level (4.00 m) from about Friday and may exceed the moderate flood level (4.50 m) over the weekend. Forecasts will be refined as upstream peaks are observed.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Bulloo River downstream of Quilpie and Bulloo River at Thargomindah</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC126</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS076</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

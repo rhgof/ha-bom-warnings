@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20829-2026-11-03T02:30:36+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T02:30:36+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <references>CAP.Message@bom.gov.au,AusBoM-IDQ20829-2026-11-02T02:04:14+00:00,2026-11-02T02:04:14+00:00</references>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Moderate</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T02:30:36+00:00</effective>
+    <expires>2026-11-06T05:30:36+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Moderate Flood Warning for Condamine River downstream of Oakey Creek to Cotswold, Condamine River at Chinchilla Weir TW and Condamine River at Condamine</headline>
+    <description>Moderate flooding is occurring along the Condamine River downstream of Oakey Creek to Cotswold.
+
+The Condamine River at Chinchilla Weir TW peaked at 8.49 m around 09:45 pm Monday, with moderate flooding. The river is currently at 8.21 m and falling, with moderate flooding. The Condamine River at Chinchilla Weir TW is likely to fall below the moderate flood level (8.00 m) Tuesday afternoon. The river is likely to remain above the minor flood level (6.00 m) during Thursday 05 November.
+
+The Condamine River at Condamine is currently at 5.50 m and rising, above the minor flood level (5.00 m). The Condamine River at Condamine may peak near 6.70 m Wednesday evening, with minor flooding.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Condamine River downstream of Oakey Creek to Cotswold, Condamine River at Chinchilla Weir TW and Condamine River at Condamine</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC170</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS067</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS112</value>
+      </geocode>
+    </area>
+  </info>
+</alert>
