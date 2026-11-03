@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from xml.etree import ElementTree as ET
 
-from .cap import _DoctypeError, _safe_parse
+from .cap import parse_xml
 
 # One product per state, keyed by the prefix of the district code (`NSW_FW004`). The ACT has no
 # product of its own: BoM publishes it in the NSW one as `NSW_FW008`. Adding a state is one line.
@@ -103,13 +103,8 @@ def _period(el: ET.Element) -> FireDangerPeriod | None:
 
 def parse_fire_danger(data: bytes) -> FireDangerProduct | None:
     """Parse one product. Return None for empty, malformed or district-less input."""
-    if not data.strip():
-        return None
-    try:
-        root = _safe_parse(data)
-    except ET.ParseError, _DoctypeError, ValueError:
-        return None
-    if root.tag != "product":
+    root = parse_xml(data)
+    if root is None or root.tag != "product":
         return None
     districts: dict[str, FireDistrict] = {}
     for area in root.iter("area"):
