@@ -43,6 +43,7 @@ from .fire_danger import (
 )
 from .fire_store import FireStore
 from .ftp import BomFtp, BomFtpError, client_from_env
+from .layer_check import LayerSchedule, read_record, write_record
 from .spatial import (
     LAYERS,
     RefreshResult,
@@ -69,12 +70,6 @@ REFRESH_ISSUE_ID = "refresh_failing"
 
 def no_area_issue_id(entry: BomWarningsConfigEntry) -> str:
     return f"no_area_{entry.entry_id}"
-
-
-# Shapefile layers change rarely, so they are checked weekly, in the background.
-LAYER_CHECK_INTERVAL = timedelta(days=7)
-# When the last check reached the server, so a restart does not start a fresh one.
-LAYER_CHECK_RECORD = ".last_layer_check"
 
 
 @dataclass(frozen=True, slots=True)
@@ -249,7 +244,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self._fire_reader = FireDangerReader(ftp)
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
-        self._next_layer_check = dt_util.utcnow()
+        self._layer_schedule = LayerSchedule.loaded(None, dt_util.utcnow())
         self._layer_task: asyncio.Task[None] | None = None
         self.layer_generation = 0
         # Entries using this feed, so the last one to leave can shut it down.
@@ -259,30 +254,10 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
     def _cache_dir(self) -> Path:
         return Path(self.hass.config.path(SPATIAL_CACHE_DIR))
 
-    def _read_layer_record(self) -> datetime | None:
-        """Blocking. When the last check reached the server; None if missing or unreadable."""
-        try:
-            last = datetime.fromisoformat((self._cache_dir() / LAYER_CHECK_RECORD).read_text())
-        except OSError, ValueError:
-            return None
-        return last if last.tzinfo else None
-
-    def _write_layer_record(self) -> None:
-        """Blocking. Failing to write only means the next start checks again."""
-        directory = self._cache_dir()
-        try:
-            directory.mkdir(parents=True, exist_ok=True)
-            (directory / LAYER_CHECK_RECORD).write_text(dt_util.utcnow().isoformat())
-        except OSError as err:
-            _LOGGER.debug("Could not record the layer check time: %s", err)
-
     async def async_load_layer_record(self) -> None:
         """Schedule the first layer check from the persisted record; call before the first poll."""
-        last = await self.hass.async_add_executor_job(self._read_layer_record)
-        now = dt_util.utcnow()
-        # A record from the future (clock change) would postpone the check for too long.
-        if last is not None and last <= now:
-            self._next_layer_check = last + LAYER_CHECK_INTERVAL
+        last = await self.hass.async_add_executor_job(read_record, self._cache_dir())
+        self._layer_schedule = LayerSchedule.loaded(last, dt_util.utcnow())
 
     def _refresh(
         self, fire_products: set[str]
@@ -310,7 +285,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
         reached = len(result.failed) < len(LAYERS)
         if reached:
-            self._write_layer_record()
+            write_record(self._cache_dir(), dt_util.utcnow())
         return bool(result.changed), reached
 
     async def _async_check_layers(self) -> None:
@@ -320,8 +295,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             _LOGGER.debug("Layer check failed: %s", err)
             changed = reached = False
         if not reached:
-            # Never got through: due again on the next successful poll rather than in a week.
-            self._next_layer_check = dt_util.utcnow()
+            self._layer_schedule = self._layer_schedule.unreached(dt_util.utcnow())
         if changed and self.data is not None:
             self.layer_generation += 1
             self.async_set_updated_data(
@@ -329,10 +303,9 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             )
 
     def _schedule_layer_check(self, now: datetime) -> None:
-        if now < self._next_layer_check or (self._layer_task and not self._layer_task.done()):
+        if not self._layer_schedule.due(now) or (self._layer_task and not self._layer_task.done()):
             return
-        # Set now, not when it finishes, so a slow check is not scheduled a second time.
-        self._next_layer_check = now + LAYER_CHECK_INTERVAL
+        self._layer_schedule = self._layer_schedule.started(now)
         self._layer_task = self.hass.async_create_background_task(
             self._async_check_layers(), f"{DOMAIN} layer check"
         )
