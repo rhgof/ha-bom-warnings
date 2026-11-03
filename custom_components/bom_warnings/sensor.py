@@ -30,10 +30,10 @@ from .const import (
     FIRE_DANGER_COLORS,
     FIRE_DANGER_ICONS,
     NO_WARNING_ICON,
-    WARNING_TYPE_SENSORS,
 )
 from .coordinator import BomWarningsCoordinator
 from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView
+from .warning_types import sensor_types
 
 PARALLEL_UPDATES = 0
 
@@ -46,9 +46,11 @@ async def async_setup_entry(
     coordinator = entry.runtime_data.coordinator
     registry = er.async_get(hass)
     unique_id = entry.unique_id or entry.entry_id
-    for _, key in WARNING_TYPE_SENSORS:
-        if key not in coordinator.enabled_types and (
-            entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{unique_id}_{key}")
+    for warning_type in sensor_types():
+        if warning_type.key not in coordinator.enabled_types and (
+            entity_id := registry.async_get_entity_id(
+                "sensor", DOMAIN, f"{unique_id}_{warning_type.key}"
+            )
         ):
             # A type that is off has no sensor at all, not a disabled one, so the entity list
             # only shows what the location cares about. Turning it on again recreates it.
@@ -58,9 +60,9 @@ async def async_setup_entry(
             WarningCountSensor(coordinator, entry),
             MostSevereWarningSensor(coordinator, entry),
             *(
-                WarningTypeSensor(coordinator, entry, event, key)
-                for event, key in WARNING_TYPE_SENSORS
-                if key in coordinator.enabled_types
+                WarningTypeSensor(coordinator, entry, t.event, t.key)
+                for t in sensor_types()
+                if t.key in coordinator.enabled_types
             ),
         ]
     )

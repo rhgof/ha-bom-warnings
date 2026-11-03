@@ -8,8 +8,8 @@ from typing import Any
 import pytest
 
 from custom_components.bom_warnings.active_warnings import LEVEL_OPTIONS
-from custom_components.bom_warnings.const import WARNING_TYPE_SENSORS
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
+from custom_components.bom_warnings.warning_types import WarningType, sensor_types
 
 COMPONENT = Path(__file__).parent.parent / "custom_components" / "bom_warnings"
 STRINGS = COMPONENT / "strings.json"
@@ -73,7 +73,7 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
         "warning_count",
         "most_severe_warning",
     }
-    # The per-type sensors take their translation key from WARNING_TYPE_SENSORS, not a literal.
+    # The per-type sensors take their translation key from the warning type table, not a literal.
 
 
 @pytest.mark.parametrize("key", ["fire_danger_today", "fire_danger_tomorrow"])
@@ -81,10 +81,13 @@ def test_fire_danger_translates_every_enum_option(key: str) -> None:
     assert set(load(STRINGS)["entity"]["sensor"][key]["state"]) == set(LEVEL_KEYS)
 
 
-@pytest.mark.parametrize("key", [key for _, key in WARNING_TYPE_SENSORS])
-def test_every_warning_type_sensor_is_named_and_translates_every_level(key: str) -> None:
+@pytest.mark.parametrize("warning_type", sensor_types(), ids=lambda t: t.key)
+def test_every_warning_type_sensor_is_named_and_translates_every_level(
+    warning_type: WarningType,
+) -> None:
+    key = warning_type.key
     sensor = load(STRINGS)["entity"]["sensor"][key]
-    assert sensor["name"].strip()
+    assert sensor["name"] == f"{warning_type.label} warning"
     assert set(sensor["state"]) == set(LEVEL_OPTIONS)
     assert all(text.strip() for text in sensor["state"].values())
     # The type sensors are level sensors now; no binary sensor of that name may linger.

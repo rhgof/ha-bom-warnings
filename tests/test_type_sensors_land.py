@@ -11,10 +11,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import (
-    EVENT_ICONS,
-    WARNING_TYPE_SENSORS,
-)
+from custom_components.bom_warnings import warning_types
+from custom_components.bom_warnings.const import EVENT_ICONS
+from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -69,12 +68,16 @@ def sensor_id(key: str) -> str:
     return f"sensor.home_{key}"
 
 
+def rows() -> list[tuple[str, str]]:
+    return [(t.event, t.key) for t in sensor_types()]
+
+
 def table_entity_ids() -> list[str]:
-    return [sensor_id(key) for _, key in WARNING_TYPE_SENSORS]
+    return [sensor_id(key) for _, key in rows()]
 
 
 def test_the_table_has_a_row_for_every_land_and_marine_type_and_thunderstorm() -> None:
-    events = {event for event, _ in WARNING_TYPE_SENSORS}
+    events = {event for event, _ in rows()}
     assert events == {*LAND_IDS, "Thunderstorm", "Wind", "Large Coastal Surf"}
     # Tsunami has no zones yet (#25).
     assert "Tsunami" not in events
@@ -82,9 +85,9 @@ def test_the_table_has_a_row_for_every_land_and_marine_type_and_thunderstorm() -
 
 def test_every_row_has_a_distinct_key_a_name_and_an_icon() -> None:
     names = load(STRINGS)["entity"]["sensor"]
-    keys = [key for _, key in WARNING_TYPE_SENSORS]
+    keys = [key for _, key in rows()]
     assert len(set(keys)) == len(keys)
-    for event, key in WARNING_TYPE_SENSORS:
+    for event, key in rows():
         assert names[key]["name"].strip(), key
         assert event in EVENT_ICONS, event
     assert len({names[key]["name"] for key in keys}) == len(keys)
@@ -96,7 +99,7 @@ def test_every_row_has_a_distinct_key_a_name_and_an_icon() -> None:
     ids=LAND_IDS,
 )
 def test_each_land_type_is_named_for_what_it_is(event: str, key: str, name: str) -> None:
-    assert (event, key) in WARNING_TYPE_SENSORS
+    assert (event, key) in rows()
     assert load(STRINGS)["entity"]["sensor"][key]["name"] == name
 
 
@@ -114,7 +117,7 @@ async def test_every_sensor_is_created_enabled_and_the_state_count_is_bounded(
         assert hass.states.get(entity_id) is not None
     # Twelve type sensors, plus the warning, count, most severe and event entities (the fire
     # danger sensors need a state in the NSW product).
-    assert len(WARNING_TYPE_SENSORS) == 12
+    assert len(rows()) == 12
     assert len(hass.states.async_all()) - before <= 12 + 6
 
 
@@ -154,7 +157,7 @@ async def test_a_sensor_is_on_exactly_when_a_warning_of_its_type_covers_the_loca
     assert listed is not None
     covering = {w["event"] for w in listed.attributes["warnings"]}
     assert event in covering
-    for row_event, key in WARNING_TYPE_SENSORS:
+    for row_event, key in rows():
         state = hass.states.get(sensor_id(key))
         assert state is not None, key
         assert (state.state != "none") == (row_event in covering), key
@@ -182,7 +185,7 @@ async def test_only_weather_and_marine_wind_carry_a_note(hass: HomeAssistant, fr
 
     notes = {
         key: hass.states.get(sensor_id(key)).attributes.get("note")  # type: ignore[union-attr]
-        for _, key in WARNING_TYPE_SENSORS
+        for _, key in rows()
     }
     assert "display" in (notes["severe_weather_warning"] or "").lower()
     assert "automation" in (notes["severe_weather_warning"] or "").lower()
@@ -202,11 +205,8 @@ async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A type with no row (surf here, as if it were new) is in the list, count and event entity."""
-    without_surf = tuple(row for row in WARNING_TYPE_SENSORS if row[0] != "Large Coastal Surf")
-    monkeypatch.setattr("custom_components.bom_warnings.sensor.WARNING_TYPE_SENSORS", without_surf)
-    monkeypatch.setattr(
-        "custom_components.bom_warnings.coordinator.WARNING_TYPE_SENSORS", without_surf
-    )
+    without_surf = tuple(t for t in WARNING_TYPES if t.event != "Large Coastal Surf")
+    monkeypatch.setattr(warning_types, "WARNING_TYPES", without_surf)
     scenarios.apply("baseline", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
 
@@ -216,8 +216,8 @@ async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
 
     registry = er.async_get(hass)
     assert [e.entity_id for e in registry.entities.values() if "surf" in e.entity_id] == []
-    for _, key in without_surf:
-        entity_id = sensor_id(key)
+    for warning_type in without_surf:
+        entity_id = sensor_id(warning_type.key)
         assert hass.states.get(entity_id).state == "none"  # type: ignore[union-attr]
     listed = hass.states.get(ANY_WARNING)
     assert listed is not None

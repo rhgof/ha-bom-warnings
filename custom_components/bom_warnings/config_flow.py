@@ -41,7 +41,7 @@ from .const import (
 )
 from .ftp import BomFtpError, client_from_env
 from .spatial import SpatialDataError, resolve_coordinate
-from .warning_types import TYPE_LABELS, enabled_keys, type_keys
+from .warning_types import enabled_keys, label_of, type_keys
 
 
 def _resolve(cache_dir: Path, lat: float, lon: float, radius_m: float) -> set[str]:
@@ -204,7 +204,7 @@ class BomWarningsOptionsFlow(OptionsFlowWithReload):
                     ): SelectSelector(
                         SelectSelectorConfig(
                             options=[
-                                SelectOptionDict(value=key, label=TYPE_LABELS[key])
+                                SelectOptionDict(value=key, label=label_of(key))
                                 for key in type_keys()
                             ],
                             multiple=True,
