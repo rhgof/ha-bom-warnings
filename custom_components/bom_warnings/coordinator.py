@@ -11,8 +11,8 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
+from . import location
 from .active_warnings import ActiveWarning, WarningState, covering, product_states
-from .areas import state_of
 from .const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
@@ -30,12 +30,8 @@ from .fire_danger import (
     derive,
 )
 from .fire_store import FireStore
-from .ftp import BomFtp, BomFtpError
+from .ftp import BomFtp
 from .shared_feed import SharedFeed
-from .spatial import (
-    SpatialDataError,
-    resolve_coordinate,
-)
 from .warning_types import enabled_keys, event_is_on, sensor_types
 from .zone import ZoneFollower
 
@@ -135,25 +131,24 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             self.hass, self.async_refresh(), f"{DOMAIN} derive {self.config_entry.entry_id}"
         )
 
-    def _re_resolve(self) -> set[str] | None:
-        """Blocking. The area codes now covering this entry's location, or None if unknown."""
+    def _re_resolve(self) -> location.ResolvedLocation | None:
+        """Blocking. What now covers this entry's location, or None if that cannot be told."""
         data = self.config_entry.data
         cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
         try:
-            with self._ftp.session():
-                return resolve_coordinate(
-                    self._ftp,
-                    cache_dir,
-                    lat=data[CONF_LATITUDE],
-                    lon=data[CONF_LONGITUDE],
-                    radius_m=data.get(CONF_RADIUS, 0.0),
-                )
-        except (BomFtpError, SpatialDataError, OSError) as err:
+            return location.resolve_location(
+                self._ftp,
+                cache_dir,
+                lat=data[CONF_LATITUDE],
+                lon=data[CONF_LONGITUDE],
+                radius_m=data.get(CONF_RADIUS, 0.0),
+            )
+        except location.LocationUnavailable as err:
             _LOGGER.debug("Could not re-resolve the location after a layer change: %s", err)
             return None
 
-    def _apply_resolved(self, codes: set[str]) -> None:
-        if not codes:
+    def _apply_resolved(self, found: location.ResolvedLocation) -> None:
+        if not found.area_codes:
             ir.async_create_issue(
                 self.hass,
                 DOMAIN,
@@ -165,15 +160,15 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             )
             return
         ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
-        if codes == self._area_codes:
+        if found.area_codes == self._area_codes:
             return
-        self._area_codes = frozenset(codes)
+        self._area_codes = found.area_codes
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
                 **self.config_entry.data,
-                CONF_AREA_CODES: sorted(codes),
-                CONF_STATE: state_of(codes),
+                CONF_AREA_CODES: sorted(found.area_codes),
+                CONF_STATE: found.state,
             },
         )
 
@@ -183,12 +178,12 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             raise UpdateFailed("The shared BoM refresh is failing")
         snapshot = feed.data
         if snapshot.layer_generation != self._seen_generation or self._reresolve:
-            new_codes = await self.hass.async_add_executor_job(self._re_resolve)
+            found = await self.hass.async_add_executor_job(self._re_resolve)
             # Only after success, so a failed attempt is retried on the next poll.
-            if new_codes is not None:
+            if found is not None:
                 self._seen_generation = snapshot.layer_generation
                 self._reresolve = False
-                self._apply_resolved(new_codes)
+                self._apply_resolved(found)
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
         active = covering(

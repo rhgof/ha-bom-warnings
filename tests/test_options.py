@@ -2,7 +2,8 @@
 
 The shapefiles are not in the repo, so layer changes are injected at two seams, where they are
 imported: `refresh_layers` (in the shared feed) reports which layers changed and
-`resolve_coordinate` (in the coordinator) says which area codes the stored point now resolves to.
+`location.resolve_location` (the shared `resolve` fixture) says what the stored point now
+resolves to.
 Everything else is real, against the fake BoM server.
 """
 
@@ -25,12 +26,14 @@ from custom_components.bom_warnings.const import (
     CONF_WARNING_TYPES,
     DOMAIN,
 )
-from custom_components.bom_warnings.spatial import RefreshResult, SpatialDataError
+from custom_components.bom_warnings.location import LocationUnavailable
+from custom_components.bom_warnings.spatial import RefreshResult
 from custom_components.bom_warnings.warning_types import type_keys
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
+from .locations import location_of
 from .test_binary_sensor import ENTITY_ID, poll, setup_entry
 
 pytestmark = pytest.mark.freeze_time(NOW)
@@ -53,15 +56,6 @@ def layers() -> Iterator[MagicMock]:
     with patch(
         "custom_components.bom_warnings.shared_feed.refresh_layers",
         return_value=RefreshResult(),
-    ) as mock:
-        yield mock
-
-
-@pytest.fixture
-def resolve() -> Iterator[MagicMock]:
-    with patch(
-        "custom_components.bom_warnings.coordinator.resolve_coordinate",
-        return_value={"QLD_PW001", "QLD_ME008"},
     ) as mock:
         yield mock
 
@@ -170,7 +164,7 @@ async def test_changed_layer_re_resolves_stored_codes(
     resolve.assert_not_called()  # nothing changed at setup
 
     # The district boundary moved: the same point is now in an area with a warning.
-    resolve.return_value = {"NSW_PW002", "QLD_ME008"}
+    resolve.return_value = location_of("NSW_PW002", "QLD_ME008")
     layers.return_value = RefreshResult(changed=["IDM00001"])
     await poll(hass, freezer, LAYER_CHECK_DUE)
 
@@ -206,7 +200,7 @@ async def test_no_area_after_layer_change_raises_a_repair_and_keeps_codes(
 ) -> None:
     await setup_entry(hass, mock_config_entry)
 
-    resolve.return_value = set()
+    resolve.return_value = location_of()
     layers.return_value = RefreshResult(changed=["IDM00001"])
     await poll(hass, freezer, LAYER_CHECK_DUE)
 
@@ -219,7 +213,7 @@ async def test_no_area_after_layer_change_raises_a_repair_and_keeps_codes(
     assert sensor_state(hass).state == STATE_OFF
 
     # A later layer update that covers the point again clears the repair.
-    resolve.return_value = {"QLD_PW001"}
+    resolve.return_value = location_of("QLD_PW001")
     await poll(hass, freezer, LAYER_CHECK_DUE)
     assert issue_of(mock_config_entry, hass) is None
 
@@ -234,7 +228,10 @@ async def test_failed_re_resolve_is_retried_on_the_next_poll(
 ) -> None:
     await setup_entry(hass, mock_config_entry)
 
-    resolve.side_effect = [SpatialDataError("half-written"), {"NSW_PW002", "QLD_ME008"}]
+    resolve.side_effect = [
+        LocationUnavailable("half-written"),
+        location_of("NSW_PW002", "QLD_ME008"),
+    ]
     layers.return_value = RefreshResult(changed=["IDM00001"])
     await poll(hass, freezer, LAYER_CHECK_DUE)
     assert mock_config_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]

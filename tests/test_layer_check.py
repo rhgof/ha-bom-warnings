@@ -23,8 +23,9 @@ from custom_components.bom_warnings.spatial import LAYERS, RefreshResult
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
+from .locations import location_of
 from .test_binary_sensor import ENTITY_ID, poll
-from .test_options import layers, resolve  # noqa: F401
+from .test_options import layers  # noqa: F401
 from .test_reliability import repair_issues
 
 pytestmark = pytest.mark.freeze_time(NOW)
@@ -167,10 +168,10 @@ async def test_a_layer_change_publishes_a_new_snapshot_and_entries_re_resolve(
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,  # noqa: F811
+    resolve: MagicMock,
 ) -> None:
     layers.return_value = RefreshResult(changed=["IDM00001"])
-    resolve.return_value = {"QLD_ME008"}
+    resolve.return_value = location_of("QLD_ME008")
     await setup(hass, mock_config_entry)
 
     assert hass.data[FEED].data.layer_generation == 1
