@@ -1,19 +1,21 @@
 """The one entry point from a coordinate to a resolved location, through the fake FTP client."""
 
+import os
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 
 import pytest
 
+from custom_components.bom_warnings.areas import state_of
 from custom_components.bom_warnings.ftp import BomFtpError, BomFtpRejectedError
 from custom_components.bom_warnings.location import (
     LocationUnavailable,
     ResolvedLocation,
     resolve_location,
 )
-from custom_components.bom_warnings.spatial import LAYERS
+from custom_components.bom_warnings.spatial import LAYERS, resolve_coordinate
 from tests.fake_ftp import FakeFtp
-from tests.shapefiles import remote, zip_layer
+from tests.shapefiles import remote, zip_layer, zip_real
 
 # Every generated layer is the same square, so a point inside it is in one area per layer.
 AREAS = {
@@ -101,3 +103,45 @@ def test_unexpected_exception_propagates_unchanged(ftp: FakeFtp, tmp_path: Path)
 def test_negative_radius_propagates_unchanged(ftp: FakeFtp, tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="radius"):
         resolve_location(ftp, tmp_path / "cache", lat=5, lon=5, radius_m=-1)
+
+
+SPATIAL = os.environ.get("BOM_SPATIAL_DIR")
+
+
+@pytest.mark.skipif(not SPATIAL, reason="set BOM_SPATIAL_DIR to the unzipped BoM shapefiles")
+@pytest.mark.parametrize(
+    ("lat", "lon", "expected", "state"),
+    [
+        (-26.6123, 144.2580, {"QLD_RC126", "QLD_PW011"}, "QLD"),  # Quilpie
+        (-27.5420, 151.9128, {"QLD_RC167", "QLD_PW013", "QLD_ME010"}, "QLD"),  # Toowoomba
+        (-42.8899, 147.3273, {"TAS_PW006"}, "TAS"),  # Hobart
+    ],
+    ids=["quilpie", "toowoomba", "hobart"],
+)
+def test_real_shapefiles_resolve_to_the_same_areas_and_state(
+    tmp_path: Path, lat: float, lon: float, expected: set[str], state: str
+) -> None:
+    base = Path(SPATIAL or "")
+    fake = FakeFtp({remote(layer): zip_real(base, layer) for layer in LAYERS})
+    cache = tmp_path / "cache"
+
+    found = resolve_location(fake, cache, lat=lat, lon=lon)
+
+    assert expected <= found.area_codes
+    assert found.state == state
+    # The same answer the callers used to assemble for themselves.
+    codes = resolve_coordinate(fake, cache, lat=lat, lon=lon)
+    assert found == ResolvedLocation(frozenset(codes), state_of(codes))
+    # A radius only ever adds areas.
+    wider = resolve_location(fake, cache, lat=lat, lon=lon, radius_m=50_000)
+    assert found.area_codes <= wider.area_codes
+
+
+@pytest.mark.skipif(not SPATIAL, reason="set BOM_SPATIAL_DIR to the unzipped BoM shapefiles")
+def test_real_shapefiles_find_no_area_at_sea(tmp_path: Path) -> None:
+    base = Path(SPATIAL or "")
+    fake = FakeFtp({remote(layer): zip_real(base, layer) for layer in LAYERS})
+
+    assert resolve_location(fake, tmp_path / "cache", lat=0.0, lon=0.0) == ResolvedLocation(
+        frozenset(), ""
+    )

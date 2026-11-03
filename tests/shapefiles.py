@@ -30,3 +30,12 @@ def zip_layer(tmp_path: Path, name: str, aac: str) -> bytes:
 
 def remote(layer: str) -> str:
     return f"{SPATIAL_DIR}{layer}.zip"
+
+
+def zip_real(base: Path, layer: str) -> bytes:
+    """A real BoM layer, zipped from an unzipped folder (`BOM_SPATIAL_DIR`) as BoM serves it."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        for part in (base / layer).iterdir():
+            archive.write(part, part.name)
+    return buffer.getvalue()

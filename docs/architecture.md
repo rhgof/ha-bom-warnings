@@ -73,6 +73,7 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
+| `location.py` | The one entry point from a coordinate to a place: `resolve_location(ftp, cache_dir, lat=, lon=, radius_m=0)` returns a frozen `ResolvedLocation(area_codes, state)`. It opens the FTP session itself, so callers never write `with ftp.session()`. A point no area covers is an empty result (empty `state`), which callers report as `no_area`. Anything that stops it being worked out (BoM unreachable, a corrupt or incomplete layer, an `OSError`) raises the one `LocationUnavailable`; any other exception propagates. Blocking: call from an executor. |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
 | `warning_types.py` | The one table of warning types. `WARNING_TYPES` has a `WarningType` row (event, icon, optional note and strength rule) for every CAP event BoM is known to send. A `SensorType` row adds the key, label and marine flag for the 12 types with a level sensor and a checklist toggle. Tsunami is a plain row: an icon but no sensor, so it falls under "Other warnings". The views derive from the table each time they are called (`sensor_types`, `type_of`, `label_of`, `type_keys`, `key_of`, `event_is_on`, `enabled_keys`, `keys_from_legacy_options`), so a test removes a type by patching `WARNING_TYPES` alone. A new type is a new row plus its name in `strings.json` and `translations/en.json`, which `tests/test_strings.py` checks. `wind_strength` is the one strength rule, read from the Wind headline. |
 | `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. A warning's strength comes from its row's `strength` rule in `warning_types.py`. |
@@ -83,9 +84,9 @@ Home Assistant layer:
 | --- | --- |
 | `__init__.py` | Entry setup/unload/remove. `PLATFORMS = [BINARY_SENSOR, EVENT, SENSOR]`. `runtime_data = BomWarningsData(coordinator)`. |
 | `shared_feed.py` | `SharedFeed` and `FeedSnapshot`, the `FEED` key, and the lifecycle helpers (acquire, abandon, release, release-removed, shutdown). The layer check's async wiring (executor job, background task, new snapshot) lives here; its timing rules are in `layer_check.py`. |
-| `coordinator.py` | `BomWarningsCoordinator`: listens to the feed, re-resolves the entry's location, and derives its warnings and fire danger. |
+| `coordinator.py` | `BomWarningsCoordinator`: listens to the feed, re-resolves the entry's location through `location.resolve_location` (a `LocationUnavailable` is retried on the next poll), and derives its warnings and fire danger. |
 | `fire_store.py` | `FireStore`: loads, saves and removes one entry's `FireMemory` in Home Assistant storage. The only place that knows the storage key, version and shape. |
-| `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
+| `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location through `location.resolve_location`, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
 | `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
 | `binary_sensor.py`, `sensor.py`, `event.py` | The entities above. |
 | `diagnostics.py` | Download with coordinates, name, title, zone entity id and `unique_id` redacted (the radius stays). |
@@ -192,7 +193,8 @@ Home Assistant layer:
   - Synthetic polygons written with pyshp (`tests/test_areas.py`) run everywhere. They cover
     holes, multipart shapes, a radius reaching a neighbour, and the 0 m radius equalling the point
     test.
-  - Real-shapefile tests are skipped unless `BOM_SPATIAL_DIR` is set. It needs all six layers
+  - Real-shapefile tests (in `tests/test_spatial.py`, `tests/test_areas.py` and, for
+    `resolve_location`, `tests/test_location.py`) are skipped unless `BOM_SPATIAL_DIR` is set. It needs all six layers
     (`IDM00001`, `IDM00003`, `IDM00007`, `IDM00014`, `IDM00017`, `IDM00020`), each unzipped into
     its own folder. Fetch the zips read-only from `ftp://ftp.bom.gov.au/anon/home/adfd/spatial/`
     into an empty directory outside the repo. They use central Sydney: 100 m equals the point
@@ -202,7 +204,12 @@ Home Assistant layer:
     0.33 s for any point, because every shape is parsed before the bounding box is checked, and
     about 0.6 s in central Australia (huge polygons) at the 50 km cap. To re-measure, time
     `resolve_area_codes` on the real layers at `-25.0, 135.0` with `radius_m=50_000`.
-  - The config flow tests patch `resolve_coordinate`, so they never need shapefiles. Zone edits,
+  - The resolver itself (`tests/test_location.py`) runs everywhere: it drives `resolve_location`
+    through `FakeFtp` with a tiny generated shapefile (`tests/shapefiles.py`), covering the result,
+    the empty case, the one error, and the session being closed.
+  - Every other test that needs a location uses the one `resolve` fixture in `tests/conftest.py`,
+    which patches `location.resolve_location`, so they never need shapefiles. `tests/locations.py`
+    builds the `ResolvedLocation` a test wants. Zone edits,
     deletion and the marine toggles are tested through Home Assistant in `tests/test_zones.py`, and the
     checklist and its migration in `tests/test_type_checklist.py`.
 - Module boundaries are declared in `docs/architecture.json` and checked by
@@ -215,8 +222,8 @@ Home Assistant layer:
   it, and the test fails when an entry stops being true. Add, move or rename a module by editing
   the model first.
 - Recorded CAP files live in `tests/fixtures/cap/`. Add new ones by capturing real BoM output.
-- `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and listings
-  and can change, remove and fail files (a rejected or timed-out wildcard listing).
+- `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches, listings and
+  sessions, and can change, remove and fail files (a rejected or timed-out wildcard listing).
 - `scripts/fake_bom/`: a real local FTP server (pyftpdlib) laid out like BoM, with scenarios
   (`baseline`, `warning_appears`, `warning_updated`, `warning_cancelled`, `warning_removed`,
   `file_empty`, `unavailable`, `all_types`: the baseline plus one real sample of every warning
@@ -224,11 +231,23 @@ Home Assistant layer:
   products unchanged (`layout.put_fire_danger`). Used by the Home Assistant tests through `BOM_WARNINGS_FTP_HOST`,
   and by hand against the dev instance.
 - Home Assistant tests run through `hass` with `pytest-homeassistant-custom-component`; the
-  config flow tests patch `resolve_coordinate` rather than ship shapefiles. Time is frozen because
+  tests patch `location.resolve_location` (the `resolve` fixture) rather than ship shapefiles. Time is frozen because
   the recorded warnings expire in early November 2026, so refresh them if tests start failing
   after that.
 - `scripts/ha-dev.sh` runs a throwaway Home Assistant on `127.0.0.1:8124` (README "Dev instance");
   `docs/live-verification-c1.md` has the walkthrough and the recorded result.
+- The single location resolver (`location.py`) was checked on 3 November 2026 without booting Home
+  Assistant: the old route (open a session, `resolve_coordinate`, then `state_of`) and
+  `resolve_location` were run on the same eight points, with the real `BomFtp` client against the
+  fake BoM server and a copy of the dev instance's real layer cache. The points were the two
+  configured entries (a home point and a 50 km zone), central Sydney with and without a 2 km radius,
+  Hobart, Quilpie and a spot at sea with and without a radius. All eight gave the same area codes
+  and state, and the two entries matched the codes they have stored (7 areas in NSW, 18 in QLD).
+  A point at sea gave an empty result with no error. The coordinator's re-resolve and repair-issue
+  wiring were not run live. They are covered through Home Assistant by `tests/test_options.py` and
+  `tests/test_zones.py`, with the resolver replaced by the shared `resolve` fixture. A comparison
+  that booted two copies of the dev instance was started and stopped, because it was slow and its
+  first attempt failed on a port clash.
 - The split of the coordinator (shared feed, layer schedule, active warnings) was checked on the dev
   instance on 3 November 2026, from a copy of its config on another port, against the fake BoM
   server serving the shapefile zips (not BoM's real server, not a browser). With the layer-check
