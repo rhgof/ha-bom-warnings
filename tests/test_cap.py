@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from custom_components.bom_warnings.cap import Phase, Severity, parse_cap
+from custom_components.bom_warnings.cap import Phase, Severity, parse_cap, parse_xml
 
 FIXTURES = Path(__file__).parent / "fixtures" / "cap"
 NOW = datetime(2026, 11, 1, 6, 0, tzinfo=UTC)
@@ -67,9 +67,38 @@ def test_unknown_severity_is_tolerated():
     assert load("IDQ21033").infos[0].severity is Severity.UNKNOWN
 
 
-@pytest.mark.parametrize("raw", [b"", b"   ", b"<not-cap/>", b"garbage"])
-def test_empty_or_invalid_input_returns_none(raw):
+UNTRUSTWORTHY_XML = [
+    pytest.param(b"", id="empty"),
+    pytest.param(b"   \n", id="whitespace"),
+    pytest.param(b"garbage", id="not-xml"),
+    pytest.param(b"<a><b>", id="truncated"),
+    pytest.param(b"\xff\xfe\x00", id="invalid-bytes"),
+    pytest.param(b'<!DOCTYPE a [<!ENTITY x "y">]><a>&x;</a>', id="doctype"),
+    # ElementTree raises LookupError for this, not ParseError, so it once escaped both parsers.
+    pytest.param(b'<?xml version="1.0" encoding="no-such-encoding"?><a/>', id="unknown-encoding"),
+]
+
+
+@pytest.mark.parametrize("raw", [b"<not-cap/>", *UNTRUSTWORTHY_XML])
+def test_empty_or_invalid_input_returns_none(raw: bytes) -> None:
     assert parse_cap(raw) is None
+
+
+@pytest.mark.parametrize("raw", UNTRUSTWORTHY_XML)
+def test_parse_xml_returns_nothing_for_input_it_cannot_trust(raw: bytes) -> None:
+    assert parse_xml(raw) is None
+
+
+def test_parse_xml_returns_the_root_of_well_formed_input() -> None:
+    root = parse_xml(b"<a><b/></a>")
+    assert root is not None
+    assert root.tag == "a"
+
+
+def test_parse_xml_honours_a_declared_encoding() -> None:
+    root = parse_xml('<?xml version="1.0" encoding="iso-8859-1"?><a>é</a>'.encode("iso-8859-1"))
+    assert root is not None
+    assert root.text == "é"
 
 
 def test_info_headline_cancellation_and_final_are_detected():

@@ -131,6 +131,7 @@ def test_a_missing_period_leaves_the_rest(raw: bytes) -> None:
         b"<other><area aac='NSW_FW001' type='fire-district'/></other>",
         b'<!DOCTYPE product [<!ENTITY a "b">]><product/>',
         b"\xff\xfe\x00",
+        b'<?xml version="1.0" encoding="no-such-encoding"?><product/>',
     ],
 )
 def test_empty_or_malformed_input_returns_nothing(data: bytes) -> None:

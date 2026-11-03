@@ -66,11 +66,11 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 
 | File | Role |
 | --- | --- |
-| `cap.py` | `parse_cap(bytes) -> CapWarning \| None`. `Phase` and `Severity` enums. Rejects DOCTYPE/entities, treats offset-less times as UTC. |
+| `cap.py` | `parse_cap(bytes) -> CapWarning \| None`, and `parse_xml(bytes) -> Element \| None`, the one XML parse both CAP and fire danger use (rejects DOCTYPE/entities; None for empty, malformed or unknown-encoding input). `Phase` and `Severity` enums. Treats offset-less times as UTC. |
 | `areas.py` | `resolve_area_codes(layer paths, lat, lon, radius_m=0)`: point-in-polygon, plus any area whose boundary is within `radius_m` (bbox prefilter, flat-plane distance); shapefiles read as cp1252. `state_of(codes)`, `is_marine(code)`. |
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh), `read_current_warnings`, and `FireDangerReader` (optional fire danger step). |
-| `fire_danger.py` | `parse_fire_danger(bytes) -> FireDangerProduct \| None`, the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. Reuses `cap._safe_parse`. |
+| `fire_danger.py` | `parse_fire_danger(bytes) -> FireDangerProduct \| None`, the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. Parses through `cap.parse_xml`. |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 
 Home Assistant layer:

@@ -54,16 +54,5 @@
       "why": "A BomFtp session is not thread-safe and the dev host override is read in one place."
     }
   ],
-  "allow": [
-    {
-      "violation": "private-import: fire_danger.py imports cap.py:_DoctypeError",
-      "reason": "fire_danger reuses cap's hardened XML parse through private names.",
-      "removedBy": "architecture review candidate 1, which gives cap a public parse helper"
-    },
-    {
-      "violation": "private-import: fire_danger.py imports cap.py:_safe_parse",
-      "reason": "Same leak as above.",
-      "removedBy": "architecture review candidate 1"
-    }
-  ]
+  "allow": []
 }

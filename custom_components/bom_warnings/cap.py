@@ -92,17 +92,23 @@ def _reject_doctype(*_args: object) -> None:
     raise _DoctypeError
 
 
-def _safe_parse(data: bytes) -> ET.Element:
-    """Parse XML, refusing any DOCTYPE so entity tricks (billion laughs) cannot run."""
+def parse_xml(data: bytes) -> ET.Element | None:
+    """Parse XML, refusing any DOCTYPE so entity tricks (billion laughs) cannot run.
+
+    Returns None for anything it cannot trust (empty, malformed, a DOCTYPE, an encoding Python
+    does not know), so callers need not know which exception each case raises.
+    """
     # ElementTree's C parser hides its expat handlers, so a throwaway expat pass checks for a
     # DOCTYPE first. Hooking expat also covers non-UTF-8 encodings, which a byte scan would miss.
     scanner = expat.ParserCreate()
     scanner.StartDoctypeDeclHandler = _reject_doctype
     try:
         scanner.Parse(data, True)
-    except expat.ExpatError as err:
-        raise ET.ParseError(str(err)) from err
-    return ET.fromstring(data)
+        return ET.fromstring(data)
+    except expat.ExpatError, ET.ParseError, _DoctypeError, LookupError, ValueError:
+        # LookupError is what ElementTree raises for an unknown declared encoding. ValueError was
+        # already caught by the fire danger parser; no input that raises it is known.
+        return None
 
 
 def _severity(value: str) -> Severity:
@@ -147,13 +153,8 @@ _MSG_PHASE = {"alert": Phase.NEW, "update": Phase.UPDATE, "cancel": Phase.CANCEL
 
 def parse_cap(data: bytes) -> CapWarning | None:
     """Parse one CAP file. Return None for empty, malformed or non-CAP input."""
-    if not data.strip():
-        return None
-    try:
-        root = _safe_parse(data)
-    except ET.ParseError, _DoctypeError:
-        return None
-    if root.tag != f"{{{_NS['c']}}}alert":
+    root = parse_xml(data)
+    if root is None or root.tag != f"{{{_NS['c']}}}alert":
         return None
     identifier = _text(root, "identifier")
     # identifier looks like "AusBoM-IDQ21013-2026-11-01T04:14:38+00:00"
