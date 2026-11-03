@@ -10,13 +10,14 @@ from itertools import permutations
 import pytest
 
 from custom_components.bom_warnings.active_warnings import (
+    LEVEL_OPTIONS,
     SEVERITY_ORDER,
     covering,
     product_states,
+    rank_warnings,
 )
 from custom_components.bom_warnings.cap import Severity
 from custom_components.bom_warnings.const import LEVEL_COLORS
-from custom_components.bom_warnings.sensor import LEVEL_OPTIONS, rank_warnings
 
 from .test_active_warnings import HERE, NOW, info, warning
 

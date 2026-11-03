@@ -9,9 +9,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.bom_warnings.active_warnings import ActiveWarning
+from custom_components.bom_warnings.active_warnings import ActiveWarning, rank_warnings
 from custom_components.bom_warnings.cap import Severity
-from custom_components.bom_warnings.sensor import rank_warnings
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 

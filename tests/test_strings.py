@@ -7,9 +7,9 @@ from typing import Any
 
 import pytest
 
+from custom_components.bom_warnings.active_warnings import LEVEL_OPTIONS
 from custom_components.bom_warnings.const import WARNING_TYPE_SENSORS
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
-from custom_components.bom_warnings.sensor import LEVEL_OPTIONS
 
 COMPONENT = Path(__file__).parent.parent / "custom_components" / "bom_warnings"
 STRINGS = COMPONENT / "strings.json"
