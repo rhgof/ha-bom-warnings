@@ -32,9 +32,10 @@ from .const import (
     SPATIAL_CACHE_DIR,
     WARNING_TYPE_SENSORS,
 )
-from .feed import FireDangerReader, WarningReader
+from .feed import WarningReader
 from .fire_danger import (
     FireDangerProduct,
+    FireDangerReader,
     FireDangerView,
     FireMemory,
     derive,
