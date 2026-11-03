@@ -128,21 +128,3 @@ def fixture_events() -> set[str]:
 
 def test_every_event_seen_in_recorded_files_is_offered() -> None:
     assert fixture_events() <= {t.event for t in WARNING_TYPES}
-
-
-def test_known_event_types_are_exactly_the_observed_ones_sorted() -> None:
-    assert sorted(t.event for t in WARNING_TYPES) == [
-        "Exposure",
-        "Extreme Heat",
-        "Fire Weather",
-        "Frost",
-        "Hazardous Road Conditions",
-        "Large Coastal Surf",
-        "Riverine Flood",
-        "Sheep Grazier Warning",
-        "Thunderstorm",
-        "Tropical Cyclone",
-        "Tsunami",
-        "Weather",
-        "Wind",
-    ]

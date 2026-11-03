@@ -13,14 +13,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
+from custom_components.bom_warnings.warning_types import WARNING_TYPES
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
 from .test_binary_sensor import setup_entry
 from .test_options import layers, resolve, set_options  # noqa: F401
-from .test_strings import STRINGS, load
 from .test_zones import ZONE, set_zone, zone_codes, zone_entry, zone_options  # noqa: F401
 
 EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
@@ -76,22 +75,6 @@ def all_types(fake_bom: FakeBom) -> None:
 
 def entity(key: str) -> str:
     return f"sensor.holiday_house_{key}"
-
-
-@pytest.mark.parametrize(
-    ("event", "key", "name"),
-    [
-        ("Wind", "marine_wind_warning", "Marine wind warning"),
-        ("Large Coastal Surf", "hazardous_surf_warning", "Hazardous surf warning"),
-    ],
-    ids=["wind", "surf"],
-)
-def test_the_marine_types_are_in_the_table_with_a_clear_name(
-    event: str, key: str, name: str
-) -> None:
-    assert (event, key) in [(t.event, t.key) for t in sensor_types()]
-    assert event in EVENT_ICONS
-    assert load(STRINGS)["entity"]["sensor"][key]["name"] == name
 
 
 @pytest.mark.parametrize(

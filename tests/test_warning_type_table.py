@@ -3,13 +3,19 @@
 import pytest
 
 from custom_components.bom_warnings import warning_types
-from custom_components.bom_warnings.const import DEFAULT_EVENT_ICON, OTHER_WARNINGS
+from custom_components.bom_warnings.const import (
+    CONF_EVENT_TYPES,
+    CONF_INCLUDE_MARINE,
+    DEFAULT_EVENT_ICON,
+    OTHER_WARNINGS,
+)
 from custom_components.bom_warnings.warning_types import (
     WARNING_TYPES,
     SensorType,
     WarningType,
     event_is_on,
     key_of,
+    keys_from_legacy_options,
     label_of,
     sensor_types,
     type_keys,
@@ -191,3 +197,39 @@ def test_a_type_without_a_rule_has_none() -> None:
     weather = type_of("Weather")
     assert weather is not None
     assert weather.strength is None
+
+
+LAND_KEYS = [
+    key for _, key, _ in ROWS if key not in ("marine_wind_warning", "hazardous_surf_warning")
+]
+
+
+@pytest.mark.parametrize(
+    ("options", "expected"),
+    [
+        pytest.param(
+            {}, [*LAND_KEYS, OTHER_WARNINGS], id="no-filter-means-every-type-but-not-coastal-waters"
+        ),
+        pytest.param(
+            {CONF_INCLUDE_MARINE: True}, list(type_keys()), id="coastal-waters-on-means-every-type"
+        ),
+        pytest.param(
+            {CONF_EVENT_TYPES: ["Thunderstorm", "Wind"]},
+            ["thunderstorm_warning"],
+            id="a-named-marine-type-needs-coastal-waters",
+        ),
+        pytest.param(
+            {CONF_EVENT_TYPES: ["Thunderstorm", "Wind"], CONF_INCLUDE_MARINE: True},
+            ["thunderstorm_warning", "marine_wind_warning"],
+            id="named-types-in-checklist-order",
+        ),
+        pytest.param({CONF_EVENT_TYPES: ["Tsunami"]}, [OTHER_WARNINGS], id="a-type-with-no-sensor"),
+        pytest.param(
+            {CONF_EVENT_TYPES: ["A Type BoM Adds Later"]}, [OTHER_WARNINGS], id="never-seen"
+        ),
+    ],
+)
+def test_old_options_become_the_checklist_that_reproduces_them(
+    options: dict[str, object], expected: list[str]
+) -> None:
+    assert keys_from_legacy_options(options) == expected
