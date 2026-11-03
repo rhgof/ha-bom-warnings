@@ -42,6 +42,18 @@ class ActiveWarning:
 
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
 
+# The one severity order, lowest first. It is our ranking policy, not CAP's: `unknown` sits between
+# moderate and severe because BoM sends it for Severe Weather and Severe Thunderstorm warnings,
+# which must not rank below a minor flood. The ranked list, the level sensors and the block that
+# stands for a product in the event data all derive from it.
+SEVERITY_ORDER = (
+    Severity.MINOR,
+    Severity.MODERATE,
+    Severity.UNKNOWN,
+    Severity.SEVERE,
+    Severity.EXTREME,
+)
+
 
 def warning_attributes(warning: ActiveWarning) -> dict[str, Any]:
     """One warning as the list attributes of the binary sensors and the type sensors show it."""
@@ -141,7 +153,7 @@ def product_states(
             continue
         # One file can hold several blocks (e.g. extreme and severe heatwave); the most severe
         # one stands for the product, so a product raises one event per transition.
-        info = max(covering, key=lambda i: list(Severity).index(i.severity))
+        info = max(covering, key=lambda i: SEVERITY_ORDER.index(i.severity))
         states[warning.product_id] = WarningState(
             product_id=warning.product_id,
             identifier=warning.identifier,

@@ -16,7 +16,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
 from . import BomWarningsConfigEntry
-from .active_warnings import ActiveWarning, warning_attributes
+from .active_warnings import SEVERITY_ORDER, ActiveWarning, warning_attributes
+from .cap import Severity
 from .const import (
     DEFAULT_EVENT_ICON,
     DEFAULT_FIRE_DANGER_ICON,
@@ -35,17 +36,16 @@ from .strength import WIND_EVENT
 
 PARALLEL_UPDATES = 0
 
-# Dict order is the ranking order, lowest first: minor < moderate < unknown < severe < extreme.
-_LEVEL_RANK = {level: rank for rank, level in enumerate(LEVEL_COLORS)}
+_LEVEL_RANK = {severity.value: rank for rank, severity in enumerate(SEVERITY_ORDER)}
 _EPOCH = datetime.min.replace(tzinfo=UTC)
 
 STATE_NONE = "none"
-# The states of a type sensor, lowest first: the ranking above, with BoM's CAP severity `unknown`
+# The states of a type sensor, lowest first: the severity order, with BoM's CAP severity `unknown`
 # (sent for Severe Thunderstorm and Severe Weather warnings) called `unrated`, because `unknown` is
 # Home Assistant's own no-value state and must not be a state of ours.
 LEVEL_OPTIONS = [
     STATE_NONE,
-    *("unrated" if level == "unknown" else level for level in LEVEL_COLORS),
+    *("unrated" if severity is Severity.UNKNOWN else severity.value for severity in SEVERITY_ORDER),
 ]
 
 
