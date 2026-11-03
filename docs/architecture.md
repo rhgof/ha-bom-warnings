@@ -85,8 +85,6 @@ Home Assistant layer:
 | `diagnostics.py` | Download with coordinates, name, title, zone entity id and `unique_id` redacted (the radius stays). |
 | `const.py`, `strings.json`, `translations/en.json` | Constants and text. The two JSON files must match (`tests/test_strings.py`). |
 
-`api.py` is an empty leftover with a stale docstring and can be deleted.
-
 ## Behaviour worth knowing
 
 - **FTP clients.** Every `BomFtp` is built by `client_from_env(os.environ)`, which reads the
@@ -200,6 +198,15 @@ Home Assistant layer:
   - The config flow tests patch `resolve_coordinate`, so they never need shapefiles. Zone edits,
     deletion and the marine toggles are tested through Home Assistant in `tests/test_zones.py`, and the
     checklist and its migration in `tests/test_type_checklist.py`.
+- Module boundaries are declared in `docs/architecture.json` and checked by
+  `tests/test_architecture.py`, so they hold on every test run. The model has domains that own
+  file-name patterns, four layers (`platforms`, `runtime`, `readers`, `foundation`, a module may
+  import its own layer or below), and the layers that must not import Home Assistant (`readers` and
+  `foundation`). The test also fails on a private name imported across modules, on `BomFtp` built
+  anywhere but `client_from_env`, and on a module no domain owns. Imports under `TYPE_CHECKING`
+  are exempt from the layer rule. A known violation goes in `allow` with the change that removes
+  it, and the test fails when an entry stops being true. Add, move or rename a module by editing
+  the model first.
 - Recorded CAP files live in `tests/fixtures/cap/`. Add new ones by capturing real BoM output.
 - `tests/fake_ftp.py`: in-memory `FakeFtp` for pure-Python tests. It counts fetches and listings
   and can change, remove and fail files (a rejected or timed-out wildcard listing).

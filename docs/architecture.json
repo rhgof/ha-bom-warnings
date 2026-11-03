@@ -1,0 +1,69 @@
+{
+  "$comment": "The module boundaries, checked by tests/test_architecture.py on every test run. Add, move or rename a module by editing this file first. A domain owns file-name patterns relative to custom_components/bom_warnings, never a list that has to be kept in step. A module may import from its own layer or any layer below it, never above; `layers` runs top to bottom. Imports under `if TYPE_CHECKING:` are erased at runtime, so they are exempt from the layer rule.",
+  "layers": ["platforms", "runtime", "readers", "foundation"],
+  "homeassistantFree": ["readers", "foundation"],
+  "domains": {
+    "ha-entry": {
+      "layer": "platforms",
+      "purpose": "The files Home Assistant loads by name: entry setup and unload, the config and options flows, the entities and the diagnostics download. Nothing may import them, apart from the type-only BomWarningsConfigEntry alias.",
+      "owns": [
+        "__init__.py",
+        "config_flow.py",
+        "binary_sensor.py",
+        "sensor.py",
+        "event.py",
+        "diagnostics.py"
+      ]
+    },
+    "runtime": {
+      "layer": "runtime",
+      "purpose": "The stateful Home Assistant wiring: the shared feed that polls, the per-entry coordinator that filters it, and the zone follower. This is the file the architecture review wants split.",
+      "owns": ["coordinator.py", "zone.py"]
+    },
+    "feeds": {
+      "layer": "readers",
+      "purpose": "Turns BoM files into parsed values: the incremental warnings read, fire danger products, and the shapefile layer cache. Blocking, so callers run it in an executor. Imports nothing from Home Assistant.",
+      "owns": ["feed.py", "fire_danger.py", "spatial.py"]
+    },
+    "warning-format": {
+      "layer": "foundation",
+      "purpose": "The CAP 1.2 parser and its types (CapWarning, Info, Phase, Severity).",
+      "owns": ["cap.py"]
+    },
+    "area-matching": {
+      "layer": "foundation",
+      "purpose": "Point and circle to BoM area codes over shapefiles, plus state and marine lookups.",
+      "owns": ["areas.py"]
+    },
+    "ftp-client": {
+      "layer": "foundation",
+      "purpose": "The one FTP client and its protocol, the seam with two real adapters (BomFtp and the fake server). BomFtp is built only by client_from_env.",
+      "owns": ["ftp.py"]
+    },
+    "vocabulary": {
+      "layer": "foundation",
+      "purpose": "Constants, the warning type table and checklist rules, and the marine wind strength class. Pure data and small rules that every other domain reads.",
+      "owns": ["const.py", "warning_types.py", "strength.py"]
+    }
+  },
+  "constructedOnlyIn": [
+    {
+      "class": "BomFtp",
+      "module": "ftp.py",
+      "function": "client_from_env",
+      "why": "A BomFtp session is not thread-safe and the dev host override is read in one place."
+    }
+  ],
+  "allow": [
+    {
+      "violation": "private-import: fire_danger.py imports cap.py:_DoctypeError",
+      "reason": "fire_danger reuses cap's hardened XML parse through private names.",
+      "removedBy": "architecture review candidate 1, which gives cap a public parse helper"
+    },
+    {
+      "violation": "private-import: fire_danger.py imports cap.py:_safe_parse",
+      "reason": "Same leak as above.",
+      "removedBy": "architecture review candidate 1"
+    }
+  ]
+}
