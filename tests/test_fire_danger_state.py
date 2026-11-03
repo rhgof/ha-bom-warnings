@@ -45,7 +45,7 @@ def at(local: str) -> datetime:
 
 def today_of(memory_and_view: tuple[FireMemory, Any], now: datetime) -> FireDangerPeriod | None:
     _, view = memory_and_view
-    return view.by_date.get(view.local_date(now))
+    return view.period(0, now)
 
 
 MORNING = products(
@@ -152,7 +152,40 @@ def test_the_products_own_offset_decides_today() -> None:
     _, view = derive(FireMemory(), perth, ["WA_FW001"], now, SYDNEY)
     assert view is not None
     assert view.tz.utcoffset(None) == PERTH.utcoffset(None)
-    assert view.local_date(now) == date(2026, 11, 3)
+    found = view.period(0, now)
+    assert found is not None
+    assert found.date == date(2026, 11, 3)
+
+
+def test_tomorrow_is_the_next_local_day() -> None:
+    now = at("2026-11-03T08:00")
+    _, view = derive(FireMemory(), MORNING, [CODE], now, SYDNEY)
+    assert view is not None
+    tomorrow = view.period(1, now)
+    assert tomorrow is not None
+    assert (tomorrow.date, tomorrow.level) == (date(2026, 11, 4), "extreme")
+
+
+@pytest.mark.parametrize("offset", [0, 1])
+def test_a_day_with_no_rating_gives_nothing(offset: int) -> None:
+    # The morning issue stops at 4 November, so on the 5th neither today nor tomorrow is rated.
+    now = at("2026-11-05T08:00")
+    _, view = derive(FireMemory(), MORNING, [CODE], now, SYDNEY)
+    assert view is not None
+    assert view.period(offset, now) is None
+
+
+@pytest.mark.parametrize(
+    ("local", "day"),
+    [("2026-11-02T23:59", date(2026, 11, 2)), ("2026-11-03T00:01", date(2026, 11, 3))],
+)
+def test_today_changes_at_local_midnight(local: str, day: date) -> None:
+    now = at(local)
+    _, view = derive(FireMemory(), MORNING, [CODE], now, SYDNEY)
+    assert view is not None
+    found = view.period(0, now)
+    assert found is not None
+    assert found.date == day
 
 
 def test_a_product_without_an_issue_time_falls_back_to_the_default_zone() -> None:

@@ -135,8 +135,10 @@ class FireDangerView:
     # The product's own local offset, which decides what "today" means for its district.
     tz: tzinfo
 
-    def local_date(self, now: datetime) -> date:
-        return now.astimezone(self.tz).date()
+    def period(self, day_offset: int, now: datetime) -> FireDangerPeriod | None:
+        """The rating for today (offset 0) or a later day, where today is the district's own."""
+        day = now.astimezone(self.tz).date() + timedelta(days=day_offset)
+        return self.by_date.get(day)
 
 
 def derive(
