@@ -11,7 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import issue_registry as ir
-from homeassistant.helpers.storage import Store
 
 from .const import (
     CONF_EVENT_TYPES,
@@ -21,15 +20,14 @@ from .const import (
     WARNING_TYPE_SENSORS,
 )
 from .coordinator import (
-    FIRE_STORE_VERSION,
     BomWarningsCoordinator,
     async_abandon_setup,
     async_acquire_feed,
     async_release_feed,
     async_release_removed_entry,
-    fire_store_key,
     no_area_issue_id,
 )
+from .fire_store import FireStore
 from .ftp import BomFtpError, client_from_env
 from .warning_types import keys_from_legacy_options
 from .zone import delete_zone_issues
@@ -78,7 +76,7 @@ async def async_remove_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry)
     """Drop the entry's repair issues and remembered ratings, which would otherwise outlive it."""
     ir.async_delete_issue(hass, DOMAIN, no_area_issue_id(entry))
     delete_zone_issues(hass, entry)
-    await Store(hass, FIRE_STORE_VERSION, fire_store_key(entry)).async_remove()
+    await FireStore(hass, entry).async_remove()
     await async_release_removed_entry(hass, entry)
 
 
