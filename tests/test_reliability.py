@@ -14,7 +14,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, async_
 
 from custom_components.bom_warnings.const import DOMAIN
 from custom_components.bom_warnings.diagnostics import async_get_config_entry_diagnostics
-from custom_components.bom_warnings.ftp import BomFtpError
 from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom.server import FakeBom
 
@@ -158,26 +157,29 @@ async def test_removing_an_entry_that_never_set_up_clears_the_repair_issue(
     assert repair_issues(hass) == []
 
 
-@pytest.mark.parametrize(
-    ("target", "error"),
-    [
-        ("custom_components.bom_warnings.client_from_env", BomFtpError("bad host")),
-        (
-            "custom_components.bom_warnings.BomWarningsCoordinator.async_config_entry_first_refresh",
-            RuntimeError("bug"),
-        ),
-    ],
-)
 async def test_failed_setup_leaves_no_entry_registered_on_the_feed(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
-    target: str,
-    error: Exception,
 ) -> None:
     mock_config_entry.add_to_hass(hass)
 
-    with patch(target, side_effect=error):
+    with patch(
+        "custom_components.bom_warnings.BomWarningsCoordinator.async_config_entry_first_refresh",
+        side_effect=RuntimeError("bug"),
+    ):
         assert not await hass.config_entries.async_setup(mock_config_entry.entry_id)
 
     assert hass.data[FEED].entry_ids == set()
+
+
+async def test_a_bad_host_override_fails_setup_before_any_feed_exists(
+    hass: HomeAssistant, mock_config_entry: MockConfigEntry
+) -> None:
+    mock_config_entry.add_to_hass(hass)
+
+    with patch.dict("os.environ", {"BOM_WARNINGS_FTP_HOST": "localhost:notaport"}):
+        assert not await hass.config_entries.async_setup(mock_config_entry.entry_id)
+
+    assert mock_config_entry.state is ConfigEntryState.SETUP_ERROR
+    assert FEED not in hass.data

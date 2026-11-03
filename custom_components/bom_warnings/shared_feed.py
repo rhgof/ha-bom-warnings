@@ -71,7 +71,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
     when the last one detaches. The failure count lives here, so there is one repair issue.
     """
 
-    def __init__(self, hass: HomeAssistant, ftp: BomFtp, layer_ftp: BomFtp) -> None:
+    def __init__(self, hass: HomeAssistant, client: BomFtp) -> None:
         super().__init__(
             hass,
             _LOGGER,
@@ -79,12 +79,10 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             name=f"{DOMAIN} feed",
             update_interval=UPDATE_INTERVAL,
         )
-        self._ftp = ftp
-        # The layer check runs in an executor beside warnings refreshes, and a BomFtp session is
-        # not thread-safe, so it gets its own client.
-        self._layer_ftp = layer_ftp
-        self._reader = WarningReader(ftp)
-        self._fire_reader = FireDangerReader(ftp)
+        # The one client of the integration: the entries' coordinators resolve through it too.
+        self.client = client
+        self._reader = WarningReader(client)
+        self._fire_reader = FireDangerReader(client)
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
         self._layer_schedule = LayerSchedule.loaded(None, dt_util.utcnow())
@@ -107,7 +105,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
     ) -> tuple[list[CapWarning], dict[str, FireDangerProduct]]:
         """Blocking. The warnings read decides success; the fire danger step runs after it."""
         # One connection per refresh instead of one login per file.
-        with self._ftp.session():
+        with self.client.session():
             warnings = self._reader.refresh()
             # Never raises: a failure here keeps the previous fire danger data.
             return warnings, self._fire_reader.refresh(fire_products)
@@ -121,8 +119,8 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
 
     def _check_layers(self) -> tuple[bool, bool]:
         """Blocking. Returns (a layer changed, the server was reached)."""
-        with self._layer_ftp.session():
-            result: RefreshResult = refresh_layers(self._layer_ftp, self._cache_dir())
+        with self.client.session():
+            result: RefreshResult = refresh_layers(self.client, self._cache_dir())
         for layer, error in result.failed.items():
             # The cached copy stays in use, and the next check retries.
             _LOGGER.debug("Could not refresh shapefile layer %s: %s", layer, error)
@@ -188,10 +186,8 @@ async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
     """Join the shared feed, creating it and doing its first refresh if this is the first entry."""
     feed = hass.data.get(FEED)
     if feed is None:
-        # The only place the feed's clients are built, so the dev-only host override applies once.
-        feed = hass.data[FEED] = SharedFeed(
-            hass, client_from_env(os.environ), client_from_env(os.environ)
-        )
+        # The only place the runtime's client is built, so the dev-only host override applies once.
+        feed = hass.data[FEED] = SharedFeed(hass, client_from_env(os.environ))
         await feed.async_load_layer_record()
     feed.entry_ids.add(entry.entry_id)
     async with feed.lock:
