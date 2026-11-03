@@ -74,7 +74,7 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
-| `active_warnings.py` | What one location sees of the parsed warnings. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), `product_states(...)` gives the per-product `WarningState`s the event entity compares, and `warning_attributes` builds a warning's list attributes. |
+| `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. The marine wind strength class (`wind_strength`, `WIND_EVENT`) lives here too. |
 
 Home Assistant layer:
 
@@ -120,7 +120,7 @@ Home Assistant layer:
   HA guidance models momentary occurrences as `event` entities.
 - **Ranking.** Both sensors read only warnings covering the location (never the whole state, which
   would list, say, a western NSW sheep graziers alert for a Sydney home). `rank_warnings` in
-  `sensor.py` sorts by level, most recent `sent`, undated last, then product id. Level order is
+  `active_warnings.py` sorts by level, most recent `sent`, undated last, then product id. Level order is
   minor < moderate < unknown < severe < extreme, defined once as `SEVERITY_ORDER` in
   `active_warnings.py` (CAP `unknown` is what BoM sends for Severe Weather and Severe Thunderstorm,
   so it must outrank a minor flood). The list holds current warnings, then
@@ -236,6 +236,14 @@ Home Assistant layer:
   appeared. A restart left the record unchanged, so no second check ran. Removing one entry and then
   the last one deleted their stored fire ratings, removed their entities and logged no error from
   this integration.
+- The warning view (one severity order, ranking and attribute builders in `active_warnings.py`) was
+  checked on the dev instance on 3 November 2026 against BoM's real server, by running a copy of its
+  config on another port from the new code and comparing every warning entity's state and
+  attributes with the instance still running the old code. 31 entities were identical, among them
+  a real Severe Thunderstorm warning with BoM's `unknown` severity: the type sensor said `unrated`
+  and the ranked list kept `level: unknown` with the same colour and icon. The one difference was
+  the event entity, which had fired a live `new` event on the old instance while the copy, started
+  later, correctly fired nothing at startup. The event entity's payload is covered by the HA tests.
 
 ## Fire danger ratings
 
@@ -286,6 +294,9 @@ districts):
 
 ## Known gaps
 
+- The ranked list's `level` attribute shows BoM's severity `unknown` as is, while the type sensors'
+  state calls it `unrated` (`unknown` is Home Assistant's own no-value state). Both are kept as
+  they are so dashboards do not change.
 - Fire danger: the midnight rollover of today/tomorrow happens at the next feed update (up to 10
   minutes late); the timezone is a fixed offset (see above).
 - Fire danger was checked on the dev instance against the fake BoM server only, not against BoM's

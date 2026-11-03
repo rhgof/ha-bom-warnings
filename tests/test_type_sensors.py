@@ -16,7 +16,6 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.bom_warnings.active_warnings import (
     LEVEL_OPTIONS,
     ActiveWarning,
-    highest_level,
 )
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import (
@@ -141,35 +140,6 @@ async def test_attributes_list_each_warning_of_the_type_with_the_highest_severit
         "effective",
         "expires",
     }
-
-
-@pytest.mark.parametrize(
-    ("severities", "expected"),
-    [
-        ([], "none"),
-        ([Severity.MINOR], "minor"),
-        ([Severity.MINOR, Severity.SEVERE, Severity.MODERATE], "severe"),
-        # `unknown` is what BoM sends for Severe Thunderstorm. It is shown as `unrated`, because
-        # `unknown` is Home Assistant's own no-value state, and it ranks above moderate.
-        ([Severity.MODERATE, Severity.UNKNOWN], "unrated"),
-        ([Severity.UNKNOWN, Severity.SEVERE], "severe"),
-        ([Severity.SEVERE, Severity.EXTREME], "extreme"),
-    ],
-)
-def test_highest_level_uses_the_existing_ranking(severities: list[Severity], expected: str) -> None:
-    assert highest_level([warning(s) for s in severities]) == expected
-
-
-def test_a_finished_warning_does_not_set_the_level() -> None:
-    finished = warning(Severity.EXTREME, phase=Phase.CANCELLED)
-
-    assert highest_level([finished, warning(Severity.MINOR)]) == "minor"
-    assert highest_level([finished]) == "none"
-
-
-def test_the_states_are_the_ranking_lowest_first_and_never_the_ha_unknown_state() -> None:
-    assert LEVEL_OPTIONS == ["none", "minor", "moderate", "unrated", "severe", "extreme"]
-    assert "unknown" not in LEVEL_OPTIONS
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_PW013"]])

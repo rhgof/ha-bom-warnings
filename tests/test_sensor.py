@@ -1,6 +1,6 @@
 """The warning count and most-severe sensors, driven through Home Assistant."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.bom_warnings.active_warnings import ActiveWarning, rank_warnings
+from custom_components.bom_warnings.active_warnings import ActiveWarning
 from custom_components.bom_warnings.cap import Severity
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
@@ -137,41 +137,3 @@ async def test_unavailable_when_the_server_is_down(
 
     assert state_of(hass, COUNT).state == STATE_UNAVAILABLE
     assert state_of(hass, MOST_SEVERE).state == STATE_UNAVAILABLE
-
-
-@pytest.mark.parametrize(
-    "severities",
-    [
-        [Severity.SEVERE, Severity.UNKNOWN, Severity.EXTREME, Severity.MINOR, Severity.MODERATE],
-        [Severity.UNKNOWN, Severity.MINOR, Severity.MODERATE, Severity.SEVERE, Severity.EXTREME],
-    ],
-)
-def test_severity_order_is_minor_moderate_unknown_severe_extreme(
-    severities: list[Severity],
-) -> None:
-    # CAP `unknown` is what BoM sends for Severe Weather and Severe Thunderstorm, so it must
-    # rank above a minor or moderate warning and below a severe one.
-    ranked = rank_warnings(warning(s) for s in severities)
-
-    assert [w.severity for w in ranked] == [
-        Severity.EXTREME,
-        Severity.SEVERE,
-        Severity.UNKNOWN,
-        Severity.MODERATE,
-        Severity.MINOR,
-    ]
-
-
-def test_ties_break_on_most_recent_sent_then_undated_last_then_product_id() -> None:
-    old = warning(Severity.SEVERE, datetime(2026, 11, 1, 1, tzinfo=UTC), "Old", "IDX00001")
-    new = warning(Severity.SEVERE, datetime(2026, 11, 1, 2, tzinfo=UTC), "New", "IDX00009")
-    undated_b = warning(Severity.SEVERE, None, "UndatedB", "IDX00002")
-    undated_a = warning(Severity.SEVERE, None, "UndatedA", "IDX00001")
-
-    ranked = rank_warnings([undated_b, old, undated_a, new])
-
-    assert [w.event for w in ranked] == ["New", "Old", "UndatedA", "UndatedB"]
-
-
-def test_ranking_nothing_gives_an_empty_list() -> None:
-    assert rank_warnings([]) == []

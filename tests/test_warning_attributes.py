@@ -181,3 +181,9 @@ def test_a_note_is_added_for_the_types_that_have_one(event: str) -> None:
         assert attributes["note"] == WARNING_TYPE_NOTES[event]
     else:
         assert "note" not in attributes
+
+
+def test_a_lean_item_without_times_has_them_as_none() -> None:
+    open_ended = ActiveWarning("IDQ1", "Flood", "Flood Watch", Severity.MINOR, None, None)
+    item = warning_attributes(open_ended)
+    assert (item["effective"], item["expires"]) == (None, None)

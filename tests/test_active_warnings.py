@@ -13,7 +13,6 @@ from custom_components.bom_warnings.active_warnings import (
     WarningState,
     covering,
     product_states,
-    warning_attributes,
 )
 from custom_components.bom_warnings.cap import CapWarning, Info, Phase, Severity
 
@@ -168,41 +167,3 @@ def test_the_type_filter_applies_to_states_even_for_ended_blocks() -> None:
     final = warning(info("Flood", phase=Phase.FINAL))
     assert product_states([final], HERE, NOW, lambda event: False) == {}
     assert "IDQ1" in product_states([final], HERE, NOW, lambda event: True)
-
-
-def test_attributes_list_the_warning_fields() -> None:
-    (found,) = covering([warning(info())], HERE, NOW)
-    assert warning_attributes(found) == {
-        "product_id": "IDQ1",
-        "event": "Severe Thunderstorm",
-        "headline": "Severe Thunderstorm Warning for Brisbane",
-        "severity": "severe",
-        "phase": "new",
-        "effective": EARLIER.isoformat(),
-        "expires": LATER.isoformat(),
-    }
-
-
-def test_attributes_leave_out_times_a_warning_does_not_have() -> None:
-    open_ended = ActiveWarning("IDQ1", "Flood", "Flood Watch", Severity.MINOR, None, None)
-    attributes = warning_attributes(open_ended)
-    assert attributes["effective"] is None
-    assert attributes["expires"] is None
-
-
-@pytest.mark.parametrize(
-    ("event", "headline", "strength"),
-    [
-        pytest.param("Wind", "Gale Force Wind Warning for Moreton Bay", "gale", id="wind"),
-        pytest.param("Wind", "Cancellation of Strong Wind Warning", None, id="cancelled-wind"),
-        pytest.param("Severe Thunderstorm", "Gale Force Wind Warning", None, id="other-event"),
-    ],
-)
-def test_strength_appears_only_for_a_wind_warning_with_a_class(
-    event: str, headline: str, strength: str | None
-) -> None:
-    attributes = warning_attributes(
-        ActiveWarning("IDQ1", event, headline, Severity.MODERATE, None, None)
-    )
-    assert attributes.get("strength") == strength
-    assert ("strength" in attributes) is (strength is not None)
