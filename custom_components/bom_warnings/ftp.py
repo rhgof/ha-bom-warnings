@@ -6,6 +6,7 @@ No Home Assistant imports. Every method blocks, so callers run them in an execut
 from __future__ import annotations
 
 import ftplib
+import threading
 import time
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager, contextmanager
@@ -97,11 +98,19 @@ def client_from_env(environ: Mapping[str, str], directory: str = WARNINGS_DIR) -
     return BomFtp(host, port, directory)
 
 
-class BomFtp:
-    """Anonymous, passive-mode FTP client.
+class _SessionState(threading.local):
+    """The open session of the calling thread; each thread starts with none."""
 
-    Each call opens its own connection, unless run inside `session()`, which shares one.
-    Transient failures are retried up to `ATTEMPTS` times; a rejection (5xx) never is.
+    shared: ftplib.FTP | None = None
+    in_session = False
+
+
+class BomFtp:
+    """Anonymous, passive-mode FTP client, safe to share between threads.
+
+    Each call opens its own connection, unless run inside `session()`, which shares one with the
+    other calls on the same thread. Transient failures are retried up to `ATTEMPTS` times; a
+    rejection (5xx) never is.
     """
 
     def __init__(
@@ -113,8 +122,9 @@ class BomFtp:
         self._host = host
         self._port = port
         self._directory = directory
-        self._shared: ftplib.FTP | None = None
-        self._in_session = False
+        # An ftplib connection must never be used by two threads, and the feed's refresh, its layer
+        # check and every entry's resolver run on different executor threads at once.
+        self._state = _SessionState()
 
     def _connect(self) -> ftplib.FTP:
         ftp = ftplib.FTP(timeout=TIMEOUT)  # noqa: S321
@@ -135,32 +145,35 @@ class BomFtp:
     def session(self) -> Iterator[BomFtp]:
         """Share one connection across calls, e.g. one refresh instead of N+1 logins.
 
-        If the connection drops, the next call (or retry) opens a new shared one.
+        If the connection drops, the next call (or retry) opens a new shared one. The session
+        belongs to the calling thread: calls from any other thread open their own connections.
         """
-        self._shared = self._connect()
-        self._in_session = True
+        state = self._state
+        state.shared = self._connect()
+        state.in_session = True
         try:
             yield self
         finally:
-            self._in_session = False
-            if self._shared:
-                self._shared.close()
-            self._shared = None
+            state.in_session = False
+            if state.shared:
+                state.shared.close()
+            state.shared = None
 
     @contextmanager
     def _conn(self) -> Iterator[ftplib.FTP]:
-        if self._in_session and self._shared is None:
-            self._shared = self._connect()
-        ftp = self._shared or self._connect()
+        state = self._state
+        if state.in_session and state.shared is None:
+            state.shared = self._connect()
+        ftp = state.shared or self._connect()
         try:
             yield ftp
         except BaseException:
             # The control channel may be out of sync after a failure, so never reuse it.
             ftp.close()
-            if ftp is self._shared:
-                self._shared = None
+            if ftp is state.shared:
+                state.shared = None
             raise
-        if ftp is not self._shared:
+        if ftp is not state.shared:
             ftp.close()
 
     @staticmethod

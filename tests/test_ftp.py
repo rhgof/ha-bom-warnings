@@ -1,7 +1,9 @@
 """Tests for BomFtp and parse_host against a scripted ftplib.FTP, never the network."""
 
 import ftplib
+import threading
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import pytest
@@ -244,3 +246,56 @@ def test_connection_is_not_reused_after_the_session(scripted: type[ScriptedFTP])
         client.fetch("a")
     client.fetch("a")
     assert len(scripted.instances) == 2
+
+
+def run_in_threads(*jobs: Callable[[], None]) -> None:
+    threads = [threading.Thread(target=job) for job in jobs]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+
+def test_sessions_on_different_threads_use_their_own_connections(scripted: type[ScriptedFTP]):
+    client = BomFtp()
+    # Both sessions are open before either reads, and neither closes before both have read.
+    barrier = threading.Barrier(2)
+
+    def job() -> None:
+        with client.session():
+            barrier.wait()
+            client.list_files("*")
+            client.fetch("a")
+            barrier.wait()
+
+    run_in_threads(job, job)
+    assert len(scripted.instances) == 2
+    assert [i.logins for i in scripted.instances] == [1, 1]
+    assert all(i.closed for i in scripted.instances)
+
+
+def test_call_outside_a_session_does_not_borrow_another_threads_connection(
+    scripted: type[ScriptedFTP],
+):
+    client = BomFtp()
+    with client.session():
+        run_in_threads(lambda: client.fetch("a"))
+        assert len(scripted.instances) == 2
+        assert scripted.instances[1].closed
+        assert not scripted.instances[0].closed
+        client.fetch("a")
+    assert len(scripted.instances) == 2
+
+
+def test_a_reused_thread_does_not_see_the_previous_session(scripted: type[ScriptedFTP]):
+    client = BomFtp()
+
+    def in_session() -> None:
+        with client.session():
+            client.fetch("a")
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        pool.submit(in_session).result()
+        pool.submit(client.fetch, "a").result()
+    assert len(scripted.instances) == 2
+    assert all(i.closed for i in scripted.instances)
