@@ -13,8 +13,9 @@ import pytest
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.active_warnings import wind_strength
-from custom_components.bom_warnings.cap import parse_cap
+from custom_components.bom_warnings.active_warnings import ActiveWarning
+from custom_components.bom_warnings.cap import Severity, parse_cap
+from custom_components.bom_warnings.warning_types import wind_strength
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -55,7 +56,7 @@ SAMPLE = recorded_headlines("cap_samples/IDD20105.cap.xml")
     ids=["storm", "storm-2", "gale", "strong", "tas-strong", "wa-strong", "hurricane", "lowercase"],
 )
 def test_the_class_is_read_from_the_headline(headline: str, strength: str) -> None:
-    assert wind_strength("Wind", headline) == strength
+    assert wind_strength(headline) == strength
 
 
 @pytest.mark.parametrize(
@@ -71,7 +72,7 @@ def test_the_class_is_read_from_the_headline(headline: str, strength: str) -> No
 )
 def test_wording_that_is_not_a_known_class(headline: str, expected: str | None) -> None:
     """A cancellation has no strength; wording this code does not know keeps its class text."""
-    assert wind_strength("Wind", headline) == expected
+    assert wind_strength(headline) == expected
 
 
 @pytest.mark.parametrize(
@@ -79,7 +80,13 @@ def test_wording_that_is_not_a_known_class(headline: str, expected: str | None) 
     ["Large Coastal Surf", "Weather", "Thunderstorm", "Tropical Cyclone"],
 )
 def test_other_events_never_have_a_strength(event: str) -> None:
-    assert wind_strength(event, SAMPLE[0]) is None
+    """Even with a headline that reads like a wind warning, only Wind's row has the rule."""
+    warning = ActiveWarning("IDX00001", event, SAMPLE[0], Severity.MODERATE, None, None)
+    assert warning.strength is None
+    assert (
+        ActiveWarning("IDX00001", "Wind", SAMPLE[0], Severity.MODERATE, None, None).strength
+        == "storm"
+    )
 
 
 @pytest.fixture(autouse=True)

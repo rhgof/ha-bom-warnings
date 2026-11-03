@@ -14,6 +14,7 @@ from custom_components.bom_warnings.warning_types import (
     sensor_types,
     type_keys,
     type_of,
+    wind_strength,
 )
 
 # Today's rows, in the order the options checklist lists them and the sensors are created.
@@ -173,3 +174,20 @@ def test_an_event_with_no_row_has_no_type() -> None:
 def test_every_sensor_type_is_a_warning_type_and_there_are_twelve() -> None:
     assert all(isinstance(t, SensorType) and isinstance(t, WarningType) for t in sensor_types())
     assert len(sensor_types()) == 12
+
+
+def test_only_wind_carries_a_strength_rule() -> None:
+    assert {t.event for t in WARNING_TYPES if t.strength} == {"Wind"}
+
+
+def test_the_wind_rule_is_the_wind_strength_function() -> None:
+    wind = type_of("Wind")
+    assert wind is not None and wind.strength is not None
+    assert wind.strength is wind_strength
+    assert wind.strength("Gale Force Wind Warning for Moreton Bay") == "gale"
+
+
+def test_a_type_without_a_rule_has_none() -> None:
+    weather = type_of("Weather")
+    assert weather is not None
+    assert weather.strength is None

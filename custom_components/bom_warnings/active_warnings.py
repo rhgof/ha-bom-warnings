@@ -6,7 +6,6 @@ No Home Assistant imports.
 
 from __future__ import annotations
 
-import re
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -39,7 +38,8 @@ class ActiveWarning:
     @property
     def strength(self) -> str | None:
         """The class of a marine wind warning (strong, gale, storm), read from its headline."""
-        return wind_strength(self.event, self.headline)
+        row = type_of(self.event)
+        return row.strength(self.headline) if row and row.strength else None
 
 
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
@@ -230,8 +230,8 @@ def event_icon(event: str) -> str:
 def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
     """The attributes of one type's level sensor: its top warning's fields, then every warning.
 
-    The top warning is the highest-ranked one still in force. Only marine wind carries a strength,
-    and only some types a note.
+    The top warning is the highest-ranked one still in force. A type whose row has a strength rule
+    (marine wind) carries a strength, and a type whose row has a note carries that.
     """
     current = rank_warnings(w for w in warnings if w.is_current)
     top = current[0] if current else None
@@ -242,41 +242,9 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "event": top.event if top else None,
         "warnings": [warning_attributes(w) for w in warnings],
     }
-    if event == WIND_EVENT:
+    row = type_of(event)
+    if row and row.strength:
         attributes["strength"] = top.strength if top else None
-    if (row := type_of(event)) and row.note:
+    if row and row.note:
         attributes["note"] = row.note
     return attributes
-
-
-# The marine wind strength class, read from the headline.
-WIND_EVENT = "Wind"
-
-_CLASSES = {
-    "strong": "strong",
-    "gale force": "gale",
-    "gale": "gale",
-    "storm force": "storm",
-    "storm": "storm",
-    "hurricane force": "hurricane",
-    "hurricane": "hurricane",
-}
-_HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
-
-
-def wind_strength(event: str, headline: str) -> str | None:
-    """The strength class of a Wind warning, or None.
-
-    Known classes are lowercase and stable (`strong`, `gale`, `storm`, `hurricane`). Wording this
-    code does not know keeps its class text as written, so a new class is shown and not lost. A
-    cancellation, a headline with no class, and any event other than Wind have no strength.
-    """
-    if event != WIND_EVENT:
-        return None
-    match = _HEADLINE.match(headline.strip())
-    if match is None:
-        return None
-    text = match.group("class").strip()
-    if text.lower().startswith("cancellation"):
-        return None
-    return _CLASSES.get(text.lower(), text)
