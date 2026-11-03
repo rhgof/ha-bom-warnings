@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import shapefile
 
-from custom_components.bom_warnings.areas import resolve_area_codes, state_of
+from custom_components.bom_warnings.areas import resolve_area_codes, resolve_areas, state_of
 
 
 def _write(path: Path, shapes: list[tuple[str, list[list[tuple[float, float]]]]]) -> Path:
@@ -64,6 +64,59 @@ def test_nonstandard_cpg_encoding_label_is_tolerated(tmp_path):
 def test_missing_layer_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         resolve_area_codes([tmp_path / "nope.shp"], lat=0, lon=0)
+
+
+def _write_named(path: Path, shapes: list[tuple[str, str, list[tuple[float, float]]]]) -> Path:
+    """Like `_write`, with BoM's `DIST_NAME` field after `AAC`, as in the real layers."""
+    with shapefile.Writer(str(path)) as w:
+        w.field("AAC", "C", size=20)
+        w.field("DIST_NAME", "C", size=60)
+        for aac, name, ring in shapes:
+            w.poly([ring])
+            w.record(aac, name)
+    return path.with_suffix(".shp")
+
+
+SQUARE_A = [(0, 0), (0, 10), (10, 10), (10, 0), (0, 0)]
+SQUARE_B = [(10, 0), (10, 10), (20, 10), (20, 0), (10, 0)]
+
+
+def test_each_code_comes_with_its_district_name(tmp_path):
+    path = _write_named(tmp_path / "named", [("T_A", "Illawarra", SQUARE_A)])
+    assert resolve_areas([path], lat=5, lon=5) == {"T_A": "Illawarra"}
+
+
+def test_names_follow_the_radius(tmp_path):
+    path = _write_named(
+        tmp_path / "pair", [("T_A", "Illawarra", SQUARE_A), ("T_B", "South Coast", SQUARE_B)]
+    )
+    assert resolve_areas([path], lat=5, lon=5) == {"T_A": "Illawarra"}
+    # One degree of longitude is about 111 km, and the point is five degrees from the border.
+    assert resolve_areas([path], lat=5, lon=5, radius_m=600_000) == {
+        "T_A": "Illawarra",
+        "T_B": "South Coast",
+    }
+
+
+def test_names_are_read_from_the_matching_layer_only(tmp_path):
+    first = _write_named(tmp_path / "one", [("T_A", "Illawarra", SQUARE_A)])
+    second = _write_named(tmp_path / "two", [("T_C", "Metro", SQUARE_A)])
+    assert resolve_areas([first, second], lat=5, lon=5) == {"T_A": "Illawarra", "T_C": "Metro"}
+
+
+def test_a_layer_without_names_still_gives_its_codes(layer):
+    # The name field is documented but unconfirmed on every layer, so a missing one is not an error.
+    assert resolve_areas([layer], lat=2, lon=2) == {"T_A": ""}
+
+
+def test_a_blank_name_is_kept_blank(tmp_path):
+    path = _write_named(tmp_path / "blank", [("T_A", "", SQUARE_A)])
+    assert resolve_areas([path], lat=5, lon=5) == {"T_A": ""}
+
+
+def test_resolve_area_codes_is_the_codes_of_resolve_areas(tmp_path):
+    path = _write_named(tmp_path / "named", [("T_A", "Illawarra", SQUARE_A)])
+    assert resolve_area_codes([path], lat=5, lon=5) == set(resolve_areas([path], lat=5, lon=5))
 
 
 SPATIAL = os.environ.get("BOM_SPATIAL_DIR")

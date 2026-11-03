@@ -13,14 +13,18 @@ from custom_components.bom_warnings.spatial import SPATIAL_DIR
 SQUARE = [(0, 0), (0, 10), (10, 10), (10, 0), (0, 0)]
 
 
-def zip_layer(tmp_path: Path, name: str, aac: str) -> bytes:
-    """A one-polygon layer, the square from (0, 0) to (10, 10), whose only area is `aac`."""
+def zip_layer(tmp_path: Path, name: str, aac: str, district: str = "") -> bytes:
+    """A one-polygon layer, the square from (0, 0) to (10, 10), whose only area is `aac`.
+
+    `district` is the area's `DIST_NAME`, the field BoM's layers use for the area's name.
+    """
     stem = tmp_path / "build" / name
     stem.parent.mkdir(exist_ok=True)
     with shapefile.Writer(str(stem)) as w:
         w.field("AAC", "C", size=20)
+        w.field("DIST_NAME", "C", size=60)
         w.poly([SQUARE])
-        w.record(aac)
+        w.record(aac, district)
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
         for suffix in (".shp", ".shx", ".dbf"):

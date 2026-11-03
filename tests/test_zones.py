@@ -16,6 +16,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
@@ -32,6 +33,7 @@ from .conftest import NOW
 from .locations import location_of
 from .test_binary_sensor import poll, setup_entry
 from .test_options import layers, set_options  # noqa: F401
+from .test_sensor import state_of
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
@@ -84,6 +86,7 @@ def zone_entry(zone_codes: list[str], zone_options: dict[str, Any]) -> MockConfi
             CONF_RADIUS: 2000.0,
             CONF_STATE: zone_codes[0].split("_")[0],
             CONF_AREA_CODES: zone_codes,
+            CONF_AREA_NAMES: {},
         },
     )
 
@@ -150,6 +153,55 @@ async def test_editing_the_zone_re_resolves_without_a_restart(
     assert zone_entry.data[CONF_RADIUS] == expected["radius_m"]
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_ME008", "QLD_PW001"]
     assert hass.states.get(SENSOR).state == STATE_ON  # type: ignore[union-attr]
+
+
+NAMES = {"QLD_ME008": "Brisbane", "QLD_PW001": "Moreton Bay"}
+ZONE_COUNT = "sensor.holiday_house_warning_count"
+
+
+async def test_growing_and_shrinking_the_zone_changes_the_areas_it_shows(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    zone_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    resolve: MagicMock,
+) -> None:
+    set_zone(hass)
+    await setup_entry(hass, zone_entry)
+    assert state_of(hass, ZONE_COUNT).attributes["areas"] == []
+
+    # The wider circle reaches the district with the recorded warning, which is then named.
+    resolve.return_value = location_of("QLD_PW001", "QLD_ME008", names=NAMES)
+    await change_zone(hass, radius=15_000.0)
+
+    assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Brisbane", "Moreton Bay"]
+    (item,) = state_of(hass, ZONE_COUNT).attributes["warnings"]
+    assert item["area"] == "Brisbane"
+    assert zone_entry.data[CONF_AREA_NAMES] == NAMES
+
+    resolve.return_value = location_of("QLD_PW001", names=NAMES)
+    await change_zone(hass, radius=100.0)
+
+    assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Moreton Bay"]
+    assert state_of(hass, ZONE_COUNT).attributes["warnings"] == []
+    assert zone_entry.data[CONF_AREA_NAMES] == {"QLD_PW001": "Moreton Bay"}
+
+
+async def test_a_new_name_for_the_same_codes_is_stored(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    zone_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    resolve: MagicMock,
+) -> None:
+    set_zone(hass)
+    await setup_entry(hass, zone_entry)
+
+    resolve.return_value = location_of("QLD_PW001", names={"QLD_PW001": "Moreton Bay"})
+    await change_zone(hass, radius=3_000.0)
+
+    assert zone_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]
+    assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Moreton Bay"]
 
 
 @pytest.mark.parametrize("zone_codes", [["QLD_ME008", "QLD_PW001"]])

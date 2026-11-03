@@ -11,6 +11,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_STATE,
@@ -46,6 +47,7 @@ def entry_at(code: str) -> MockConfigEntry:
             CONF_LONGITUDE: 153.021,
             CONF_STATE: code.split("_")[0],
             CONF_AREA_CODES: [code],
+            CONF_AREA_NAMES: {},
         },
     )
 

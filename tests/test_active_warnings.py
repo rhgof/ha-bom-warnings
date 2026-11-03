@@ -68,6 +68,35 @@ def test_a_current_matching_block_is_reported_with_its_fields() -> None:
     )
 
 
+def test_a_warning_names_only_the_areas_the_entry_matched() -> None:
+    wide = warning(info(codes=frozenset({"QLD_ME008", "WA_ME001"})))
+    names = {"QLD_ME008": "Brisbane", "WA_ME001": "Perth"}
+    (found,) = covering([wide], HERE, NOW, area_names=names)
+    assert found.area == "Brisbane"
+
+
+def test_several_matched_areas_are_listed_in_code_order() -> None:
+    wide = warning(info(codes=frozenset({"QLD_PW013", "QLD_PW011", "QLD_PW012"})))
+    entry = frozenset({"QLD_PW013", "QLD_PW011"})
+    names = {"QLD_PW011": "Channel Country", "QLD_PW013": "Wide Bay", "QLD_PW012": "Elsewhere"}
+    (found,) = covering([wide], entry, NOW, area_names=names)
+    assert found.area == "Channel Country; Wide Bay"
+
+
+def test_areas_sharing_a_name_are_listed_once() -> None:
+    wide = warning(info(codes=frozenset({"QLD_RC001", "QLD_RC002"})))
+    names = {"QLD_RC001": "Condamine River", "QLD_RC002": "Condamine River"}
+    (found,) = covering([wide], frozenset(names), NOW, area_names=names)
+    assert found.area == "Condamine River"
+
+
+@pytest.mark.parametrize("names", [{}, {"QLD_ME008": ""}, {"WA_ME001": "Perth"}])
+def test_a_matched_area_with_no_name_leaves_the_warning_unnamed(names: dict[str, str]) -> None:
+    wide = warning(info(codes=frozenset({"QLD_ME008", "WA_ME001"})))
+    (found,) = covering([wide], HERE, NOW, area_names=names)
+    assert found.area == ""
+
+
 def test_a_block_for_another_area_is_not_reported() -> None:
     assert covering([warning(info(codes=ELSEWHERE))], HERE, NOW) == ()
 

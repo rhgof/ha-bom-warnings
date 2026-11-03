@@ -124,7 +124,11 @@ class WarningCountSensor(_WarningSensor):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {"warnings": [warning_attributes(w, ranked=True) for w in self._ranked]}
+        return {
+            # Names only: where the entry reaches, so a zone's radius can be checked by eye.
+            "areas": self.coordinator.area_names,
+            "warnings": [warning_attributes(w, ranked=True) for w in self._ranked],
+        }
 
 
 class MostSevereWarningSensor(_WarningSensor):

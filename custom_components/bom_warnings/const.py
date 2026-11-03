@@ -5,6 +5,9 @@ CONF_LATITUDE = "latitude"
 CONF_LONGITUDE = "longitude"
 CONF_STATE = "state"
 CONF_AREA_CODES = "area_codes"
+# The name of each stored code that has one, as {code: name}. Absent on an entry made before names
+# were stored, which is how the coordinator knows to look them up once.
+CONF_AREA_NAMES = "area_names"
 # Set only on entries that follow a Home Assistant zone: its entity id, and its radius in metres.
 CONF_ZONE = "zone"
 CONF_RADIUS = "radius"

@@ -18,6 +18,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_HIDE_FINAL,
     CONF_LATITUDE,
     CONF_LONGITUDE,
@@ -264,6 +265,7 @@ async def test_an_entry_from_before_the_checklist_is_migrated(
             CONF_LONGITUDE: 153.021,
             CONF_STATE: "QLD",
             CONF_AREA_CODES: ["QLD_PW001"],
+            CONF_AREA_NAMES: {},
         },
     )
 
@@ -293,6 +295,7 @@ async def test_an_entry_with_no_options_at_all_is_migrated(
             CONF_LONGITUDE: 153.021,
             CONF_STATE: "QLD",
             CONF_AREA_CODES: ["QLD_PW001"],
+            CONF_AREA_NAMES: {},
         },
     )
 
@@ -333,6 +336,7 @@ async def test_the_old_binary_type_sensors_are_removed_and_replaced_by_level_sen
             CONF_LONGITUDE: 153.021,
             CONF_STATE: "QLD",
             CONF_AREA_CODES: ["QLD_PW001"],
+            CONF_AREA_NAMES: {},
         },
     )
     entry.add_to_hass(hass)

@@ -19,8 +19,13 @@ looping over a list attribute well enough to give you something correct.
 `state_attr('sensor.<title>_warning_count', 'warnings')` is a list, most severe first, only for
 warnings covering your location. Each item has `product_id`, `event`, `severity`, `level`
 (`minor`, `moderate`, `unknown`, `severe`, `extreme`), `icon` (an `mdi:` name), `color` (hex),
-`headline`, `phase`, `sent`, `effective` and `expires`. With the option to keep final and cancelled
-warnings, ended ones come after the current ones with `phase` set to `final` or `cancelled`.
+`headline`, `phase`, `sent`, `effective` and `expires`, and `area` (the names of your location's
+areas the warning covers, such as `Illawarra`; left out when none has a name). With the option to
+keep final and cancelled warnings, ended ones come after the current ones with `phase` set to
+`final` or `cancelled`.
+
+`state_attr('sensor.<title>_warning_count', 'areas')` is the list of area names the location
+covers, in code order. It is there with no warning active, so it shows what a zone's radius reaches.
 
 ## Markdown card, coloured icon
 

@@ -15,6 +15,7 @@ from . import location
 from .active_warnings import ActiveWarning, WarningState, covering, product_states
 from .const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_HIDE_FINAL,
     CONF_LATITUDE,
     CONF_LONGITUDE,
@@ -69,9 +70,11 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         # warning counts is the Marine wind and Hazardous surf toggles' business, so toggling them
         # never needs a re-resolve.
         self._area_codes = frozenset(config_entry.data[CONF_AREA_CODES])
+        self._area_names: dict[str, str] = dict(config_entry.data.get(CONF_AREA_NAMES, {}))
         self._zone: ZoneFollower | None = None
-        # Set when the location itself changed, so the next derivation re-resolves it.
-        self._reresolve = False
+        # Set when the location itself changed, so the next derivation re-resolves it. An entry
+        # made before names were stored has none to show, so it looks them up once.
+        self._reresolve = CONF_AREA_NAMES not in config_entry.data
         self._hide_final: bool = config_entry.options.get(CONF_HIDE_FINAL, True)
         # The checklist: the warning types that are on.
         self.enabled_types = enabled_keys(config_entry.options)
@@ -97,6 +100,11 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
     @property
     def consecutive_failures(self) -> int:
         return self._feed.consecutive_failures
+
+    @property
+    def area_names(self) -> list[str]:
+        """The names of the areas the entry covers, in code order, each once."""
+        return list(dict.fromkeys(self._area_names[code] for code in sorted(self._area_names)))
 
     def _type_on(self, event: str) -> bool:
         return event_is_on(event, self.enabled_types)
@@ -156,14 +164,18 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             )
             return
         ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
-        if found.area_codes == self._area_codes:
+        names = dict(found.area_names)
+        # The names are compared too: a district can be renamed without its code changing.
+        if found.area_codes == self._area_codes and names == self._area_names:
             return
         self._area_codes = found.area_codes
+        self._area_names = names
         self.hass.config_entries.async_update_entry(
             self.config_entry,
             data={
                 **self.config_entry.data,
                 CONF_AREA_CODES: sorted(found.area_codes),
+                CONF_AREA_NAMES: names,
                 CONF_STATE: found.state,
             },
         )
@@ -183,7 +195,12 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         now = dt_util.utcnow()
         warnings = list(snapshot.warnings)
         active = covering(
-            warnings, self._area_codes, now, hide_final=self._hide_final, type_on=self._type_on
+            warnings,
+            self._area_codes,
+            now,
+            area_names=self._area_names,
+            hide_final=self._hide_final,
+            type_on=self._type_on,
         )
         self.by_event = {
             t.event: tuple(w for w in active if w.event == t.event) for t in sensor_types()

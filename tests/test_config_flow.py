@@ -18,6 +18,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
@@ -30,6 +31,12 @@ from custom_components.bom_warnings.location import LocationUnavailable, Resolve
 from scripts.fake_bom.server import FakeBom
 
 BRISBANE = {CONF_LATITUDE: -27.4698, CONF_LONGITUDE: 153.0251}
+# What the `resolve` fixture says the point is in, by code.
+RESOLVED_NAMES = {
+    "QLD_PW011": "Moreton Bay",
+    "QLD_ME008": "Brisbane",
+    "QLD_RC167": "Brisbane River",
+}
 
 
 @pytest.fixture(autouse=True)
@@ -74,6 +81,7 @@ async def test_home_location(hass: HomeAssistant, resolve: MagicMock) -> None:
         CONF_LONGITUDE: 153.0251,
         CONF_STATE: "QLD",
         CONF_AREA_CODES: ["QLD_ME008", "QLD_PW011", "QLD_RC167"],
+        CONF_AREA_NAMES: RESOLVED_NAMES,
     }
     assert resolve.call_args.kwargs == {"lat": -27.4698, "lon": 153.0251, "radius_m": 0.0}
     # The cache lives under the config directory, so it survives restarts.
@@ -215,6 +223,7 @@ async def test_zone_creates_an_entry_that_follows_it(
         CONF_RADIUS: 2000.0,
         CONF_STATE: "QLD",
         CONF_AREA_CODES: ["QLD_ME008", "QLD_PW011", "QLD_RC167"],
+        CONF_AREA_NAMES: RESOLVED_NAMES,
     }
     assert resolve.call_args.kwargs == {"lat": -33.8688, "lon": 151.2093, "radius_m": 2000.0}
 

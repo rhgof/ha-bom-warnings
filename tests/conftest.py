@@ -10,6 +10,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
+    CONF_AREA_NAMES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_STATE,
@@ -61,13 +62,25 @@ def area_codes() -> list[str]:
 
 
 @pytest.fixture
+def entry_area_names() -> dict[str, str]:
+    """Names stored on the entry for its codes; parametrize this fixture to change them.
+
+    Always stored, even when empty: an entry without the key is looked up once at setup, which
+    is the old-entry case and is tested on its own.
+    """
+    return {}
+
+
+@pytest.fixture
 def entry_options() -> dict[str, Any]:
     """Options stored on the entry; parametrize this fixture to change them."""
     return {}
 
 
 @pytest.fixture
-def mock_config_entry(area_codes: list[str], entry_options: dict[str, Any]) -> MockConfigEntry:
+def mock_config_entry(
+    area_codes: list[str], entry_options: dict[str, Any], entry_area_names: dict[str, str]
+) -> MockConfigEntry:
     """A location in a QLD forecast district that no baseline warning covers."""
     return MockConfigEntry(
         domain=DOMAIN,
@@ -80,6 +93,7 @@ def mock_config_entry(area_codes: list[str], entry_options: dict[str, Any]) -> M
             CONF_LONGITUDE: 153.021,
             CONF_STATE: "QLD",
             CONF_AREA_CODES: area_codes,
+            CONF_AREA_NAMES: entry_area_names,
         },
     )
 
@@ -96,13 +110,25 @@ def resolved_state() -> str:
 
 
 @pytest.fixture
-def resolve(resolved_codes: set[str], resolved_state: str) -> Iterator[MagicMock]:
+def resolved_names() -> dict[str, str]:
+    """The names the shapefiles give those codes; a code left out has none."""
+    return {"QLD_PW011": "Moreton Bay", "QLD_ME008": "Brisbane", "QLD_RC167": "Brisbane River"}
+
+
+@pytest.fixture
+def resolve(
+    resolved_codes: set[str], resolved_state: str, resolved_names: dict[str, str]
+) -> Iterator[MagicMock]:
     """The one seam for locating a point: `location.resolve_location` as callers reach it.
 
     The shapefiles are not in the repo, so tests decide what a point resolves to. How codes become a
     state is the resolver's rule and is tested there, so the state is given, not derived.
     """
-    found = ResolvedLocation(frozenset(resolved_codes), resolved_state if resolved_codes else "")
+    found = ResolvedLocation(
+        frozenset(resolved_codes),
+        resolved_state if resolved_codes else "",
+        {code: name for code, name in resolved_names.items() if code in resolved_codes},
+    )
     with patch(
         "custom_components.bom_warnings.location.resolve_location", return_value=found
     ) as mock:
