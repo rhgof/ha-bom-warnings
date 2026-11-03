@@ -8,7 +8,7 @@ from __future__ import annotations
 import ftplib
 import time
 from collections.abc import Callable, Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import AbstractContextManager, contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Protocol, TypeVar
@@ -48,6 +48,10 @@ class BomFtpClient(Protocol):
     def fetch(self, name: str) -> bytes | None: ...
     def modified(self, name: str) -> datetime | None: ...
     def download(self, remote_path: str, local_path: str) -> None: ...
+
+    def session(self) -> AbstractContextManager[object]:
+        """Share one connection across the calls made inside the `with` block."""
+        ...
 
 
 def parse_listing_line(line: str) -> FileEntry | None:
