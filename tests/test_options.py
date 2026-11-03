@@ -27,6 +27,7 @@ from custom_components.bom_warnings.const import (
     DOMAIN,
 )
 from custom_components.bom_warnings.location import LocationUnavailable
+from custom_components.bom_warnings.shared_feed import FEED
 from custom_components.bom_warnings.spatial import RefreshResult
 from custom_components.bom_warnings.warning_types import type_keys
 from scripts.fake_bom import scenarios
@@ -171,6 +172,7 @@ async def test_changed_layer_re_resolves_stored_codes(
     assert mock_config_entry.data[CONF_AREA_CODES] == ["NSW_PW002", "QLD_ME008"]
     assert mock_config_entry.data[CONF_STATE] == "NSW"
     assert resolve.call_args.kwargs == {"lat": -27.47, "lon": 153.021, "radius_m": 0.0}
+    assert resolve.call_args.args[0] is hass.data[FEED].client
     assert sensor_state(hass).state == STATE_ON
 
 

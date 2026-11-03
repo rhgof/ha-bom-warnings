@@ -30,7 +30,6 @@ from .fire_danger import (
     derive,
 )
 from .fire_store import FireStore
-from .ftp import BomFtp
 from .shared_feed import SharedFeed
 from .warning_types import enabled_keys, event_is_on, sensor_types
 from .zone import ZoneFollower
@@ -59,12 +58,9 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         hass: HomeAssistant,
         config_entry: BomWarningsConfigEntry,
         feed: SharedFeed,
-        ftp: BomFtp,
     ) -> None:
         super().__init__(hass, _LOGGER, config_entry=config_entry, name=DOMAIN)
         self._feed = feed
-        # This entry's own client: a BomFtp session is not safe to share between threads.
-        self._ftp = ftp
         self._unsubscribe: CALLBACK_TYPE | None = None
         # Start at the feed's generation: layer changes before this entry existed are already
         # reflected in the codes it was created with, so reloading must not re-resolve.
@@ -137,7 +133,7 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         cache_dir = Path(self.hass.config.path(SPATIAL_CACHE_DIR))
         try:
             return location.resolve_location(
-                self._ftp,
+                self._feed.client,
                 cache_dir,
                 lat=data[CONF_LATITUDE],
                 lon=data[CONF_LONGITUDE],

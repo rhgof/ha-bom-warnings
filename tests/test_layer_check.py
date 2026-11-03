@@ -49,7 +49,7 @@ async def setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
     await hass.async_block_till_done(wait_background_tasks=True)
 
 
-async def test_first_check_runs_after_the_first_refresh_with_its_own_client(
+async def test_first_check_runs_after_the_first_refresh_on_the_feeds_client(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
@@ -58,7 +58,7 @@ async def test_first_check_runs_after_the_first_refresh_with_its_own_client(
     await setup(hass, mock_config_entry)
 
     assert layers.call_count == 1
-    assert layers.call_args.args[0] is not hass.data[FEED]._ftp
+    assert layers.call_args.args[0] is hass.data[FEED].client
     assert hass.states.get(ENTITY_ID).state == STATE_OFF  # type: ignore[union-attr]
 
 

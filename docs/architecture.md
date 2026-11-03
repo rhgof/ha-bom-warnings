@@ -94,10 +94,12 @@ Home Assistant layer:
 
 ## Behaviour worth knowing
 
-- **FTP clients.** Every `BomFtp` is built by `client_from_env(os.environ)`, which reads the
-  dev-only `BOM_WARNINGS_FTP_HOST`. The feed has two (warnings, and layer check) and each entry
-  has one, because `BomFtp.session()` (one login reused across calls) is not thread-safe and these
-  run concurrently in executors.
+- **FTP client.** Every `BomFtp` is built by `client_from_env(os.environ)`, which reads the
+  dev-only `BOM_WARNINGS_FTP_HOST`. The feed builds the one runtime client (`feed.client`), and the
+  warnings refresh, the layer check and every entry's location resolver share it. The config flow
+  builds its own, because it can run before any feed exists. A `BomFtp` is safe to share between
+  threads: `session()` (one login reused across calls) belongs to the thread that opened it, and a
+  call from another thread opens its own connection.
 - **Flaky server.** BoM's control login works while the passive data transfer sometimes stalls,
   then works a second later. So `TIMEOUT` is 10 s, and `list_files`, `fetch`, `modified` and
   `download` each try up to `ATTEMPTS` (3) times, `RETRY_DELAY` (1 s) apart, on a plain

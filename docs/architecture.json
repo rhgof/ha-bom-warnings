@@ -42,7 +42,7 @@
     },
     "ftp-client": {
       "layer": "foundation",
-      "purpose": "The one FTP client and its protocol, the seam with two real adapters (BomFtp and the fake server). BomFtp is built only by client_from_env.",
+      "purpose": "The one FTP client and its protocol, the seam with two real adapters (BomFtp and the fake server). BomFtp is built only by client_from_env, and one instance is safe to share between threads: each thread has its own session.",
       "owns": ["ftp.py"]
     },
     "vocabulary": {
@@ -56,7 +56,7 @@
       "class": "BomFtp",
       "module": "ftp.py",
       "function": "client_from_env",
-      "why": "A BomFtp session is not thread-safe and the dev host override is read in one place."
+      "why": "The dev host override is read in one place. Threads are not the reason: a BomFtp keeps its session per thread, so one instance serves them all."
     }
   ],
   "allow": []

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 
 from homeassistant.config_entries import ConfigEntry
@@ -20,7 +19,7 @@ from .const import (
 )
 from .coordinator import BomWarningsCoordinator, no_area_issue_id
 from .fire_store import FireStore
-from .ftp import BomFtpError, client_from_env
+from .ftp import BomFtpError
 from .shared_feed import (
     async_abandon_setup,
     async_acquire_feed,
@@ -51,14 +50,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) 
         raise ConfigEntryError(f"Invalid BOM_WARNINGS_FTP_HOST: {err}") from err
 
     try:
-        # The feed's own client may be in use on another thread, so this entry gets its own.
-        ftp = client_from_env(os.environ)
-        coordinator = BomWarningsCoordinator(hass, entry, feed, ftp)
+        coordinator = BomWarningsCoordinator(hass, entry, feed)
         await coordinator.async_load_remembered()
         await coordinator.async_config_entry_first_refresh()
-    except BomFtpError as err:
-        await async_abandon_setup(hass, entry)
-        raise ConfigEntryError(f"Invalid BOM_WARNINGS_FTP_HOST: {err}") from err
     except BaseException:
         # Whatever went wrong, the entry must not stay registered on the shared feed.
         await async_abandon_setup(hass, entry)
