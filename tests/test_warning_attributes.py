@@ -17,10 +17,12 @@ from custom_components.bom_warnings.active_warnings import (
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import (
     DEFAULT_EVENT_ICON,
-    EVENT_ICONS,
     LEVEL_COLORS,
-    WARNING_TYPE_NOTES,
 )
+from custom_components.bom_warnings.warning_types import WARNING_TYPES
+
+EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
+WARNING_TYPE_NOTES = {t.event: t.note for t in WARNING_TYPES if t.note}
 
 NOW = datetime(2026, 11, 3, 6, 0, tzinfo=UTC)
 EARLIER = NOW - timedelta(hours=1)

@@ -15,8 +15,8 @@ from custom_components.bom_warnings.const import (
     CONF_LONGITUDE,
     CONF_STATE,
     DOMAIN,
-    KNOWN_EVENT_TYPES,
 )
+from custom_components.bom_warnings.warning_types import WARNING_TYPES
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -125,5 +125,5 @@ async def test_turning_the_other_type_off_keeps_the_thunderstorm_warning(
 
 
 def test_severe_thunderstorm_is_not_offered_as_an_event_type() -> None:
-    assert "Severe Thunderstorm" not in KNOWN_EVENT_TYPES
-    assert "Thunderstorm" in KNOWN_EVENT_TYPES
+    assert "Severe Thunderstorm" not in {t.event for t in WARNING_TYPES}
+    assert "Thunderstorm" in {t.event for t in WARNING_TYPES}

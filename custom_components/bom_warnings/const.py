@@ -25,24 +25,6 @@ OTHER_WARNINGS = "other_warnings"
 # reads them: an event-type filter, and whether coastal waters counted.
 CONF_EVENT_TYPES = "event_types"
 CONF_INCLUDE_MARINE = "include_marine"
-# Every `<event>` seen in recorded BoM CAP files (tests/fixtures/cap and cap_samples), sorted; the
-# options field also accepts any other name. "Weather" covers both severe weather and coastal
-# hazard warnings, so it cannot tell them apart.
-KNOWN_EVENT_TYPES = (
-    "Exposure",
-    "Extreme Heat",
-    "Fire Weather",
-    "Frost",
-    "Hazardous Road Conditions",
-    "Large Coastal Surf",
-    "Riverine Flood",
-    "Sheep Grazier Warning",
-    "Thunderstorm",
-    "Tropical Cyclone",
-    "Tsunami",
-    "Weather",
-    "Wind",
-)
 
 # The colour of each level, which are the CAP severities. The order that ranks them is
 # `active_warnings.SEVERITY_ORDER`, not the order here. Colours run yellow to purple.
@@ -54,38 +36,8 @@ LEVEL_COLORS = {
     "extreme": "#7B1FA2",
 }
 
-# One icon per CAP event; every name is checked against the frontend icon list in the tests.
-EVENT_ICONS = {
-    "Exposure": "mdi:snowflake-thermometer",
-    "Extreme Heat": "mdi:thermometer-alert",
-    "Fire Weather": "mdi:fire-alert",
-    "Frost": "mdi:snowflake-alert",
-    "Hazardous Road Conditions": "mdi:car-brake-alert",
-    "Large Coastal Surf": "mdi:waves-arrow-up",
-    "Riverine Flood": "mdi:home-flood",
-    "Sheep Grazier Warning": "mdi:sheep",
-    "Thunderstorm": "mdi:weather-lightning-rainy",
-    "Tropical Cyclone": "mdi:weather-hurricane",
-    "Tsunami": "mdi:tsunami",
-    "Weather": "mdi:cloud-alert",
-    "Wind": "mdi:weather-windy",
-}
 DEFAULT_EVENT_ICON = "mdi:alert-circle"
 
-# An entity has no description field, so a type that is easy to misread says so in a `note`
-# attribute. BoM's Wind event is marine wind, which is not wind at the house. Its Weather event is
-# both the Severe Weather Warning and the Coastal Hazard Warning, and which of the two a warning is
-# can only be told from its headline, so it is no automation trigger.
-WARNING_TYPE_NOTES = {
-    "Wind": (
-        "Marine wind only: BoM's Wind event is for coastal and local waters, not wind at your "
-        "house. Damaging winds on land arrive as the Severe weather warning."
-    ),
-    "Weather": (
-        "For display. BoM's Weather event covers both Severe Weather Warnings and Coastal Hazard "
-        "Warnings, so it is not a good automation trigger."
-    ),
-}
 NO_WARNING_ICON = "mdi:check-circle-outline"
 
 # Fire danger rating levels, lowest first (the keys the parser stores), with the colours BoM's own

@@ -17,11 +17,10 @@ from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
     DEFAULT_EVENT_ICON,
-    EVENT_ICONS,
-    KNOWN_EVENT_TYPES,
     LEVEL_COLORS,
     NO_WARNING_ICON,
 )
+from custom_components.bom_warnings.warning_types import WARNING_TYPES
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -29,6 +28,8 @@ from .conftest import NOW
 from .test_options import layers, set_options  # noqa: F401
 from .test_sensor import COUNT, MOST_SEVERE, poll, setup_entry, state_of
 from .test_warning_types import MATCHABLE, entry_at
+
+EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
@@ -240,7 +241,6 @@ async def test_each_event_gets_its_icon(
 
 
 def test_every_known_event_type_has_an_icon() -> None:
-    assert set(EVENT_ICONS) == set(KNOWN_EVENT_TYPES)
     assert DEFAULT_EVENT_ICON not in EVENT_ICONS.values()
 
 

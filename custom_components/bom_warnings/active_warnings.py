@@ -13,7 +13,8 @@ from datetime import UTC, datetime
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
-from .const import DEFAULT_EVENT_ICON, EVENT_ICONS, LEVEL_COLORS, WARNING_TYPE_NOTES
+from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
+from .warning_types import type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -222,7 +223,8 @@ def current_then_ended(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]
 
 
 def event_icon(event: str) -> str:
-    return EVENT_ICONS.get(event, DEFAULT_EVENT_ICON)
+    row = type_of(event)
+    return row.icon if row else DEFAULT_EVENT_ICON
 
 
 def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
@@ -242,8 +244,8 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
     }
     if event == WIND_EVENT:
         attributes["strength"] = top.strength if top else None
-    if note := WARNING_TYPE_NOTES.get(event):
-        attributes["note"] = note
+    if (row := type_of(event)) and row.note:
+        attributes["note"] = row.note
     return attributes
 
 

@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from custom_components.bom_warnings.cap import Phase, Severity, parse_cap
-from custom_components.bom_warnings.const import KNOWN_EVENT_TYPES
+from custom_components.bom_warnings.warning_types import WARNING_TYPES
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SAMPLES = FIXTURES / "cap_samples"
@@ -127,11 +127,11 @@ def fixture_events() -> set[str]:
 
 
 def test_every_event_seen_in_recorded_files_is_offered() -> None:
-    assert fixture_events() <= set(KNOWN_EVENT_TYPES)
+    assert fixture_events() <= {t.event for t in WARNING_TYPES}
 
 
 def test_known_event_types_are_exactly_the_observed_ones_sorted() -> None:
-    assert list(KNOWN_EVENT_TYPES) == [
+    assert sorted(t.event for t in WARNING_TYPES) == [
         "Exposure",
         "Extreme Heat",
         "Fire Weather",

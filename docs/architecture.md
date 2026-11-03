@@ -125,8 +125,8 @@ Home Assistant layer:
   `active_warnings.py` (CAP `unknown` is what BoM sends for Severe Weather and Severe Thunderstorm,
   so it must outrank a minor flood). The list holds current warnings, then
   (with `hide_final_cancelled` off) ended ones, marked by `phase`. Each item has `level`, an `icon`
-  chosen per CAP event (`EVENT_ICONS`, default `DEFAULT_EVENT_ICON`) and a hex `color` per level
-  (`LEVEL_COLORS`), all in `const.py`. The two sensors' `icon` follows the top warning, or
+  chosen per CAP event (the row's `icon` in `warning_types.WARNING_TYPES`, default
+  `DEFAULT_EVENT_ICON`) and a hex `color` per level (`LEVEL_COLORS` in `const.py`). The two sensors' `icon` follows the top warning, or
   `NO_WARNING_ICON`. The binary sensor is unchanged. `docs/dashboard.md` has card examples. The
   event entity picks one block per product with the same order, so the block that stands for a
   product is the one the ranked list puts first.
@@ -309,9 +309,10 @@ districts):
   `BomFtp`'s own retries, so a brief stall no longer adds to it.
 - A warning that expires between polls stays on for up to 10 minutes.
 - The `no_area` repair issue is informational; there is no fix flow.
-- `KNOWN_EVENT_TYPES` lists every `<event>` in the recorded CAP files (`tests/test_cap_types.py`
-  fails if a fixture uses one that is missing). It is only what the samples show, and the options
-  checklist no longer reads it: the toggles come from `warning_types.WARNING_TYPES`.
+- `warning_types.WARNING_TYPES` has a row for every `<event>` in the recorded CAP files
+  (`tests/test_cap_types.py` fails if a fixture uses one that is missing). It is only what the
+  samples show. Tsunami has a row with an icon but no sensor or toggle, so it falls under "Other
+  warnings".
 - The tsunami sample is named `IDY68027_cap.xml` (underscore), so `LIST *.cap.xml` does not list it
   and a tsunami warning is never seen. Kept as is; the `all_types` scenario reproduces it.
 - Area codes of kind TW (tsunami) and PT (cyclone place) are never matched to a location, because

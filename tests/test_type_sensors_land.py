@@ -12,7 +12,6 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings import warning_types
-from custom_components.bom_warnings.const import EVENT_ICONS
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
@@ -22,6 +21,8 @@ from .test_binary_sensor import ENTITY_ID as ANY_WARNING
 from .test_binary_sensor import poll, setup_entry
 from .test_strings import STRINGS, load
 from .test_warning_types import entry_at
+
+EVENT_ICONS = {t.event: t.icon for t in WARNING_TYPES}
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
@@ -216,7 +217,7 @@ async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
 
     registry = er.async_get(hass)
     assert [e.entity_id for e in registry.entities.values() if "surf" in e.entity_id] == []
-    for warning_type in without_surf:
+    for warning_type in sensor_types():
         entity_id = sensor_id(warning_type.key)
         assert hass.states.get(entity_id).state == "none"  # type: ignore[union-attr]
     listed = hass.states.get(ANY_WARNING)

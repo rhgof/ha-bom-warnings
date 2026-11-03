@@ -3,14 +3,17 @@
 import pytest
 
 from custom_components.bom_warnings import warning_types
-from custom_components.bom_warnings.const import OTHER_WARNINGS
+from custom_components.bom_warnings.const import DEFAULT_EVENT_ICON, OTHER_WARNINGS
 from custom_components.bom_warnings.warning_types import (
     WARNING_TYPES,
+    SensorType,
+    WarningType,
     event_is_on,
     key_of,
     label_of,
     sensor_types,
     type_keys,
+    type_of,
 )
 
 # Today's rows, in the order the options checklist lists them and the sensors are created.
@@ -36,7 +39,7 @@ def test_the_sensor_types_are_these_rows_in_this_order() -> None:
 
 def test_every_event_and_key_is_unique() -> None:
     events = [t.event for t in WARNING_TYPES]
-    keys = [t.key for t in WARNING_TYPES]
+    keys = [t.key for t in sensor_types()]
     assert len(set(events)) == len(events)
     assert len(set(keys)) == len(keys)
 
@@ -61,7 +64,7 @@ def test_a_key_with_no_row_has_no_label() -> None:
 
 
 def test_only_wind_and_large_coastal_surf_are_marine() -> None:
-    assert {t.event for t in WARNING_TYPES if t.marine} == {"Wind", "Large Coastal Surf"}
+    assert {t.event for t in sensor_types() if t.marine} == {"Wind", "Large Coastal Surf"}
 
 
 @pytest.mark.parametrize(
@@ -106,3 +109,67 @@ def test_patching_the_one_table_changes_every_derived_view(
     assert event_is_on("Large Coastal Surf", frozenset({OTHER_WARNINGS}))
     with pytest.raises(KeyError):
         label_of("hazardous_surf_warning")
+
+
+ICONS = {
+    "Exposure": "mdi:snowflake-thermometer",
+    "Extreme Heat": "mdi:thermometer-alert",
+    "Fire Weather": "mdi:fire-alert",
+    "Frost": "mdi:snowflake-alert",
+    "Hazardous Road Conditions": "mdi:car-brake-alert",
+    "Large Coastal Surf": "mdi:waves-arrow-up",
+    "Riverine Flood": "mdi:home-flood",
+    "Sheep Grazier Warning": "mdi:sheep",
+    "Thunderstorm": "mdi:weather-lightning-rainy",
+    "Tropical Cyclone": "mdi:weather-hurricane",
+    "Tsunami": "mdi:tsunami",
+    "Weather": "mdi:cloud-alert",
+    "Wind": "mdi:weather-windy",
+}
+
+
+def test_the_known_events_are_the_thirteen_seen_in_recorded_files() -> None:
+    assert sorted(t.event for t in WARNING_TYPES) == sorted(ICONS)
+    assert len(WARNING_TYPES) == 13
+
+
+def test_every_event_has_its_icon() -> None:
+    assert {t.event: t.icon for t in WARNING_TYPES} == ICONS
+
+
+def test_every_event_has_an_icon_of_its_own_that_is_not_the_default() -> None:
+    icons = [t.icon for t in WARNING_TYPES]
+    assert len(set(icons)) == len(icons)
+    assert DEFAULT_EVENT_ICON not in icons
+
+
+def test_only_wind_and_weather_carry_a_note() -> None:
+    assert {t.event for t in WARNING_TYPES if t.note} == {"Wind", "Weather"}
+
+
+def test_the_notes_say_what_the_type_is_not() -> None:
+    wind, weather = type_of("Wind"), type_of("Weather")
+    assert wind is not None and wind.note is not None
+    assert weather is not None and weather.note is not None
+    assert wind.note.startswith("Marine wind only")
+    assert "not wind at your house" in wind.note
+    assert weather.note.startswith("For display")
+    assert "automation trigger" in weather.note
+
+
+def test_tsunami_has_an_icon_but_no_sensor_or_toggle() -> None:
+    tsunami = type_of("Tsunami")
+    assert tsunami is not None
+    assert not isinstance(tsunami, SensorType)
+    assert tsunami.icon == "mdi:tsunami"
+    assert "Tsunami" not in [t.event for t in sensor_types()]
+    assert key_of("Tsunami") == OTHER_WARNINGS
+
+
+def test_an_event_with_no_row_has_no_type() -> None:
+    assert type_of("A Type BoM Adds Later") is None
+
+
+def test_every_sensor_type_is_a_warning_type_and_there_are_twelve() -> None:
+    assert all(isinstance(t, SensorType) and isinstance(t, WarningType) for t in sensor_types())
+    assert len(sensor_types()) == 12
