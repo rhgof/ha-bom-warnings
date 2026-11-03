@@ -2,8 +2,8 @@
 
 Bureau of Meteorology warnings as Home Assistant entities and events (domain `bom_warnings`).
 
-*Unofficial, for personal use. Data from the Australian Bureau of Meteorology, © Commonwealth of
-Australia; not endorsed by the Bureau.*
+*Unofficial and for personal use. The warning data belongs to the Bureau of Meteorology: see
+[Licence](#licence).*
 
 ## Install
 
