@@ -7,7 +7,7 @@ import logging
 import os
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta, tzinfo
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -36,10 +36,11 @@ from .const import (
 )
 from .feed import FireDangerReader, WarningReader
 from .fire_danger import (
-    FireDangerPeriod,
     FireDangerProduct,
+    FireDangerView,
+    FireMemory,
+    derive,
     fire_product_ids,
-    match_district,
 )
 from .ftp import BomFtp, BomFtpError, client_from_env
 from .spatial import (
@@ -228,24 +229,6 @@ class FeedSnapshot:
     layer_generation: int
     # Product id -> latest parse, for the products some entry needs. Empty when none could be read.
     fire_danger: Mapping[str, FireDangerProduct] = field(default_factory=dict)
-
-
-@dataclass(frozen=True, slots=True)
-class FireDangerView:
-    """One entry's fire district: the latest issue, plus days remembered from earlier issues."""
-
-    product_id: str
-    issued: datetime | None
-    district_code: str
-    district_name: str
-    # Every period of the latest issue, in date order.
-    forecast: tuple[FireDangerPeriod, ...]
-    by_date: Mapping[date, FireDangerPeriod]
-    # The product's own local offset, which decides what "today" means for its district.
-    tz: tzinfo
-
-    def local_date(self, now: datetime) -> date:
-        return now.astimezone(self.tz).date()
 
 
 class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
@@ -494,10 +477,8 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         self.by_event: dict[str, tuple[ActiveWarning, ...]] = {}
         # This entry's fire district, or None when no stored code is in a fetched product.
         self.fire_danger: FireDangerView | None = None
-        # Periods seen in earlier issues, so the afternoon issue (which starts tomorrow) does not
-        # erase today's rating. Persisted, so a restart in the afternoon keeps it too. A period is
-        # only ever shown on its own local date, so it expires at the end of that day.
-        self._remembered: tuple[str, dict[date, FireDangerPeriod]] = ("", {})
+        # Persisted, so a restart in the afternoon keeps today's rating too.
+        self._fire_memory = FireMemory()
         self._fire_store: Store[dict[str, Any]] = Store(
             hass, FIRE_STORE_VERSION, fire_store_key(config_entry)
         )
@@ -507,33 +488,14 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
         stored = await self._fire_store.async_load()
         if not stored:
             return
-        try:
-            periods = {
-                (d := date.fromisoformat(item["date"])): FireDangerPeriod(
-                    d, item["level"], item["fire_behaviour_index"]
-                )
-                for item in stored["periods"]
-            }
-            self._remembered = (stored["district"], periods)
-        except KeyError, TypeError, ValueError:
+        if (restored := FireMemory.from_dict(stored)) is None:
             # A damaged file is replaced by the next save; the next issue refills it.
             _LOGGER.debug("Ignoring unreadable remembered fire danger data")
+            return
+        self._fire_memory = restored
 
     async def _async_save_remembered(self) -> None:
-        code, periods = self._remembered
-        await self._fire_store.async_save(
-            {
-                "district": code,
-                "periods": [
-                    {
-                        "date": p.date.isoformat(),
-                        "level": p.level,
-                        "fire_behaviour_index": p.fire_behaviour_index,
-                    }
-                    for _, p in sorted(periods.items())
-                ],
-            }
-        )
+        await self._fire_store.async_save(self._fire_memory.to_dict())
 
     @property
     def consecutive_failures(self) -> int:
@@ -610,30 +572,6 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             },
         )
 
-    def _derive_fire_danger(self, snapshot: FeedSnapshot, now: datetime) -> FireDangerView | None:
-        match = match_district(snapshot.fire_danger, self._area_codes)
-        if match is None:
-            return None
-        product, district = match
-        code, remembered = self._remembered
-        if code != district.code:
-            remembered = {}
-        # The latest issue wins for any day both cover.
-        remembered = {**remembered, **{p.date: p for p in district.periods}}
-        tz = product.issued.tzinfo if product.issued and product.issued.tzinfo else None
-        local_today = now.astimezone(tz or dt_util.get_default_time_zone()).date()
-        remembered = {d: p for d, p in remembered.items() if d >= local_today - timedelta(days=1)}
-        self._remembered = (district.code, remembered)
-        return FireDangerView(
-            product_id=product.product_id,
-            issued=product.issued,
-            district_code=district.code,
-            district_name=district.name,
-            forecast=district.periods,
-            by_date=remembered,
-            tz=tz or dt_util.get_default_time_zone(),
-        )
-
     async def _async_update_data(self) -> tuple[ActiveWarning, ...]:
         feed = self._feed
         if not feed.last_update_success or feed.data is None:
@@ -656,8 +594,10 @@ class BomWarningsCoordinator(DataUpdateCoordinator[tuple[ActiveWarning, ...]]):
             for event, _ in WARNING_TYPE_SENSORS
         }
         self.states = _states(warnings, self._area_codes, now, self._type_on)
-        before = self._remembered
-        self.fire_danger = self._derive_fire_danger(snapshot, now)
-        if self._remembered != before:
+        before = self._fire_memory
+        self._fire_memory, self.fire_danger = derive(
+            before, snapshot.fire_danger, self._area_codes, now, dt_util.get_default_time_zone()
+        )
+        if self._fire_memory != before:
             await self._async_save_remembered()
         return covering
