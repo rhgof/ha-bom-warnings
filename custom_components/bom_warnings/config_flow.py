@@ -19,6 +19,10 @@ from homeassistant.helpers.selector import (
     BooleanSelector,
     EntitySelector,
     EntitySelectorConfig,
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
 )
 
 from .areas import state_of
@@ -37,7 +41,7 @@ from .const import (
 )
 from .ftp import BomFtpError, client_from_env
 from .spatial import SpatialDataError, resolve_coordinate
-from .warning_types import enabled_keys, type_keys
+from .warning_types import TYPE_LABELS, enabled_keys, type_keys
 
 
 def _resolve(cache_dir: Path, lat: float, lon: float, radius_m: float) -> set[str]:
@@ -177,20 +181,36 @@ class BomWarningsOptionsFlow(OptionsFlowWithReload):
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         enabled = enabled_keys(self.config_entry.options)
         if user_input is not None:
+            chosen = set(user_input.get(CONF_WARNING_TYPES, enabled))
             return self.async_create_entry(
                 data={
-                    CONF_HIDE_FINAL: user_input[CONF_HIDE_FINAL],
-                    CONF_WARNING_TYPES: [
-                        key for key in type_keys() if user_input.get(key, key in enabled)
-                    ],
+                    CONF_HIDE_FINAL: user_input.get(
+                        CONF_HIDE_FINAL, self.config_entry.options.get(CONF_HIDE_FINAL, True)
+                    ),
+                    CONF_WARNING_TYPES: [key for key in type_keys() if key in chosen],
                 }
             )
-        # Every field defaults to the stored choice, so a submit that leaves one out keeps it.
-        fields: dict[Any, Any] = {
-            probatio.Optional(
-                CONF_HIDE_FINAL, default=self.config_entry.options.get(CONF_HIDE_FINAL, True)
-            ): BooleanSelector()
-        }
-        for key in type_keys():
-            fields[probatio.Optional(key, default=key in enabled)] = BooleanSelector()
-        return self.async_show_form(step_id="init", data_schema=probatio.Schema(fields))
+        # One checkbox list is much shorter on screen than a switch per type.
+        return self.async_show_form(
+            step_id="init",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Optional(
+                        CONF_HIDE_FINAL,
+                        default=self.config_entry.options.get(CONF_HIDE_FINAL, True),
+                    ): BooleanSelector(),
+                    probatio.Optional(
+                        CONF_WARNING_TYPES, default=[k for k in type_keys() if k in enabled]
+                    ): SelectSelector(
+                        SelectSelectorConfig(
+                            options=[
+                                SelectOptionDict(value=key, label=TYPE_LABELS[key])
+                                for key in type_keys()
+                            ],
+                            multiple=True,
+                            mode=SelectSelectorMode.LIST,
+                        )
+                    ),
+                }
+            ),
+        )

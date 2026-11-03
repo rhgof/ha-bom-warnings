@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from custom_components.bom_warnings.const import OTHER_WARNINGS, WARNING_TYPE_SENSORS
+from custom_components.bom_warnings.const import WARNING_TYPE_SENSORS
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
 from custom_components.bom_warnings.sensor import LEVEL_OPTIONS
 
@@ -91,12 +91,11 @@ def test_every_warning_type_sensor_is_named_and_translates_every_level(key: str)
     assert key not in load(STRINGS)["entity"]["binary_sensor"]
 
 
-@pytest.mark.parametrize(
-    "key",
-    ["hide_final_cancelled", *[key for _, key in WARNING_TYPE_SENSORS], OTHER_WARNINGS],
-)
-def test_every_toggle_on_the_options_form_has_a_label(key: str) -> None:
-    assert load(STRINGS)["options"]["step"]["init"]["data"][key].strip()
+@pytest.mark.parametrize("field", ["hide_final_cancelled", "warning_types"])
+def test_every_field_on_the_options_form_has_a_label_and_help(field: str) -> None:
+    step = load(STRINGS)["options"]["step"]["init"]
+    assert step["data"][field].strip()
+    assert step["data_description"][field].strip()
 
 
 @pytest.mark.parametrize("field", ["title", "description"])
@@ -107,11 +106,10 @@ def test_the_options_form_explains_what_on_and_off_mean(field: str) -> None:
         assert "on" in text and "off" in text
 
 
-def test_the_old_filter_and_coastal_waters_switch_are_gone_from_the_forms() -> None:
+def test_the_options_form_is_two_fields() -> None:
     strings = load(STRINGS)
     assert set(strings["options"]["step"]["init"]["data"]) == {
         "hide_final_cancelled",
-        *[key for _, key in WARNING_TYPE_SENSORS],
-        OTHER_WARNINGS,
+        "warning_types",
     }
     assert "include_marine" not in strings["config"]["step"]["zone"]["data"]

@@ -19,6 +19,25 @@ from .const import (
 
 MARINE_EVENTS = frozenset({"Wind", "Large Coastal Surf"})
 
+# The words the options checklist shows. Given with each choice instead of looked up in the
+# translations, because the options dialog does not always load a selector's translations and then
+# shows the raw key.
+TYPE_LABELS = {
+    "thunderstorm_warning": "Thunderstorm",
+    "fire_weather_warning": "Fire weather",
+    "extreme_heat_warning": "Extreme heat",
+    "frost_warning": "Frost",
+    "hazardous_road_conditions_warning": "Hazardous road conditions",
+    "flood_warning": "Flood",
+    "sheep_grazier_warning": "Sheep grazier",
+    "exposure_warning": "Exposure",
+    "tropical_cyclone_warning": "Tropical cyclone",
+    "severe_weather_warning": "Severe weather",
+    "marine_wind_warning": "Marine wind",
+    "hazardous_surf_warning": "Hazardous surf",
+    OTHER_WARNINGS: "Other warnings",
+}
+
 
 def type_keys() -> tuple[str, ...]:
     """Every toggle, in the order the options form lists them."""

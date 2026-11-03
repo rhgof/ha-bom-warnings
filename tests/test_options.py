@@ -77,9 +77,18 @@ def sensor_state(hass: HomeAssistant) -> Any:
 
 
 async def set_options(hass: HomeAssistant, entry: MockConfigEntry, **options: Any) -> None:
+    """Submit the options form. Per-type keys (`thunderstorm_warning=False`) edit the checklist."""
     result = await hass.config_entries.options.async_init(entry.entry_id)
     assert result["type"] is FlowResultType.FORM
-    result = await hass.config_entries.options.async_configure(result["flow_id"], options)
+    submitted = {key: value for key, value in options.items() if key not in type_keys()}
+    toggles = {key: value for key, value in options.items() if key in type_keys()}
+    if toggles:
+        schema = {str(key): key for key in result["data_schema"].schema}
+        chosen = set(schema[CONF_WARNING_TYPES].default())
+        for key, on in toggles.items():
+            chosen = chosen | {key} if on else chosen - {key}
+        submitted[CONF_WARNING_TYPES] = [key for key in type_keys() if key in chosen]
+    result = await hass.config_entries.options.async_configure(result["flow_id"], submitted)
     assert result["type"] is FlowResultType.CREATE_ENTRY
     await hass.async_block_till_done()
 

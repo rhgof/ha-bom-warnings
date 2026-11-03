@@ -33,16 +33,17 @@ changes. Locations in NSW and the ACT also get today's and tomorrow's fire dange
 
 ### Choosing the warnings that matter
 
-Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about",
-with one switch per warning type, plus one for hiding final and cancelled warnings.
+Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about":
+one list of warning types with a tick box each, plus a switch for hiding final and cancelled
+warnings.
 
-- **On** (the default for every type): the type counts everywhere (the warning sensor, the count,
+- **Ticked** (the default for every type): the type counts everywhere (the warning sensor, the count,
   the most severe warning, the warning list and the events) and has its own sensor, already
   enabled.
-- **Off**: the type is ignored everywhere and its sensor is removed from the entity list. Turn it
-  on again and the sensor comes back. A dashboard row for a type that is off shows "entity not
+- **Unticked**: the type is ignored everywhere and its sensor is removed from the entity list. Tick it
+  again and the sensor comes back. A dashboard row for a type that is off shows "entity not
   available" until you remove the row.
-- **Other warnings** covers any type with no switch of its own, such as tsunami, and any type BoM
+- **Other warnings** covers any type with no entry of its own, such as tsunami, and any type BoM
   adds later.
 - **Hide final and cancelled warnings** is separate: it is about a warning's phase, not its type.
 
@@ -144,3 +145,13 @@ To point the integration at a fake FTP server, start with
 ```
 
 `scripts/ha_api.py` reads `config/.ha-token` and calls `/api/states/<entity_id>`.
+
+## Licence
+
+The code and documentation in this repository are released under the [MIT licence](LICENSE).
+
+The Bureau of Meteorology's data is not covered by that licence. The warnings, product files and
+shapefiles this integration reads, and the recorded copies of them under `tests/fixtures`, remain
+© Commonwealth of Australia (Bureau of Meteorology) and stay under the Bureau's own terms
+(<http://www.bom.gov.au/other/copyright.shtml>). This is an unofficial integration, not endorsed by
+the Bureau.

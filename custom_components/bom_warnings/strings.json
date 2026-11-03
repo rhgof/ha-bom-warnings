@@ -243,26 +243,11 @@
         "title": "Warnings I care about",
         "data": {
           "hide_final_cancelled": "Hide final and cancelled warnings",
-          "thunderstorm_warning": "Thunderstorm",
-          "fire_weather_warning": "Fire weather",
-          "extreme_heat_warning": "Extreme heat",
-          "frost_warning": "Frost",
-          "hazardous_road_conditions_warning": "Hazardous road conditions",
-          "flood_warning": "Flood",
-          "sheep_grazier_warning": "Sheep grazier",
-          "exposure_warning": "Exposure",
-          "tropical_cyclone_warning": "Tropical cyclone",
-          "severe_weather_warning": "Severe weather",
-          "marine_wind_warning": "Marine wind",
-          "hazardous_surf_warning": "Hazardous surf",
-          "other_warnings": "Other warnings"
+          "warning_types": "Warning types"
         },
         "data_description": {
           "hide_final_cancelled": "Hide a warning once it has ended or been cancelled. This is about a warning's phase, not its type.",
-          "severe_weather_warning": "Also covers Coastal Hazard Warnings, so it suits a dashboard better than an automation.",
-          "marine_wind_warning": "Wind warnings for coastal and local waters, not wind at your house.",
-          "hazardous_surf_warning": "Hazardous surf warnings for the coast the location reaches.",
-          "other_warnings": "Any warning type without its own switch, such as tsunami, and any type BoM adds later."
+          "warning_types": "Tick the types that matter here. Severe weather also covers Coastal Hazard Warnings, so it suits a dashboard better than an automation. Marine wind means coastal and local waters, not wind at your house, and Hazardous surf is for the coast the location reaches; both need a zone whose circle reaches the sea. Other warnings covers any type without its own entry, such as tsunami, and any type BoM adds later."
         },
         "description": "Choose the warning types that matter for this location. A type that is on counts everywhere (the warning sensor, the count, the most severe warning and the events) and has its own sensor. A type that is off is ignored everywhere and its sensor is removed. Marine wind and Hazardous surf only apply when the location reaches the sea, so use a zone with a large enough radius."
       }

@@ -26,6 +26,7 @@ from custom_components.bom_warnings.const import (
     OTHER_WARNINGS,
     WARNING_TYPE_SENSORS,
 )
+from custom_components.bom_warnings.warning_types import TYPE_LABELS
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -61,7 +62,18 @@ async def test_the_options_form_is_one_checklist_and_the_hide_final_switch(
     result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
 
     fields = {str(key) for key in result["data_schema"].schema}
-    assert fields == {CONF_HIDE_FINAL, *TYPE_KEYS, OTHER_WARNINGS}
+    assert fields == {CONF_HIDE_FINAL, CONF_WARNING_TYPES}
+    selector = next(
+        value
+        for key, value in result["data_schema"].schema.items()
+        if str(key) == CONF_WARNING_TYPES
+    )
+    # One compact checkbox list rather than a row per switch.
+    assert selector.config["mode"] == "list"
+    assert selector.config["multiple"] is True
+    assert selector.config["options"] == [
+        {"value": key, "label": TYPE_LABELS[key]} for key in [*TYPE_KEYS, OTHER_WARNINGS]
+    ]
 
 
 async def test_a_new_entry_has_every_type_on_and_every_sensor_enabled(
@@ -373,3 +385,15 @@ async def test_the_zone_step_no_longer_asks_about_coastal_waters(
     )
 
     assert {str(key) for key in result["data_schema"].schema} == {"zone"}
+
+
+def test_every_choice_on_the_checklist_has_a_plain_english_label() -> None:
+    """The list shows these words, so none may be a computer identifier."""
+    keys = [*TYPE_KEYS, OTHER_WARNINGS]
+    assert set(TYPE_LABELS) == set(keys)
+    labels = [TYPE_LABELS[key] for key in keys]
+    assert len(set(labels)) == len(labels)
+    for key, label in TYPE_LABELS.items():
+        assert label != key
+        assert "_" not in label
+        assert label[0].isupper()
