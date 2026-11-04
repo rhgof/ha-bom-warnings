@@ -14,9 +14,9 @@ import pytest
 from custom_components.bom_warnings.cap import CapWarning, parse_cap
 from custom_components.bom_warnings.ftp import BomFtpError
 from custom_components.bom_warnings.product_xml import (
-    HazardText,
+    MAX_XML_BYTES,
     ProductSummaryReader,
-    parse_product_text,
+    parse_product,
 )
 
 from .fake_ftp import FakeFtp
@@ -51,27 +51,27 @@ def summaries(warning: CapWarning) -> list[str]:
     return [info.xml_summary for info in warning.infos]
 
 
-def test_the_parser_reads_each_hazard_with_its_codes_and_text() -> None:
-    product = parse_product_text(capture("IDN20400.xml"))
+def test_the_parser_reads_each_hazards_codes_and_summary_text() -> None:
+    product = parse_product(capture("IDN20400.xml"))
 
     assert product is not None
     assert product.sent == datetime(2026, 11, 3, 23, 29, 52, tzinfo=UTC)
-    assert product.hazards == (
-        HazardText(frozenset({"NSW_MW001"}), "Gale Warning", "Eden Coast"),
-        HazardText(
+    assert [(h.codes, h.phenomena, h.area_text) for h in product.hazards] == [
+        (frozenset({"NSW_MW001"}), "Gale Warning", "Eden Coast"),
+        (
             frozenset({f"NSW_MW00{n}" for n in range(2, 8)}),
             "Strong Wind Warning",
             "Coffs Coast, Macquarie Coast, Hunter Coast, Sydney Coast, Illawarra Coast and "
             "Batemans Coast",
         ),
-    )
+    ]
 
 
-def test_a_product_whose_hazards_carry_no_phenomena_text_yields_no_hazards() -> None:
-    product = parse_product_text(capture("IDQ20829.xml"))
+def test_a_flood_hazard_has_no_summary_line_because_it_carries_a_sentence_instead() -> None:
+    product = parse_product(capture("IDQ20829.xml"))
 
     assert product is not None
-    assert product.hazards == ()
+    assert [h.summary for h in product.hazards] == [""]
 
 
 @pytest.mark.parametrize(
@@ -84,7 +84,7 @@ def test_a_product_whose_hazards_carry_no_phenomena_text_yields_no_hazards() -> 
     ],
 )
 def test_input_that_is_not_a_product_gives_nothing(data: bytes) -> None:
-    assert parse_product_text(data) is None
+    assert parse_product(data) is None
 
 
 def test_each_block_gets_the_summary_of_the_hazard_that_overlaps_its_codes() -> None:
@@ -147,6 +147,18 @@ def test_an_ended_block_costs_no_request() -> None:
     ProductSummaryReader(fake).enrich([cap()], AFTER_EXPIRY)
 
     assert (fake.listings, fake.fetches) == ([], [])
+
+
+def test_an_oversized_xml_is_never_fetched_and_is_remembered() -> None:
+    fake = FakeFtp({"IDN20400.xml": b"<product>" + b" " * MAX_XML_BYTES + b"</product>"})
+    reader = ProductSummaryReader(fake)
+
+    first = reader.enrich([cap()], NOW)
+    reader.enrich([cap()], NOW)
+
+    assert summaries(first[0]) == ["", ""]
+    assert fake.fetches == []
+    assert fake.listings == ["IDN20400.xml"]
 
 
 def test_a_product_with_no_xml_is_remembered_and_costs_nothing_on_the_next_refresh() -> None:

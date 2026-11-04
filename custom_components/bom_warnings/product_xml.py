@@ -16,33 +16,64 @@ import logging
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
+from xml.etree import ElementTree as ET
 
 from .cap import CapWarning, Info, parse_xml
 from .ftp import BomFtpClient, BomFtpError
 
 _LOGGER = logging.getLogger(__name__)
 
+# The thunderstorm XML embeds a map image (70 to 297 KB) and heatwave products run to 500 KB, so a
+# file over this is not worth fetching on every change. Marine wind and flood files are far smaller.
+MAX_XML_BYTES = 400_000
+
 _PHENOMENA = "warning_phenomena"
 _AREAS = "warning_areas"
+_SENTENCE = "warning"
 
 
 @dataclass(frozen=True, slots=True)
-class HazardText:
-    """One XML hazard: the area codes it covers and the two phrases that name it."""
+class HazardArea:
+    code: str
+    description: str
+    kind: str
+    phase: str
 
-    area_codes: frozenset[str]
-    phenomena: str
-    areas: str
+
+@dataclass(frozen=True, slots=True)
+class Hazard:
+    """One `<hazard>`. The type, phase and severity are BoM's codes exactly as written.
+
+    BoM publishes no code list, so none is interpreted here; an unseen code is kept, and a missing
+    attribute is an empty string.
+    """
+
+    type: str
+    phase: str
+    severity: str
+    areas: tuple[HazardArea, ...]
+    # Marine wind: "Strong Wind Warning" and the coasts it covers, in words.
+    phenomena: str = ""
+    area_text: str = ""
+    # Flood: one sentence about the warning.
+    text: str = ""
+
+    @property
+    def codes(self) -> frozenset[str]:
+        return frozenset(area.code for area in self.areas)
 
     @property
     def summary(self) -> str:
-        return f"{self.phenomena} for {self.areas}"
+        """The one line a block shows, or an empty string for a hazard that has no such phrases."""
+        return f"{self.phenomena} for {self.area_text}" if self.phenomena and self.area_text else ""
 
 
 @dataclass(frozen=True, slots=True)
-class ProductText:
+class Product:
+    identifier: str
     sent: datetime | None
-    hazards: tuple[HazardText, ...]
+    phase: str
+    hazards: tuple[Hazard, ...]
 
 
 def _sent(value: str | None) -> datetime | None:
@@ -53,30 +84,50 @@ def _sent(value: str | None) -> datetime | None:
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
 
 
-def parse_product_text(data: bytes) -> ProductText | None:
-    """Parse the text of each hazard. None for anything that is not a product XML.
+def _hazard(el: ET.Element) -> Hazard:
+    texts = {t.get("type"): (t.text or "").strip() for t in el.findall("text")}
+    return Hazard(
+        type=el.get("type") or "",
+        phase=el.get("phase") or "",
+        severity=el.get("severity") or "",
+        areas=tuple(
+            HazardArea(
+                code, area.get("description") or "", area.get("type") or "", area.get("phase") or ""
+            )
+            for area in el.findall("area-list/area")
+            if (code := area.get("aac"))
+        ),
+        phenomena=texts.get(_PHENOMENA, ""),
+        area_text=texts.get(_AREAS, ""),
+        text=texts.get(_SENTENCE, ""),
+    )
 
-    A hazard without both phrases (floods carry a `warning` sentence instead) is left out, so a
-    product of that kind gives no hazards and no summary.
+
+def parse_product(data: bytes) -> Product | None:
+    """Parse a product XML. None for anything that is not one.
+
+    Only the hazards are read. The rest of the file, including any embedded map image, is parsed
+    past and never kept.
     """
     root = parse_xml(data)
     if root is None or root.tag != "product":
         return None
-    hazards: list[HazardText] = []
-    for hazard in root.iter("hazard"):
-        texts = {t.get("type"): (t.text or "").strip() for t in hazard.findall("text")}
-        codes = frozenset(
-            code for area in hazard.findall("area-list/area") if (code := area.get("aac"))
-        )
-        if codes and texts.get(_PHENOMENA) and texts.get(_AREAS):
-            hazards.append(HazardText(codes, texts[_PHENOMENA], texts[_AREAS]))
-    return ProductText(_sent(root.findtext("amoc/sent-time")), tuple(hazards))
+    return Product(
+        identifier=(root.findtext("amoc/identifier") or "").strip(),
+        sent=_sent(root.findtext("amoc/sent-time")),
+        phase=(root.findtext("amoc/phase") or "").strip(),
+        hazards=tuple(_hazard(el) for el in root.iter("hazard")),
+    )
 
 
-def _hazard_for(info: Info, hazards: Sequence[HazardText]) -> HazardText | None:
-    """The hazard sharing the most area codes with the block, or None when none shares any."""
-    best = max(hazards, key=lambda h: len(h.area_codes & info.area_codes), default=None)
-    return best if best and best.area_codes & info.area_codes else None
+def _hazard_for(info: Info, hazards: Sequence[Hazard]) -> Hazard | None:
+    """The hazard with a summary line sharing the most area codes with the block, if any shares."""
+    best = max(
+        (h for h in hazards if h.summary),
+        key=lambda h: len(h.codes & info.area_codes),
+        default=None,
+    )
+    return best if best and best.codes & info.area_codes else None
 
 
 class ProductSummaryReader:
@@ -90,20 +141,22 @@ class ProductSummaryReader:
     def __init__(self, ftp: BomFtpClient) -> None:
         self._ftp = ftp
         # Product id -> (identifier of the CAP issue it was read for, its hazards; none if absent).
-        self._seen: dict[str, tuple[str, tuple[HazardText, ...]]] = {}
+        self._seen: dict[str, tuple[str, tuple[Hazard, ...]]] = {}
 
     def _read(self, warning: CapWarning) -> None:
         name = f"{warning.product_id}.xml"
         try:
-            entries = self._ftp.list_files(name)
-            if not any(entry.name == name for entry in entries):
+            entry = next((e for e in self._ftp.list_files(name) if e.name == name), None)
+            if entry is None or entry.size > MAX_XML_BYTES:
+                # Absent, or too big to be worth fetching: either way not asked for again until
+                # BoM re-issues the product.
                 self._seen[warning.product_id] = (warning.identifier, ())
                 return
             data = self._ftp.fetch(name)
         except BomFtpError as err:
             _LOGGER.debug("Could not read product XML %s: %s", name, err)
             return
-        if (product := parse_product_text(data or b"")) is None:
+        if (product := parse_product(data or b"")) is None:
             # Not remembered, so the next refresh tries the file again.
             _LOGGER.debug("Product XML %s is empty or unreadable", name)
             return
