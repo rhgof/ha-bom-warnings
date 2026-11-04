@@ -18,9 +18,14 @@ import yaml
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.template import Template
 
-from custom_components.bom_warnings.active_warnings import ActiveWarning, warning_attributes
+from custom_components.bom_warnings.active_warnings import (
+    ActiveWarning,
+    type_attributes,
+    warning_attributes,
+)
 from custom_components.bom_warnings.cap import Severity
 from custom_components.bom_warnings.const import LEVEL_COLORS
+from custom_components.bom_warnings.warning_types import WARNING_TYPES, SensorType
 
 from .conftest import NOW
 from .test_ranked_list import SPREAD_CODES, all_types, entry_with  # noqa: F401
@@ -145,6 +150,51 @@ def test_fixture_warnings_match_the_integrations_attributes() -> None:
         assert CARD_KEYS <= item.keys()
         assert item.keys() <= real.keys()
         assert item["color"] == LEVEL_COLORS[item["level"]]
+
+
+TYPE_SENSORS = {f"sensor.home_{t.key}" for t in WARNING_TYPES if isinstance(t, SensorType)}
+
+
+def colour_for(level: str) -> str | None:
+    """The colour a per-type sensor shows for a level: none while no warning is in force."""
+    if level == "none":
+        return None
+    return LEVEL_COLORS["unknown" if level == "unrated" else level]
+
+
+def test_fixture_type_sensors_match_the_integrations_attributes() -> None:
+    real = type_attributes("Wind", [every_field_warning()])
+
+    fixture = [
+        (entity_id, entity)
+        for scenario in STATES.values()
+        for entity_id, entity in scenario.items()
+        if entity_id in TYPE_SENSORS
+    ]
+    assert fixture
+    for entity_id, entity in fixture:
+        attributes = entity["attributes"]
+        assert {"level", "color"} <= attributes.keys(), entity_id
+        assert attributes.keys() <= real.keys(), entity_id
+        assert attributes["level"] == entity["state"], entity_id
+        assert attributes["color"] == colour_for(entity["state"]), entity_id
+
+
+async def test_every_type_sensor_says_its_level_and_colour(
+    hass: HomeAssistant,
+    all_types: None,  # noqa: F811
+) -> None:
+    await setup_entry(hass, entry_with(SPREAD_CODES))
+
+    levels = set()
+    for entity_id in sorted(TYPE_SENSORS):
+        state = hass.states.get(entity_id)
+        assert state is not None, entity_id
+        assert state.attributes["level"] == state.state, entity_id
+        assert state.attributes["color"] == colour_for(state.state), entity_id
+        levels.add(state.state)
+    # The spread of locations puts more than one level on the sensors, so this is not all `none`.
+    assert len(levels - {"none"}) >= 2
 
 
 async def test_section_names_only_entities_the_integration_creates(

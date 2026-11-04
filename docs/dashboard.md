@@ -88,6 +88,12 @@ keep final and cancelled warnings, ended ones come after the current ones with `
 `state_attr('sensor.<title>_warning_count', 'areas')` is the list of area names the location
 covers, in code order. It is there with no warning active, so it shows what a zone's radius reaches.
 
+Each per-type sensor (thunderstorm, flood, marine wind and so on) has a top-level `level` and
+`color`, so a card can colour itself from the sensor alone. `level` is the sensor's state (`none`,
+`minor`, `moderate`, `unrated`, `severe` or `extreme`), and `color` is that level's hex colour, the
+same as in the count sensor's list. `color` is `None` while no warning of the type is in force
+(ended warnings do not count), and the card decides how a quiet state looks.
+
 ## Markdown card, coloured icon
 
 ```yaml
