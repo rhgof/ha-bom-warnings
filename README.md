@@ -7,20 +7,20 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
 
 ## Install
 
-It has been run on Home Assistant 2026.10.4 only; no other version has been tested. The host also
-needs outbound access to the Bureau's FTP server (`ftp.bom.gov.au`, port 21).
+Tested on Home Assistant 2026.10.4 only; no other version has been tried. Home Assistant needs
+outbound access to the Bureau's FTP server (`ftp.bom.gov.au`, port 21).
 
-**Today (the repository is private):** copy the `custom_components/bom_warnings` folder from this
-repository into the `custom_components` folder of your Home Assistant configuration (for example
-over the Samba or SSH add-on), restart Home Assistant, then go to Settings > Devices & services >
-Add integration > **BoM Warnings**. The first location you add downloads the Bureau's area boundary
-files, so allow a minute. Take a full backup first. The step-by-step checklist is in
-`docs/live-verification-c6.md`.
+**HACS:** add this repository in HACS as a custom repository of type Integration, download
+BoM Warnings, and restart Home Assistant. The release and HACS checks are not set up yet
+(ticket #38), so this route may not work.
 
-**HACS (when the repository is public):** add this repository in HACS as a custom repository of
-type Integration, download BoM Warnings, restart Home Assistant, then add the integration as above.
-This route does not work yet: the repository is private, and the release and HACS checks are not
-set up (ticket #38).
+**Manual:** copy the `custom_components/bom_warnings` folder from this repository into the
+`custom_components` folder of your Home Assistant configuration directory, using whatever
+file access your install offers, then restart Home Assistant.
+
+Then go to Settings > Devices & services > Add integration > **BoM Warnings**. The first location
+you add downloads the Bureau's area boundary files, so allow a minute. Take a full backup first.
+The step-by-step checklist is in `docs/live-verification-c6.md`.
 
 ## Locations
 
@@ -164,42 +164,9 @@ class this code does not know is shown as BoM wrote it. BoM publishes no speed p
 warning products guide says marine wind warnings are issued for winds of 26 knots or stronger, and
 the strength is the class (strong wind, gale, storm force, hurricane force), not a measured speed.
 
-## Dev instance
+## Development
 
-A throwaway Home Assistant (2026.10.4, the live version) that loads this integration straight
-from the working tree. No Docker. It listens on `http://127.0.0.1:8124`. Its config, database and
-token live in `config/`, and its virtualenv in `.ha-venv/`; both are gitignored.
-
-```
-scripts/ha-dev.sh start    # first run creates .ha-venv and installs HA (a few minutes)
-scripts/ha-dev.sh stop
-scripts/ha-dev.sh status   # also: logs, setup
-```
-
-`config/custom_components/bom_warnings` is a symlink to `custom_components/bom_warnings`, so
-edits are live. Code changes need `stop` then `start`; a config entry can also be reloaded from
-Settings > Devices & services > BoM Warnings > ... > Reload. The integration appears under
-"Add integration" once HA has started.
-
-To point the integration at a fake FTP server, start with
-`BOM_WARNINGS_FTP_HOST=127.0.0.1:2121 scripts/ha-dev.sh start`.
-
-### One-time human steps
-
-1. `scripts/ha-dev.sh start`, then open `http://127.0.0.1:8124`.
-2. Complete onboarding: create a user (any name and password), set the location, decline analytics.
-3. Click your name (bottom left) > Security tab > "Long-lived access tokens" > Create token.
-   Copy it immediately; it is shown once.
-4. Save it, with nothing else in the file, to `config/.ha-token`
-   (for example `pbpaste > config/.ha-token`). Never commit it or paste it into other files.
-
-### Reading state through the REST API
-
-```
-.venv/bin/python -m scripts.ha_api sensor.some_entity
-```
-
-`scripts/ha_api.py` reads `config/.ha-token` and calls `/api/states/<entity_id>`.
+Contributor notes, including the throwaway dev instance, are in [docs/development.md](docs/development.md).
 
 ## Licence
 
