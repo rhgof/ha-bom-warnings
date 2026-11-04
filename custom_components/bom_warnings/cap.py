@@ -48,6 +48,8 @@ class Info:
     phase: Phase
     # Last, with a default, so existing constructors keep working. Marine wind has none.
     description: str = ""
+    # A one-line summary read from the product XML, only for a block with no description.
+    xml_summary: str = ""
 
     def is_active(self, now: datetime) -> bool:
         if self.phase in (Phase.CANCELLED, Phase.FINAL):

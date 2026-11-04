@@ -34,6 +34,8 @@ BoM FTP  ──LIST/RETR──▶  WarningReader  ──▶  SharedFeed  ──l
                                               in the background)     state, per-entry filter)
 BoM FTP  ──LIST/RETR IDN10016.xml etc.──▶  FireDangerReader ──▶ SharedFeed (same snapshot)
 (optional step after the warnings read; one exact-name listing per needed product)
+BoM FTP  ──LIST/RETR IDN20400.xml etc.──▶  ProductSummaryReader ──▶ SharedFeed (fills Info.xml_summary)
+(optional step after the warnings read; only for a current block with no CAP description)
 BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ──▶  entry.data["area_codes"]
 (/anon/home/adfd/spatial/)  (<config>/bom_warnings/spatial)       (config flow, and on layer change)
 ```
@@ -52,6 +54,16 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
    own view with `covering` / `product_states` (`active_warnings.py`), using its area codes and
    options.
 4. Entities read the entry coordinator.
+4a. `ProductSummaryReader` (`product_xml.py`) is a separate, optional step in the same FTP session,
+   run after the warnings read and before fire danger. A marine wind CAP file has no `description`,
+   so for each product with a current block that has none it lists `<ID>.xml` by exact name,
+   fetches it, and gives each block the `warning_phenomena for warning_areas` text of the XML
+   hazard whose area codes overlap the block (`Info.xml_summary`, used by `covering` when the CAP has
+   no description). It is keyed on the CAP issue's identifier, so an unchanged product costs no
+   request at all, and a product with no XML is remembered the same way. An XML that fails, is
+   empty or unreadable, or is older than its CAP file (the CAP landed first) leaves the summary out
+   and is tried again on the next poll. It never raises, so it cannot touch `consecutive_failures`,
+   the repair issue or the layer check.
 5. Fire danger (`FireDangerReader` in `fire_danger.py`) is a separate, optional step in the same FTP
    session, run after the warnings read. For each product some entry needs (a stored `_FW` code
    whose state prefix is in `fire_danger.PRODUCTS`) it lists the exact file name (`LIST IDN10016.xml`),
@@ -72,6 +84,7 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
+| `product_xml.py` | BoM's product XML beside a CAP file, for the summary of a block the CAP gives no description (marine wind). `parse_product_text(data)` reads each hazard's area codes and its `warning_phenomena` and `warning_areas` phrases into `ProductText`/`HazardText`, or None for anything that is not a product XML. `ProductSummaryReader.enrich(warnings, now)` fills `Info.xml_summary` from the hazard whose codes overlap the block; it is keyed on the CAP issue identifier and never raises. No Home Assistant import. |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` gives `{AAC: name}` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 | `location.py` | The one entry point from a coordinate to a place: `resolve_location(ftp, cache_dir, lat=, lon=, radius_m=0)` returns a frozen `ResolvedLocation(area_codes, state, area_names)`; `area_names` is `{code: name}` for the areas that have a name. It opens the FTP session itself, so callers never write `with ftp.session()`. A point no area covers is an empty result (empty `state`), which callers report as `no_area`. Anything that stops it being worked out (BoM unreachable, a corrupt or incomplete layer, an `OSError`) raises the one `LocationUnavailable`; any other exception propagates. Blocking: call from an executor. |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |

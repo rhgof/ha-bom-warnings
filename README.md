@@ -67,7 +67,10 @@ time it loads.
 
 Each item in a `warnings` list also has a `summary`: the first paragraph of the warning's text from
 BoM, on one line and cut to 300 characters at a word boundary, with an ellipsis if it was longer.
-It is left out when BoM sends no text, which today is every marine wind warning. Check for it with
+A marine wind warning has no text in the CAP file, so its summary is read from the Bureau's product
+XML beside it, for example "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast,
+Sydney Coast, Illawarra Coast and Batemans Coast". `summary` is left out when BoM sends no text
+and that XML cannot be read; the warning itself is unaffected. Check for it with
 `{% if w.summary %}` or `w.summary | default('')` in a template. The Most severe warning sensor and
 each per-warning-type sensor also show their top warning's `summary` as an attribute, so a tile can
 show it with `state_content: summary`; the warning count sensor and the warning binary sensor show it

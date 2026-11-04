@@ -22,8 +22,15 @@
     },
     "feeds": {
       "layer": "readers",
-      "purpose": "Turns BoM files into parsed values: the incremental warnings read, fire danger products, the shapefile layer cache, when its weekly check is due, and the one entry point from a coordinate to a resolved location. Blocking, so callers run it in an executor. Imports nothing from Home Assistant.",
-      "owns": ["feed.py", "fire_danger.py", "spatial.py", "layer_check.py", "location.py"]
+      "purpose": "Turns BoM files into parsed values: the incremental warnings read, fire danger products, the product XML summaries, the shapefile layer cache, when its weekly check is due, and the one entry point from a coordinate to a resolved location. Blocking, so callers run it in an executor. Imports nothing from Home Assistant.",
+      "owns": [
+        "feed.py",
+        "fire_danger.py",
+        "product_xml.py",
+        "spatial.py",
+        "layer_check.py",
+        "location.py"
+      ]
     },
     "active-warnings": {
       "layer": "readers",

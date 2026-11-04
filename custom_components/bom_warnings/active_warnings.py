@@ -163,7 +163,7 @@ def covering(
             sent=warning.sent,
             phase=info.phase,
             area=_matched_names(info, area_codes, area_names),
-            summary=summary_of(info.description),
+            summary=summary_of(info.description) or summary_of(info.xml_summary),
         )
         for warning in warnings
         for info in warning.infos
