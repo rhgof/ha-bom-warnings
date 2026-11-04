@@ -45,6 +45,16 @@ and Hazardous surf are on in the entry's warning types (they are by default). A 
 point only sees them if it sits on the water. Tsunami and tropical cyclone place warnings are not
 matched yet.
 
+## Dashboard
+
+Two ways to show the warnings on a dashboard, both described in [docs/dashboard.md](docs/dashboard.md):
+
+- **A card:** [ha-bom-warnings-card](https://github.com/rhgof/ha-bom-warnings-card) is a Lovelace
+  card installed through HACS. It lists the warnings, most severe first, with a coloured icon per
+  severity, and is added and configured from the dashboard editor with no YAML.
+- **Built-in cards:** a ready-made section made from Home Assistant's own Markdown, tile and
+  conditional cards, for when you would rather not install a card.
+
 ## Entities
 
 Each location gets a warning binary sensor (on while any current warning covers it), a warning
@@ -163,16 +173,6 @@ Each Wind entry in a `warnings` list carries the same `strength` field; no other
 class this code does not know is shown as BoM wrote it. BoM publishes no speed per warning. Its
 warning products guide says marine wind warnings are issued for winds of 26 knots or stronger, and
 the strength is the class (strong wind, gale, storm force, hurricane force), not a measured speed.
-
-## Dashboard
-
-Two ways to show the warnings on a dashboard, both described in [docs/dashboard.md](docs/dashboard.md):
-
-- **A card:** [ha-bom-warnings-card](https://github.com/rhgof/ha-bom-warnings-card) is a Lovelace
-  card installed through HACS. It lists the warnings, most severe first, with a coloured icon per
-  severity, and is added and configured from the dashboard editor with no YAML.
-- **Built-in cards:** a ready-made section made from Home Assistant's own Markdown, tile and
-  conditional cards, for when you would rather not install a card.
 
 ## Dev instance
 
