@@ -1,15 +1,19 @@
 # Dashboard: the ranked warning list
 
-**Not verified in a browser.** These snippets were written against the attribute shape the tests
-check, but I could not render them in Home Assistant. Please check:
+**Checked in a browser.** These snippets were rendered in Chrome against Home Assistant 2026.10.4,
+in a light and a dark theme, with live warnings at moderate and severe level (screenshots at the
+end of this page). What that showed:
 
-- Whether the Markdown card keeps the inline `style="color: ..."` on `<ha-icon>`. Its HTML
-  sanitiser may strip `style`. If the icons show but are not coloured, use the emoji variant
-  below, which needs no styles.
-- Whether `<ha-icon>` itself renders inside a Markdown card (it does in the versions I know, but
-  this is also unchecked).
-- Replace `<title>` with your entry's slug. For an entry titled `Home` the entity is
-  `sensor.home_warning_count`.
+- The Markdown card strips inline `style`. A `style="color: ..."` on `<ha-icon>` or `<span>` is
+  removed, so the icon and square come out in the theme's text colour. These snippets do not use it.
+- `<ha-icon>` renders inside a Markdown card.
+- A `color` attribute on a `<font>` element is kept, and colours the icon and square in exactly
+  the hex the integration reports. `<font>` is obsolete HTML, so if a later release strips it, use
+  the emoji variant, which is plain text.
+- Not exercised: the `final` and `cancelled` suffix, because no such warning was active.
+
+Replace `<title>` with your entry's slug. For an entry titled `Home` the entity is
+`sensor.home_warning_count`.
 
 I left out a `flex-table-card` or `custom:button-card` variant: I do not know their config for
 looping over a list attribute well enough to give you something correct.
@@ -38,17 +42,17 @@ content: >-
   No warnings for this location.
   {% endif %}
   {% for w in items %}
-  <ha-icon icon="{{ w.icon }}" style="color: {{ w.color }}"></ha-icon>
-  <span style="color: {{ w.color }}">&#9632;</span>
+  <font color="{{ w.color }}"><ha-icon icon="{{ w.icon }}"></ha-icon> &#9632;</font>
   **{{ w.event }}** ({{ w.level }}{% if w.phase in ['final', 'cancelled'] %}, {{ w.phase }}{% endif %}):
   {{ w.headline }}
 
   {% endfor %}
 ```
 
-## Markdown card, no inline styles (fallback)
+## Markdown card, emoji squares (fallback)
 
-Uses coloured emoji squares for the level instead of CSS, so it survives a sanitiser.
+Uses coloured emoji squares for the level instead of a colour attribute, so it needs no markup the
+sanitiser could strip.
 
 ```yaml
 type: markdown
@@ -96,11 +100,41 @@ title: Fire danger
 content: >-
   {% for e in ['today', 'tomorrow'] %}
   {% set s = states['sensor.<title>_fire_danger_' ~ e] %}
-  <ha-icon icon="{{ s.attributes.icon }}" style="color: {{ s.attributes.color }}"></ha-icon>
+  <font color="{{ s.attributes.color }}"><ha-icon icon="{{ s.attributes.icon }}"></ha-icon></font>
   **{{ e | title }}**: {{ s.state | replace('_', ' ') | title }}
 
   {% endfor %}
 ```
 
-Not verified in a browser (same caveat about inline `style` as above). A tile or entity card
-shows the dynamic icon without any template.
+The emoji variant, for the same reason as above. Its squares follow the BoM legend order: white,
+green, yellow, orange, red.
+
+```yaml
+type: markdown
+title: Fire danger
+content: >-
+  {% set marks = {'no_rating': '⬜', 'moderate': '🟩', 'high': '🟨', 'extreme': '🟧', 'catastrophic': '🟥'} %}
+  {% for e in ['today', 'tomorrow'] %}
+  {% set s = states['sensor.<title>_fire_danger_' ~ e] %}
+  {{ marks.get(s.state, '⬜') }} <ha-icon icon="{{ s.attributes.icon }}"></ha-icon>
+  **{{ e | title }}**: {{ s.state | replace('_', ' ') | title }}
+
+  {% endfor %}
+```
+
+A tile or entity card shows the dynamic icon without any template.
+
+## Screenshots
+
+What each snippet rendered as on Home Assistant 2026.10.4, light theme left and dark right. The
+list uses the live warnings at the time: two moderate (orange) for the warning zone entry, and one
+severe (red) for a Cairns entry.
+
+| Snippet | Light | Dark |
+| --- | --- | --- |
+| Markdown card, coloured icon, two moderate warnings | ![](images/dashboard/warning-list-two-moderate-light.png) | ![](images/dashboard/warning-list-two-moderate-dark.png) |
+| Same, one severe warning | ![](images/dashboard/warning-list-severe-light.png) | ![](images/dashboard/warning-list-severe-dark.png) |
+| Same, no warnings | ![](images/dashboard/warning-list-empty-light.png) | ![](images/dashboard/warning-list-empty-dark.png) |
+| Markdown card, emoji squares | ![](images/dashboard/warning-list-emoji-light.png) | ![](images/dashboard/warning-list-emoji-dark.png) |
+| Fire danger, coloured icon (High is yellow) | ![](images/dashboard/fire-danger-colour-light.png) | ![](images/dashboard/fire-danger-colour-dark.png) |
+| Fire danger, emoji squares | ![](images/dashboard/fire-danger-emoji-light.png) | ![](images/dashboard/fire-danger-emoji-dark.png) |
