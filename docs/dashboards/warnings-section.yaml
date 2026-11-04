@@ -1,0 +1,134 @@
+# A dashboard section for the BoM Warnings integration: the ranked warning list, a tile for each
+# warning type that is active, and fire danger.
+#
+# Replace every <title> with your entry's slug. For an entry titled "Home" the count sensor is
+# sensor.home_warning_count, so <title> becomes "home".
+#
+# Delete the fire danger card if your location is not in a fire weather district: its entities do
+# not exist, so the card has nothing to show. A tile for a warning type you switched off is
+# hidden, so it can stay.
+#
+# The colours use a font element's color attribute because the Markdown card strips inline style.
+# See docs/dashboard.md for what was checked and where.
+type: grid
+cards:
+  - type: heading
+    heading: Warnings
+  - type: markdown
+    title: Warnings
+    content: >-
+      {% set items = state_attr('sensor.<title>_warning_count', 'warnings') or [] %}
+      {% if items | count == 0 %}
+      No warnings for this location.
+      {% endif %}
+      {% for w in items %}
+      <font color="{{ w.color }}"><ha-icon icon="{{ w.icon }}"></ha-icon> &#9632;</font>
+      **{{ w.event }}** ({{ w.level }}{% if w.phase in ['final', 'cancelled'] %}, {{ w.phase }}{% endif %}):
+      {{ w.headline }}
+
+      {% endfor %}
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_thunderstorm_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_thunderstorm_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_fire_weather_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_fire_weather_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_extreme_heat_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_extreme_heat_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_frost_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_frost_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_hazardous_road_conditions_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_hazardous_road_conditions_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_flood_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_flood_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_sheep_grazier_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_sheep_grazier_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_exposure_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_exposure_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_tropical_cyclone_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_tropical_cyclone_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_severe_weather_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_severe_weather_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_marine_wind_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_marine_wind_warning
+  - type: conditional
+    conditions:
+      - condition: state
+        entity: sensor.<title>_hazardous_surf_warning
+        state_not: none
+    card:
+      type: tile
+      entity: sensor.<title>_hazardous_surf_warning
+  - type: markdown
+    title: Fire danger
+    content: >-
+      {% for e in ['today', 'tomorrow'] %}
+      {% set s = states['sensor.<title>_fire_danger_' ~ e] %}
+      <font color="{{ s.attributes.color }}"><ha-icon icon="{{ s.attributes.icon }}"></ha-icon></font>
+      **{{ e | title }}**: {{ s.state | replace('_', ' ') | title }}
+
+      {% endfor %}

@@ -10,10 +10,31 @@ end of this page). What that showed:
 - A `color` attribute on a `<font>` element is kept, and colours the icon and square in exactly
   the hex the integration reports. `<font>` is obsolete HTML, so if a later release strips it, use
   the emoji variant, which is plain text.
-- Not exercised: the `final` and `cancelled` suffix, because no such warning was active.
+- Not seen in a browser: the `final` and `cancelled` suffix, because no such warning was active.
+  A test renders that branch's text (`tests/test_dashboard_section.py`).
 
 Replace `<title>` with your entry's slug. For an entry titled `Home` the entity is
 `sensor.home_warning_count`.
+
+## Ready-made section
+
+[`dashboards/warnings-section.yaml`](dashboards/warnings-section.yaml) is one dashboard section
+with the ranked list below, a tile for each warning type (shown only while that type has a
+warning), and the fire danger card.
+
+To use it, open the dashboard's raw configuration editor and paste the file under `sections:` in
+a view of type `sections`, then replace every `<title>` with your entry's slug (`home` for an entry
+titled `Home`). Delete the fire danger card if your location is not in a fire weather district,
+because its entities do not exist, so the card has nothing to show. Tiles for warning types you
+switched off in the entry's options can stay (see below) or go.
+
+Checked on Home Assistant 2026.10.4 in Chrome: with two warnings active, only the two active types
+get a tile; with none, the list says so. A tile for an entity that does not exist is hidden, not
+shown as an error, so leaving the unused ones in is harmless. Tiles show in the theme's colour, not
+the warning's.
+
+A test renders the section's Markdown cards against recorded attribute payloads
+(`tests/fixtures/dashboard/states.json`) and checks that every entity it names exists.
 
 I left out a `flex-table-card` or `custom:button-card` variant: I do not know their config for
 looping over a list attribute well enough to give you something correct.
