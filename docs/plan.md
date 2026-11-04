@@ -278,7 +278,7 @@ The `home-assistant` MCP server is configured only for the `AuInData` project in
 claude mcp add --transport http --scope user home-assistant <url>
 ```
 
-The URL is in `~/.claude.json` under `projects` > `/Users/richard/Documents/GitHub/AuInData` > `mcpServers` > `home-assistant`. It contains a private token, so keep it out of this file and out of any repo. Servers only load at session start, so add it before starting the new session. It lets us check entities and test against the live HA instance.
+The URL contains a private token, so keep it in your own local Claude settings and out of this file and any repo. Servers only load at session start, so add it before starting the new session. It lets us check entities and test against the live HA instance.
 
 ## Next session
 
