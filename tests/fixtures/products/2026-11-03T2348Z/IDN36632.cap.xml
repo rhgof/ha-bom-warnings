@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDN36632-2026-11-03T01:45:43+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T01:45:43+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <references>CAP.Message@bom.gov.au,AusBoM-IDN36632-2026-11-01T23:30:19+00:00,2026-11-01T23:30:19+00:00</references>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Minor</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T01:45:43+00:00</effective>
+    <expires>2026-11-06T04:45:43+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Minor Flood Warning for Paroo River (NSW) and Paroo River at Willara Crossing</headline>
+    <description>Minor flooding is likely at Willara Crossing.
+
+The Paroo River at Willara Crossing is currently at 0.07 m and steady, below the minor flood level. The Paroo River at Willara Crossing is likely to exceed the minor flood level (0.70 m) early Wednesday morning. The river may peak near 1.00 m Thursday evening, with minor flooding.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.ses.nsw.gov.au.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>New South Wales: Paroo River (NSW) and Paroo River at Willara Crossing</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>NSW_RC032</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>NSW_RS142</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20860</identifier>
+        <issue-time-utc>2026-11-03T02:43:47Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-03T12:43:47+10:00</issue-time-local>
+        <sent-time>2026-11-03T02:43:47Z</sent-time>
+        <expiry-time>2026-11-06T05:43:47Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-03T12:43:47+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-06T15:43:47+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Moderate Flood Warning for the Lower Barcoo River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 12:30 PM AEST on Wednesday 04 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC034" description="Thomson and Barcoo Rivers and Cooper Creek" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                
+				<element type="warning_sequence">16</element>
+                <text type="warning_situation">
+				<p>MODERATE FLOODING LIKELY AT ISISFORD FROM WEDNESDAY AFTERNOON</p>
+<p>MINOR FLOODING CONTINUING AT RETREAT</p>
+
+				<p/>
+				<p>Rainfall over the last week across the upper reaches of the Barcoo River catchment has resulted in river level rises and areas of flooding.</p>
+<p/>
+<p>Along the Barcoo River, renewed river level rises are occurring at Coolagh. Minor flooding is continuing at Isisford, where moderate flooding is likely from Wednesday afternoon as upstream flows continue to arrive.</p>
+<p/>
+<p>Along the lower Barcoo River, minor flooding is occurring at Retreat. Further rises are possible over the coming week as upstream flows continue to arrive.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Moderate</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC034" phase="UPD" type="FLW" severity="MOD" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                <area-list>
+                    <area aac="QLD_RC128" phase="UPD" description="Barcoo River to Isisford" type="river-basin"/>
+                    <area aac="QLD_RS101" phase="UPD" description="Barcoo River at Blackall" type="river-site"/>
+                    <area aac="QLD_RS102" phase="UPD" description="Barcoo River at Isisford Post Office" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Moderate flooding is likely along the Barcoo River at Isisford.</text>
+            </hazard>            <hazard index="2" parent-aac="QLD_RC034" phase="UPD" type="FLW" severity="MIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                <area-list>
+                    <area aac="QLD_RC129" phase="UPD" description="Barcoo River downstream of Isisford" type="river-basin"/>
+                    <area aac="QLD_RS149" phase="UPD" description="Barcoo River at Retreat" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding is occurring along the Barcoo River downstream of Isisford.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS101" description="Barcoo River at Blackall" type="river-site" parent-aac="QLD_RC128">
+                    <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                        <text type="flood_status">No observations are currently available for the Barcoo River at Blackall. Based on the nearby automatic gauge, the river level is estimated to be below the minor flood level (2.00 m) and falling.</text>
+                        <text type="warning_prediction">The Barcoo River at Blackall is likely to remain below the minor flood level (2.00 m).</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z"/>
+                </area>                <area aac="QLD_RS102" description="Barcoo River at Isisford Post Office" type="river-site" parent-aac="QLD_RC128">
+                    <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                        <text type="flood_status">The Barcoo River at Isisford Post Office is currently at 4.27 m and steady, with minor flooding.</text>
+                        <text type="warning_prediction">The Barcoo River at Isisford Post Office is likely to remain above the minor flood level (4.00 m) for the remainder of Tuesday into Wednesday. Further rises are expected as upstream flows arrive, where the river level is likely to reach around the moderate flood level (5.00 m) from Wednesday afternoon.</text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z"/>
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z"/>
+                </area>                <area aac="QLD_RS149" description="Barcoo River at Retreat" type="river-site" parent-aac="QLD_RC129">
+                    <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                        <text type="flood_status">The Barcoo River at Retreat is currently at 3.04 m and steady, with minor flooding.</text>
+                        <text type="warning_prediction">The Barcoo River at Retreat is likely to remain above the minor flood level (2.14 m) for the remainder of Tuesday and into Wednesday. Further rises are likely as upstream flows arrive. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0117" description="Barcoo River at Coolagh" type="river-obs-site" parent-aac="QLD_RC034">
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                    <element type="obs_site_description">Barcoo River at Coolagh</element>
+                    <element type="obs_site_latitude">-24.0417</element>
+                    <element type="obs_site_longitude">144.8694</element>
+                    <element type="obs_river_height">5.40</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0558" description="Alice River at Barcaldine Weir" type="river-obs-site" parent-aac="QLD_RC034">
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                    <element type="obs_site_description">Alice River at Barcaldine Weir</element>
+                    <element type="obs_site_latitude">-23.65</element>
+                    <element type="obs_site_longitude">145.2167</element>
+                    <element type="obs_river_height">4.75</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0107" description="Barcoo River at Isisford Post Office" type="river-obs-site" parent-aac="QLD_RC034">
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                    <element type="obs_site_description">Barcoo River at Isisford Post Office</element>
+                    <element type="obs_site_latitude">-24.2591</element>
+                    <element type="obs_site_longitude">144.4406</element>
+                    <element type="obs_river_height">4.27</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:55 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0110" description="Barcoo River at Wahroongha" type="river-obs-site" parent-aac="QLD_RC034">
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                    <element type="obs_site_description">Barcoo River at Wahroongha</element>
+                    <element type="obs_site_latitude">-24.4464</element>
+                    <element type="obs_site_longitude">144.1094</element>
+                    <element type="obs_river_height">2.95</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:05 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1084" description="Barcoo River at Retreat" type="river-obs-site" parent-aac="QLD_RC034">
+                <forecast-period start-time-local="2026-11-03T12:43:47+10:00" end-time-local="2026-11-06T15:43:47+10:00" start-time-utc="2026-11-03T02:43:47Z" end-time-utc="2026-11-06T05:43:47Z">
+                    <element type="obs_site_description">Barcoo River at Retreat</element>
+                    <element type="obs_site_latitude">-25.1856</element>
+                    <element type="obs_site_longitude">143.2814</element>
+                    <element type="obs_river_height">3.04</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

@@ -48,6 +48,9 @@ One small class or protocol, so tests can fake it and only one FTP client exists
 
 ## BoM source facts (verified 2026-11-01 and 2026-11-02)
 
+The files beside a CAP file (`.txt`, product `.xml`, `.pdf`), what each holds, which to prefer for
+which field and the codes seen are in `docs/warning-products.md`.
+
 - Host `ftp.bom.gov.au`, anonymous login, passive mode.
 - Warnings: directory `/anon/gen/fwo/`. `LIST *.cap.xml` returns only the CAP files, about 1 KB,
   one line per file with size and month/day/time (no year). `NLST` works too. `MDTM <file>` works.

@@ -25,6 +25,7 @@ from .active_warnings import (
     warning_attributes,
 )
 from .const import (
+    ATTRIBUTION,
     DEFAULT_FIRE_DANGER_ICON,
     DOMAIN,
     FIRE_DANGER_COLORS,
@@ -89,6 +90,7 @@ async def async_setup_entry(
 
 class _WarningSensor(CoordinatorEntity[BomWarningsCoordinator], SensorEntity):
     _attr_has_entity_name = True
+    _attr_attribution = ATTRIBUTION
 
     def __init__(self, coordinator: BomWarningsCoordinator, entry: BomWarningsConfigEntry) -> None:
         super().__init__(coordinator)
@@ -155,7 +157,6 @@ class MostSevereWarningSensor(_WarningSensor):
 
 # Translation key by day offset from the local date.
 FIRE_DANGER_DAYS = {0: "fire_danger_today", 1: "fire_danger_tomorrow"}
-FIRE_DANGER_ATTRIBUTION = "Australian Government Bureau of Meteorology"
 
 
 def _period_item(period: FireDangerPeriod) -> dict[str, Any]:
@@ -210,7 +211,6 @@ class FireDangerSensor(_WarningSensor):
 
     _attr_device_class = SensorDeviceClass.ENUM
     _attr_options = list(LEVEL_KEYS)
-    _attr_attribution = FIRE_DANGER_ATTRIBUTION
 
     def __init__(
         self, coordinator: BomWarningsCoordinator, entry: BomWarningsConfigEntry, day_offset: int

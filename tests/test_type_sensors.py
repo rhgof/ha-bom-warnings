@@ -138,7 +138,9 @@ async def test_attributes_list_each_warning_of_the_type_with_the_highest_severit
         "phase",
         "effective",
         "expires",
+        "summary",
     }
+    assert 0 < len(brisbane["summary"]) <= 300
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_PW013"]])

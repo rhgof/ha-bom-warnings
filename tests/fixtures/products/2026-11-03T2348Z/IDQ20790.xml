@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20790</identifier>
+        <issue-time-utc>2026-11-03T22:08:55Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T08:08:55+10:00</issue-time-local>
+        <sent-time>2026-11-03T22:08:55Z</sent-time>
+        <expiry-time>2026-11-05T01:08:55Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T08:08:55+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-05T11:08:55+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Final Flood Warning for the Mary River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC020" description="Mary River" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>FLOODING NO LONGER EXPECTED AT MIVA AND TIARO </p>
+
+				<p/>
+				<p>Flooding is no longer expected along the Mary River at Miva and Tiaro. Thunderstorms remain possible during Wednesday but forecast rainfall totals are not expected to significantly affect river levels.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC020" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                <area-list>
+                    <area aac="QLD_RC087" phase="FIN" description="Mary River downstream of Gympie" type="river-basin"/>
+                    <area aac="QLD_RS037" phase="FIN" description="Mary River at Miva" type="river-site"/>
+                    <area aac="QLD_RS038" phase="FIN" description="Mary River at Tiaro" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Mary River downstream of Gympie.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS037" description="Mary River at Miva" type="river-site" parent-aac="QLD_RC087">
+                    <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                        <text type="flood_status">The Mary River at Miva is currently at 3.11 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Mary River at Miva is expected to remain below the minor flood level (7.50 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z"/>
+                </area>                <area aac="QLD_RS038" description="Mary River at Tiaro" type="river-site" parent-aac="QLD_RC087">
+                    <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                        <text type="flood_status">The Mary River at Tiaro is currently at 3.14 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Mary River at Tiaro is expected to remain below the minor flood level (6.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0789" description="Obi Obi Creek at Baroon Pocket Dam (HG)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Obi Obi Creek at Baroon Pocket Dam (HG)</element>
+                    <element type="obs_site_latitude">-26.712</element>
+                    <element type="obs_site_longitude">152.8804</element>
+                    <element type="obs_river_height">217.04</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">6:47 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0998" description="Mary River at Conondale" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Conondale</element>
+                    <element type="obs_site_latitude">-26.7294</element>
+                    <element type="obs_site_longitude">152.7133</element>
+                    <element type="obs_river_height">1.40</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:35 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1072" description="Mary River at Bellbird Creek" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Bellbird Creek</element>
+                    <element type="obs_site_latitude">-26.6274</element>
+                    <element type="obs_site_longitude">152.7046</element>
+                    <element type="obs_river_height">0.62</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0751" description="Mary River at Kenilworth Homestead" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Kenilworth Homestead</element>
+                    <element type="obs_site_latitude">-26.5803</element>
+                    <element type="obs_site_longitude">152.7322</element>
+                    <element type="obs_river_height">-0.39</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:26 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0750" description="Mary River at Moy Pocket" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Moy Pocket</element>
+                    <element type="obs_site_latitude">-26.5261</element>
+                    <element type="obs_site_longitude">152.7439</element>
+                    <element type="obs_river_height">1.19</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0715" description="Yabba Creek at Borumba Dam (HG)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Yabba Creek at Borumba Dam (HG)</element>
+                    <element type="obs_site_latitude">-26.5078</element>
+                    <element type="obs_site_longitude">152.5828</element>
+                    <element type="obs_river_height">0.03</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:27 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0200" description="Yabba Creek at Imbil" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Yabba Creek at Imbil</element>
+                    <element type="obs_site_latitude">-26.4572</element>
+                    <element type="obs_site_longitude">152.6803</element>
+                    <element type="obs_river_height">2.19</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:47 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0986" description="Mary River at Dagun Pocket" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Dagun Pocket</element>
+                    <element type="obs_site_latitude">-26.3225</element>
+                    <element type="obs_site_longitude">152.7025</element>
+                    <element type="obs_river_height"></element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time"></element>
+                    <element type="obs_river_height_tendency"></element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0202" description="Kandanga Creek at Hygait" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Kandanga Creek at Hygait</element>
+                    <element type="obs_site_latitude">-26.3817</element>
+                    <element type="obs_site_longitude">152.6483</element>
+                    <element type="obs_river_height">0.52</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0807" description="Six Mile Creek at Lake Macdonald Dam (HG)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Six Mile Creek at Lake Macdonald Dam (HG)</element>
+                    <element type="obs_site_latitude">-26.3814</element>
+                    <element type="obs_site_longitude">152.9297</element>
+                    <element type="obs_river_height">93.02</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">6:48 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0204" description="Six Mile Creek at Cooran Alert" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Six Mile Creek at Cooran Alert</element>
+                    <element type="obs_site_latitude">-26.3297</element>
+                    <element type="obs_site_longitude">152.8136</element>
+                    <element type="obs_river_height">2.71</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0810" description="Deep Creek at Cedar Pocket Dam HG" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Deep Creek at Cedar Pocket Dam HG</element>
+                    <element type="obs_site_latitude">-26.2114</element>
+                    <element type="obs_site_longitude">152.7927</element>
+                    <element type="obs_river_height">101.09</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">6:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0255" description="Mary River at Gympie" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Gympie</element>
+                    <element type="obs_site_latitude">-26.1925</element>
+                    <element type="obs_site_longitude">152.655</element>
+                    <element type="obs_river_height">0.46</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:10 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1074" description="Mary River at Fishermans Pocket" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Fishermans Pocket</element>
+                    <element type="obs_site_latitude">-26.1711</element>
+                    <element type="obs_site_longitude">152.5994</element>
+                    <element type="obs_river_height">2.69</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0624" description="Wide Bay Creek at Brooyar" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Wide Bay Creek at Brooyar</element>
+                    <element type="obs_site_latitude">-26.0067</element>
+                    <element type="obs_site_longitude">152.4108</element>
+                    <element type="obs_river_height">1.79</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0218" description="Mary River at Miva" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Miva</element>
+                    <element type="obs_site_latitude">-25.95</element>
+                    <element type="obs_site_longitude">152.5</element>
+                    <element type="obs_river_height">3.11</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0217" description="Munna Creek at Marodian" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Munna Creek at Marodian</element>
+                    <element type="obs_site_latitude">-25.9</element>
+                    <element type="obs_site_longitude">152.3497</element>
+                    <element type="obs_river_height">2.18</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0223" description="Mary River at Home Park" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Home Park</element>
+                    <element type="obs_site_latitude">-25.7683</element>
+                    <element type="obs_site_longitude">152.525</element>
+                    <element type="obs_river_height">3.12</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1005" description="Mary River at Tiaro" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Tiaro</element>
+                    <element type="obs_site_latitude">-25.7244</element>
+                    <element type="obs_site_longitude">152.5775</element>
+                    <element type="obs_river_height">3.14</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:57 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1004" description="Mary River at Owanyilla" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Owanyilla</element>
+                    <element type="obs_site_latitude">-25.6447</element>
+                    <element type="obs_site_longitude">152.6242</element>
+                    <element type="obs_river_height">2.40</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">5:20 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0622" description="Mary River at The Barrage" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at The Barrage</element>
+                    <element type="obs_site_latitude">-25.5906</element>
+                    <element type="obs_site_longitude">152.6236</element>
+                    <element type="obs_river_height">3.62</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0728" description="Tinana Creek at Tagigan Road" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Tinana Creek at Tagigan Road</element>
+                    <element type="obs_site_latitude">-26.0789</element>
+                    <element type="obs_site_longitude">152.7828</element>
+                    <element type="obs_river_height">1.59</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0179" description="Tinana Creek at Bauple East" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Tinana Creek at Bauple East</element>
+                    <element type="obs_site_latitude">-25.8222</element>
+                    <element type="obs_site_longitude">152.7211</element>
+                    <element type="obs_river_height">1.39</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0236" description="Tinana Creek at Teddington Weir (HG)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Tinana Creek at Teddington Weir (HG)</element>
+                    <element type="obs_site_latitude">-25.6517</element>
+                    <element type="obs_site_longitude">152.6633</element>
+                    <element type="obs_river_height">8.95</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0619" description="Tinana Creek at Tinana Barrage (HG)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Tinana Creek at Tinana Barrage (HG)</element>
+                    <element type="obs_site_latitude">-25.5736</element>
+                    <element type="obs_site_longitude">152.7161</element>
+                    <element type="obs_river_height">2.97</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0169" description="Mary River at Maryborough (Portside)" type="river-obs-site" parent-aac="QLD_RC020">
+                <forecast-period start-time-local="2026-11-04T08:08:55+10:00" end-time-local="2026-11-05T11:08:55+10:00" start-time-utc="2026-11-03T22:08:55Z" end-time-utc="2026-11-05T01:08:55Z">
+                    <element type="obs_site_description">Mary River at Maryborough (Portside)</element>
+                    <element type="obs_site_latitude">-25.5411</element>
+                    <element type="obs_site_longitude">152.7056</element>
+                    <element type="obs_river_height">2.55</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:59 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

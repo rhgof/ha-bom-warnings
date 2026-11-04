@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20835</identifier>
+        <issue-time-utc>2026-11-03T21:37:31Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T07:37:31+10:00</issue-time-local>
+        <sent-time>2026-11-03T21:37:31Z</sent-time>
+        <expiry-time>2026-11-07T00:37:31Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T07:37:31+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-07T10:37:31+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Final Flood Warning for the Macintyre Brook</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC028" description="Macintyre and Weir Rivers" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>FLOODING NO LONGER EXPECTED AT INGLEWOOD BRIDGE</p>
+
+				<p/>
+				<p>Flooding is no longer expected along Macintyre Brook at Inglewood Bridge after peaking well below the minor flood level early Wednesday morning. As these flows travel downstream, small river level rises are expected along the Macintyre River at Boggabilla and Goondiwindi late this week but are expected to remain well below minor flood levels.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC028" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                <area-list>
+                    <area aac="QLD_RC115" phase="FIN" description="Macintyre Brook" type="river-basin"/>
+                    <area aac="QLD_RS002" phase="FIN" description="Macintyre Brook at Inglewood Bridge" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along Macintyre Brook.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS002" description="Macintyre Brook at Inglewood Bridge" type="river-site" parent-aac="QLD_RC115">
+                    <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                        <text type="flood_status">The Macintyre Brook at Inglewood Bridge is currently at 3.40 m and falling, below the minor flood level.</text>
+                        <text type="warning_prediction">The Macintyre Brook at Inglewood Bridge is expected to remain below the minor flood level (5.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z"/>
+                </area>      
+  
+            <area aac="NSW_RO0115" description="Severn River at Ashford" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T08:37:31+11:00" end-time-local="2026-11-07T11:37:31+11:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Severn River at Ashford</element>
+                    <element type="obs_site_latitude">-29.3</element>
+                    <element type="obs_site_longitude">151.1167</element>
+                    <element type="obs_river_height">0.78</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:15 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1012" description="Quart Pot Creek at Stanthorpe" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Quart Pot Creek at Stanthorpe</element>
+                    <element type="obs_site_latitude">-28.6544</element>
+                    <element type="obs_site_longitude">151.9189</element>
+                    <element type="obs_river_height">0.65</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1042" description="Pike Creek at Glenlyon Dam HW" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Pike Creek at Glenlyon Dam HW</element>
+                    <element type="obs_site_latitude">-28.9833</element>
+                    <element type="obs_site_longitude">151.4667</element>
+                    <element type="obs_river_height">23.86</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1037" description="Dumaresq River at Bonshaw" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Dumaresq River at Bonshaw</element>
+                    <element type="obs_site_latitude">-29.0</element>
+                    <element type="obs_site_longitude">151.2833</element>
+                    <element type="obs_river_height">3.77</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:15 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0285" description="Dumaresq River at Texas" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Dumaresq River at Texas</element>
+                    <element type="obs_site_latitude">-28.8675</element>
+                    <element type="obs_site_longitude">151.1611</element>
+                    <element type="obs_river_height">2.27</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:25 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0868" description="Macintyre Brook at Barongarook" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre Brook at Barongarook</element>
+                    <element type="obs_site_latitude">-28.4333</element>
+                    <element type="obs_site_longitude">151.4667</element>
+                    <element type="obs_river_height">1.54</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:49 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1008" description="Macintyre Brook at Coolmunda Dam HG" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre Brook at Coolmunda Dam HG</element>
+                    <element type="obs_site_latitude">-28.4333</element>
+                    <element type="obs_site_longitude">151.2167</element>
+                    <element type="obs_river_height">0.11</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1015" description="Macintyre Brook at Inglewood Bridge" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre Brook at Inglewood Bridge</element>
+                    <element type="obs_site_latitude">-28.4133</element>
+                    <element type="obs_site_longitude">151.0825</element>
+                    <element type="obs_river_height">3.40</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:26 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1036" description="Macintyre Brook at Booba Sands" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre Brook at Booba Sands</element>
+                    <element type="obs_site_latitude">-28.5767</element>
+                    <element type="obs_site_longitude">150.845</element>
+                    <element type="obs_river_height">2.28</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0275" description="Dumaresq River at Bengalla" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Dumaresq River at Bengalla</element>
+                    <element type="obs_site_latitude">-28.6561</element>
+                    <element type="obs_site_longitude">150.6653</element>
+                    <element type="obs_river_height">4.47</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">2:01 pm Wed 28/10/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0276" description="Macintyre River at New Kildonan" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre River at New Kildonan</element>
+                    <element type="obs_site_latitude">-28.6656</element>
+                    <element type="obs_site_longitude">150.445</element>
+                    <element type="obs_river_height">2.06</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0888" description="Macintyre River at Boggabilla" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre River at Boggabilla</element>
+                    <element type="obs_site_latitude">-28.6083</element>
+                    <element type="obs_site_longitude">150.365</element>
+                    <element type="obs_river_height">1.46</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:15 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0272" description="Macintyre River at Goondiwindi" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre River at Goondiwindi</element>
+                    <element type="obs_site_latitude">-28.5508</element>
+                    <element type="obs_site_longitude">150.3081</element>
+                    <element type="obs_river_height">2.03</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0822" description="Callandoon Creek at Oonavale" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Callandoon Creek at Oonavale</element>
+                    <element type="obs_site_latitude">-28.5139</element>
+                    <element type="obs_site_longitude">150.0253</element>
+                    <element type="obs_river_height">1.10</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0889" description="Macintyre River at Terrewah" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Macintyre River at Terrewah</element>
+                    <element type="obs_site_latitude">-28.6089</element>
+                    <element type="obs_site_longitude">149.8742</element>
+                    <element type="obs_river_height">3.65</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:15 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0277" description="Weir River at O'Connor" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at O'Connor</element>
+                    <element type="obs_site_latitude">-27.7267</element>
+                    <element type="obs_site_longitude">150.6453</element>
+                    <element type="obs_river_height">2.95</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:09 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0266" description="Weir River at Retreat Bridge" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at Retreat Bridge</element>
+                    <element type="obs_site_latitude">-27.9006</element>
+                    <element type="obs_site_longitude">150.3486</element>
+                    <element type="obs_river_height">-0.20</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0823" description="Weir River at Gunn Bridge (DNRM)" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at Gunn Bridge (DNRM)</element>
+                    <element type="obs_site_latitude">-28.1575</element>
+                    <element type="obs_site_longitude">150.1008</element>
+                    <element type="obs_river_height">0.47</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0269" description="Yarrill Creek at Medpark Bridge" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Yarrill Creek at Medpark Bridge</element>
+                    <element type="obs_site_latitude">-28.3011</element>
+                    <element type="obs_site_longitude">150.2936</element>
+                    <element type="obs_river_height">0.92</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0257" description="Weir River at Giddi Giddi South" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at Giddi Giddi South</element>
+                    <element type="obs_site_latitude">-28.4033</element>
+                    <element type="obs_site_longitude">150.0517</element>
+                    <element type="obs_river_height">1.55</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0288" description="Weir River at Talwood" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at Talwood</element>
+                    <element type="obs_site_latitude">-28.4983</element>
+                    <element type="obs_site_longitude">149.4819</element>
+                    <element type="obs_river_height">2.20</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Sun 01/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0824" description="Weir River at Jericho" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T07:37:31+10:00" end-time-local="2026-11-07T10:37:31+10:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Weir River at Jericho</element>
+                    <element type="obs_site_latitude">-28.6456</element>
+                    <element type="obs_site_longitude">149.3514</element>
+                    <element type="obs_river_height">1.83</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="NSW_RO0296" description="Barwon River at Mungindi" type="river-obs-site" parent-aac="QLD_RC028">
+                <forecast-period start-time-local="2026-11-04T08:37:31+11:00" end-time-local="2026-11-07T11:37:31+11:00" start-time-utc="2026-11-03T21:37:31Z" end-time-utc="2026-11-07T00:37:31Z">
+                    <element type="obs_site_description">Barwon River at Mungindi</element>
+                    <element type="obs_site_latitude">-28.9683</element>
+                    <element type="obs_site_longitude">148.9833</element>
+                    <element type="obs_river_height">3.93</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:15 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

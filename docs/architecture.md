@@ -34,6 +34,8 @@ BoM FTP  ──LIST/RETR──▶  WarningReader  ──▶  SharedFeed  ──l
                                               in the background)     state, per-entry filter)
 BoM FTP  ──LIST/RETR IDN10016.xml etc.──▶  FireDangerReader ──▶ SharedFeed (same snapshot)
 (optional step after the warnings read; one exact-name listing per needed product)
+BoM FTP  ──LIST/RETR IDN20400.xml etc.──▶  ProductSummaryReader ──▶ SharedFeed (fills Info.xml_summary)
+(optional step after the warnings read; only for a current block with no CAP description)
 BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ──▶  entry.data["area_codes"]
 (/anon/home/adfd/spatial/)  (<config>/bom_warnings/spatial)       (config flow, and on layer change)
 ```
@@ -52,6 +54,18 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
    own view with `covering` / `product_states` (`active_warnings.py`), using its area codes and
    options.
 4. Entities read the entry coordinator.
+4a. `ProductSummaryReader` (`product_xml.py`) is a separate, optional step in the same FTP session,
+   run after the warnings read and before fire danger. It reads a product's XML for two reasons. A
+   marine wind CAP file has no `description`, so each block takes the `warning_phenomena for
+   warning_areas` text and the severity code (`GALE`, `STR`) of the XML hazard whose area codes
+   overlap it (`Info.xml_summary` and `Info.xml_severity`, used by `covering` and by the strength
+   rule). A flood block is marked `Phase.FINAL` when its hazard says `FIN`, because a final flood
+   warning has CAP severity `Unknown` and no "Final" in its headline (`XML_PHASE_EVENTS`). For
+   each product with such a current block it lists `<ID>.xml` by exact name and fetches it. It is keyed on the CAP issue's identifier, so an unchanged product costs no
+   request at all, and a product with no XML is remembered the same way. An XML that fails, is
+   empty or unreadable, or is older than its CAP file (the CAP landed first) leaves the summary out
+   and is tried again on the next poll. It never raises, so it cannot touch `consecutive_failures`,
+   the repair issue or the layer check.
 5. Fire danger (`FireDangerReader` in `fire_danger.py`) is a separate, optional step in the same FTP
    session, run after the warnings read. For each product some entry needs (a stored `_FW` code
    whose state prefix is in `fire_danger.PRODUCTS`) it lists the exact file name (`LIST IDN10016.xml`),
@@ -72,11 +86,12 @@ Pure Python, no Home Assistant imports (usable as a standalone package):
 | `ftp.py` | The one FTP client: `BomFtp`, `FileEntry`, `BomFtpError`, `BomFtpRejectedError`, `BomFtpClient` protocol, `parse_host`, `client_from_env`. |
 | `feed.py` | `WarningReader` (incremental refresh) and `read_current_warnings`. |
 | `fire_danger.py` | Everything about fire danger that needs no Home Assistant. `parse_fire_danger(bytes) -> FireDangerProduct \| None` (through `cap.parse_xml`), the `PRODUCTS` table (state prefix to product id), `match_district`, `fire_product_ids`, `LEVEL_KEYS`. `FireDangerReader` is the optional fetch step. `FireMemory` is the immutable record of ratings from earlier issues (`to_dict` and `from_dict`), `derive(memory, products, area_codes, now, default_tz)` returns the new memory and the entry's `FireDangerView`, and `view.period(day_offset, now)` answers "today" or "tomorrow". |
+| `product_xml.py` | BoM's product XML beside a CAP file. `parse_product(data)` reads the product (identifier, sent time, phase) and each `<hazard>` (type, phase and severity codes exactly as written, its areas with code, description, kind and phase, and its `warning_phenomena`, `warning_areas` and `warning` text) into `Product`/`Hazard`/`HazardArea`, or None for anything that is not a product XML; the rest of the file, including any embedded map image, is parsed past and never kept. `ProductSummaryReader.enrich(warnings, now)` fills `Info.xml_summary` for blocks the CAP gives no description, from the hazard whose codes overlap the block; it is keyed on the CAP issue identifier, skips a file over `MAX_XML_BYTES` (400,000), and never raises. No Home Assistant import. |
 | `spatial.py` | Layer cache (`LAYERS` has six, including the marine `IDM00003`): `resolve_coordinate(..., radius_m)` gives `{AAC: name}` (downloads missing layers once), `refresh_layers` (re-download only layers whose server `MDTM` changed). |
 | `location.py` | The one entry point from a coordinate to a place: `resolve_location(ftp, cache_dir, lat=, lon=, radius_m=0)` returns a frozen `ResolvedLocation(area_codes, state, area_names)`; `area_names` is `{code: name}` for the areas that have a name. It opens the FTP session itself, so callers never write `with ftp.session()`. A point no area covers is an empty result (empty `state`), which callers report as `no_area`. Anything that stops it being worked out (BoM unreachable, a corrupt or incomplete layer, an `OSError`) raises the one `LocationUnavailable`; any other exception propagates. Blocking: call from an executor. |
 | `layer_check.py` | When the weekly layer check is due. `LayerSchedule` is an immutable value (`due`, `started`, `unreached`, `loaded`), and `read_record` / `write_record` handle the `.last_layer_check` record that survives a restart. |
 | `warning_types.py` | The one table of warning types. `WARNING_TYPES` has a `WarningType` row (event, icon, optional note and strength rule) for every CAP event BoM is known to send. A `SensorType` row adds the key, label and marine flag for the 12 types with a level sensor and a checklist toggle. Tsunami is a plain row: an icon but no sensor, so it falls under "Other warnings". The views derive from the table each time they are called (`sensor_types`, `type_of`, `label_of`, `type_keys`, `key_of`, `event_is_on`, `enabled_keys`, `keys_from_legacy_options`), so a test removes a type by patching `WARNING_TYPES` alone. A new type is a new row plus its name in `strings.json` and `translations/en.json`, which `tests/test_strings.py` checks. `wind_strength` is the one strength rule, read from the Wind headline. |
-| `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. A warning's strength comes from its row's `strength` rule in `warning_types.py`. |
+| `active_warnings.py` | What one location sees of the parsed warnings, with no Home Assistant import. `covering(...)` gives the `ActiveWarning`s that cover it (per `<info>` block, with hide-final and the type filter), and `product_states(...)` gives the per-product `WarningState`s the event entity compares. `SEVERITY_ORDER` is the one severity order. `rank_warnings`, `highest_level`, `current_then_ended`, `LEVEL_OPTIONS` and `STATE_NONE` rank and name the levels. `warning_attributes(w, ranked=...)` builds a list item, `type_attributes(...)` a type sensor's attributes, and `event_icon` the icon. A warning's strength comes from its row's `strength` rule in `warning_types.py`. Its `summary` is `summary_of(info.description)`: the first CAP description paragraph on one line, at most 300 characters, None when there is none (every list item and each type sensor's top level carry it only when set). |
 
 Home Assistant layer:
 

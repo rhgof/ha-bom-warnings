@@ -136,10 +136,12 @@ async def test_list_items_carry_the_documented_fields(hass: HomeAssistant) -> No
         "sent",
         "effective",
         "expires",
+        "summary",
     }
     assert item["event"] == "Weather"
     assert item["severity"] == "unknown"
     assert item["phase"] == "new"
+    assert item["summary"].startswith("DAMAGING WEST TO NORTHWESTERLY WIND GUSTS in excess of")
 
 
 async def test_most_severe_sensor_shows_the_top_item_with_icon_level_and_colour(

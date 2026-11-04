@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDQ20850-2026-11-03T23:42:26+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T23:42:26+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Unknown</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T23:42:26+00:00</effective>
+    <expires>2026-11-07T02:42:26+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Flood Warning for Paroo River downstream of Eulo and Paroo River at Hungerford</headline>
+    <description>Minor flooding has eased at Hungerford.
+
+The Paroo River at Hungerford is currently at 0.95 m and steady, below the minor flood level. The Paroo River at Hungerford is expected to remain below the minor flood level (1.00 m).</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>Queensland: Paroo River downstream of Eulo and Paroo River at Hungerford</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RC124</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>QLD_RS108</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

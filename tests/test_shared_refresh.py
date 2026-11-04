@@ -49,7 +49,14 @@ def work_entry() -> MockConfigEntry:
 
 
 def count(server: FakeBom, command: str) -> int:
-    return sum(1 for cmd, _ in server.commands if cmd == command)
+    """How often the server saw `command`; `LIST` counts only the warnings listing.
+
+    A refresh also lists a product's XML by exact name (a flood warning's phase), which is a
+    separate, optional request and says nothing about how many polls ran.
+    """
+    return sum(
+        1 for cmd, arg in server.commands if cmd == command and (command != "LIST" or "*" in arg)
+    )
 
 
 def state_of(hass: HomeAssistant, entity_id: str) -> str:

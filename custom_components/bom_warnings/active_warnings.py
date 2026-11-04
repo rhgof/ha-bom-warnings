@@ -6,6 +6,7 @@ No Home Assistant imports.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -14,7 +15,7 @@ from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
 from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
-from .warning_types import type_of
+from .warning_types import XML_WIND_STRENGTHS, type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +34,10 @@ class ActiveWarning:
     # The names of the entry's areas this warning covers, which tell a warning for the home
     # district from one for a neighbour. Empty when none of them has a name.
     area: str = ""
+    # A line for display, from the CAP description. None when the block has no description.
+    summary: str | None = None
+    # The product XML's severity code for this block, empty when the XML was not read.
+    xml_severity: str = ""
 
     @property
     def is_current(self) -> bool:
@@ -41,12 +46,45 @@ class ActiveWarning:
 
     @property
     def strength(self) -> str | None:
-        """The class of a marine wind warning (strong, gale, storm), read from its headline."""
+        """The class of a marine wind warning (strong, gale, storm).
+
+        BoM's XML code is preferred, since CAP gives gale and strong wind the same severity. The
+        headline is the fallback, and the only source for a class whose code has not been seen.
+        """
         row = type_of(self.event)
-        return row.strength(self.headline) if row and row.strength else None
+        if row is None or not row.strength:
+            return None
+        return XML_WIND_STRENGTHS.get(self.xml_severity) or row.strength(self.headline)
 
 
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
+
+# Each warning is repeated on up to 15 entities, and the recorder drops a state whose attributes
+# pass 16,384 bytes, so the summary is one short paragraph and never the whole description.
+SUMMARY_LIMIT = 300
+_PARAGRAPH_BREAK = re.compile(r"\n\s*\n")
+
+
+def summary_of(description: str | None) -> str | None:
+    """The first paragraph of a CAP description on one line, cut to `SUMMARY_LIMIT` characters.
+
+    A cut falls on a word boundary and ends in an ellipsis; a single word longer than the limit is
+    cut hard. None when there is nothing to show, so the attribute is left out and never empty.
+    """
+    if not description:
+        return None
+    first = _PARAGRAPH_BREAK.split(description.strip(), maxsplit=1)[0]
+    text = " ".join(first.split())
+    if not text:
+        return None
+    if len(text) <= SUMMARY_LIMIT:
+        return text
+    cut = text[: SUMMARY_LIMIT - 1]
+    if text[SUMMARY_LIMIT - 1] != " ":
+        # The cut fell inside a word, so back up to the end of the previous one.
+        cut = cut.rpartition(" ")[0] or cut
+    return f"{cut.rstrip()}…"
+
 
 # The one severity order, lowest first. It is our ranking policy, not CAP's: `unknown` sits between
 # moderate and severe because BoM sends it for Severe Weather and Severe Thunderstorm warnings,
@@ -88,6 +126,8 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
         attributes["strength"] = strength
     if warning.area:
         attributes["area"] = warning.area
+    if warning.summary:
+        attributes["summary"] = warning.summary
     return attributes
 
 
@@ -131,6 +171,8 @@ def covering(
             sent=warning.sent,
             phase=info.phase,
             area=_matched_names(info, area_codes, area_names),
+            summary=summary_of(info.description) or summary_of(info.xml_summary),
+            xml_severity=info.xml_severity,
         )
         for warning in warnings
         for info in warning.infos
@@ -252,6 +294,9 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "event": top.event if top else None,
         "warnings": [warning_attributes(w) for w in warnings],
     }
+    # At the top level too, because a tile can show an attribute but not reach into the list.
+    if top and top.summary:
+        attributes["summary"] = top.summary
     row = type_of(event)
     if row and row.strength:
         attributes["strength"] = top.strength if top else None

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20809</identifier>
+        <issue-time-utc>2026-11-03T09:46:32Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-03T19:46:32+10:00</issue-time-local>
+        <sent-time>2026-11-03T09:46:32Z</sent-time>
+        <expiry-time>2026-11-04T12:46:32Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-03T19:46:32+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-04T22:46:32+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Minor Flood Warning for the Bremer River and Warrill Creek</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 03:00 PM AEST on Wednesday 04 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC160" description="Bremer River and Warrill Creek" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>MINOR FLOODING POSSIBLE ALONG BREMER RIVER AND WARRILL CREEK WITH STORMS FROM OVERNIGHT TUESDAY INTO WEDNESDAY</p>
+
+				<p/>
+				<p>Rainfall totals up to approximately 20 mm have been recorded across the Bremer and Warrill catchments since late Tuesday afternoon. Further showers and thunderstorms are possible during Tuesday evening and into early Wednesday. Heavy rain remains possible in parts of the catchments with thunderstorm activity, though the timing and location of heavy falls remain uncertain. </p>
+<p/>
+<p>Catchments are relatively wet and are likely to respond quickly to rainfall. Depending on the timing and location of the heaviest falls, minor flooding may develop along the Bremer River and Warrill Creek from overnight Tuesday into Wednesday. Higher levels may be possible. The situation is being closely monitored and this warning will be updated as required.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC160" phase="UPD" type="FLW" severity="MIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                <area-list>
+                    <area aac="QLD_RC162" phase="UPD" description="Warrill Creek" type="river-basin"/>
+                    <area aac="QLD_RS022" phase="UPD" description="Warrill Creek at Kalbar" type="river-site"/>
+                    <area aac="QLD_RS023" phase="UPD" description="Warrill Creek at Harrisville" type="river-site"/>
+                    <area aac="QLD_RS024" phase="UPD" description="Warrill Creek at Amberley" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding is possible with forecast thunderstorm activity along Warrill Creek.</text>
+            </hazard>            <hazard index="2" parent-aac="QLD_RC160" phase="UPD" type="FLW" severity="MIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                <area-list>
+                    <area aac="QLD_RC161" phase="UPD" description="Bremer River" type="river-basin"/>
+                    <area aac="QLD_RS025" phase="UPD" description="Bremer River at Rosewood" type="river-site"/>
+                    <area aac="QLD_RS142" phase="UPD" description="Bremer River at Five Mile Bridge" type="river-site"/>
+                    <area aac="QLD_RS026" phase="UPD" description="Bremer River at Walloon" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding is possible with forecast thunderstorm activity along the Bremer River.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS022" description="Warrill Creek at Kalbar" type="river-site" parent-aac="QLD_RC162">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">No observations are currently available for the Warrill Creek at Kalbar.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Warrill Creek at Kalbar may exceed the minor flood level (6.00 m) overnight Tuesday into Wednesday. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>                <area aac="QLD_RS023" description="Warrill Creek at Harrisville" type="river-site" parent-aac="QLD_RC162">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">The Warrill Creek at Harrisville is currently at 0.80 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Warrill Creek at Harrisville may exceed the minor flood level (3.00 m) in the early hours of Wednesday. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>                <area aac="QLD_RS024" description="Warrill Creek at Amberley" type="river-site" parent-aac="QLD_RC162">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">The Warrill Creek at Amberley is currently at 1.44 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Warrill Creek at Amberley may exceed the minor flood level (4.00 m) Wednesday morning. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>                <area aac="QLD_RS025" description="Bremer River at Rosewood" type="river-site" parent-aac="QLD_RC161">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">The Bremer River at Rosewood is currently at 0.62 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Bremer River at Rosewood may exceed the minor flood level (4.00 m) in the early hours of Wednesday. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>                <area aac="QLD_RS142" description="Bremer River at Five Mile Bridge" type="river-site" parent-aac="QLD_RC161">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">The Bremer River at Five Mile Bridge is currently at 0.10 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Bremer River at Five Mile Bridge may exceed the minor flood level (3.50 m) in the early hours of Wednesday. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>                <area aac="QLD_RS026" description="Bremer River at Walloon" type="river-site" parent-aac="QLD_RC161">
+                    <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                        <text type="flood_status">The Bremer River at Walloon is currently at 1.64 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">With forecast rainfall, the Bremer River at Walloon may exceed the minor flood level (5.00 m) early Wednesday morning. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0635" description="Western Creek at Grandchester" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Western Creek at Grandchester</element>
+                    <element type="obs_site_latitude">-27.6631</element>
+                    <element type="obs_site_longitude">152.4611</element>
+                    <element type="obs_river_height">0.20</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:25 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0977" description="Bremer River at Rosewood" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Bremer River at Rosewood</element>
+                    <element type="obs_site_latitude">-27.6592</element>
+                    <element type="obs_site_longitude">152.6042</element>
+                    <element type="obs_river_height">0.62</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:32 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0675" description="Bremer River at Five Mile Bridge" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Bremer River at Five Mile Bridge</element>
+                    <element type="obs_site_latitude">-27.6289</element>
+                    <element type="obs_site_longitude">152.6681</element>
+                    <element type="obs_river_height">0.10</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:21 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0978" description="Bremer River at Walloon" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Bremer River at Walloon</element>
+                    <element type="obs_site_latitude">-27.6033</element>
+                    <element type="obs_site_longitude">152.6928</element>
+                    <element type="obs_river_height">1.64</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0965" description="Warrill Creek at Kalbar Weir HW" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Warrill Creek at Kalbar Weir HW</element>
+                    <element type="obs_site_latitude">-27.9353</element>
+                    <element type="obs_site_longitude">152.5978</element>
+                    <element type="obs_river_height">74.91</element>
+                    <element type="obs_river_datum">AHD</element>
+                    <element type="observation_time">5:47 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0976" description="Warrill Creek at Harrisville" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Warrill Creek at Harrisville</element>
+                    <element type="obs_site_latitude">-27.8133</element>
+                    <element type="obs_site_longitude">152.6417</element>
+                    <element type="obs_river_height">0.80</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:01 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0971" description="Warrill Creek at Amberley" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Warrill Creek at Amberley</element>
+                    <element type="obs_site_latitude">-27.6783</element>
+                    <element type="obs_site_longitude">152.6989</element>
+                    <element type="obs_river_height">1.44</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:25 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0221" description="Bremer River at Ipswich" type="river-obs-site" parent-aac="QLD_RC160">
+                <forecast-period start-time-local="2026-11-03T19:46:32+10:00" end-time-local="2026-11-04T22:46:32+10:00" start-time-utc="2026-11-03T09:46:32Z" end-time-utc="2026-11-04T12:46:32Z">
+                    <element type="obs_site_description">Bremer River at Ipswich</element>
+                    <element type="obs_site_latitude">-27.6117</element>
+                    <element type="obs_site_longitude">152.7611</element>
+                    <element type="obs_river_height">1.92</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:21 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AusBoM-IDN36631-2026-11-03T01:39:42+00:00</identifier>
+  <sender>CAP.Message@bom.gov.au</sender>
+  <sent>2026-11-03T01:39:42+00:00</sent>
+  <status>Actual</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+  <references>CAP.Message@bom.gov.au,AusBoM-IDN36631-2026-11-02T00:49:45+00:00,2026-11-02T00:49:45+00:00</references>
+  <info>
+    <language>en-AU</language>
+    <category>Met</category>
+    <event>Riverine Flood</event>
+    <urgency>Unknown</urgency>
+    <severity>Minor</severity>
+    <certainty>Unknown</certainty>
+    <eventCode>
+      <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+      <value>riverineFlod</value>
+    </eventCode>
+    <effective>2026-11-03T01:39:42+00:00</effective>
+    <expires>2026-11-06T04:39:42+00:00</expires>
+    <senderName>Australian Government Bureau of Meteorology</senderName>
+    <headline>Minor Flood Warning for Warrego River (NSW), Warrego River at Barringun No. 2 and Warrego River at Enngonia</headline>
+    <description>Minor flooding is occurring along the Warrego River at Barringun No. 2 and possible at Enngonia.
+
+The Warrego River at Barringun No. 2 is currently at 3.00 m and steady, with minor flooding. The Warrego River at Barringun No. 2 may reach around 3.20 m Wednesday afternoon, with minor flooding.
+
+No observations are currently available for the Warrego River at Enngonia. The river level is estimated to be below the minor flood level (2.00 m) and steady. The Warrego River at Enngonia may reach around the minor flood level (2.00 m) during Thursday, as upstream flows arrive.</description>
+    <instruction>* Don't drive, walk, swim or play in floodwater because it is dangerous.
+* Stay away from flooded drains, rivers, streams and waterways.
+* Obey road closure signs. Plan ahead so you don't drive on flooded roads.
+* Check the ABC and local media for updates. The situation can change quickly, so stay informed.
+* For local emergency management warnings and advice visit www.ses.nsw.gov.au.
+
+For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.</instruction>
+    <web>http://www.bom.gov.au/australia/warnings</web>
+    <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+    <area>
+      <areaDesc>New South Wales: Warrego River (NSW), Warrego River at Barringun No. 2 and Warrego River at Enngonia</areaDesc>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>NSW_RC031</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>NSW_RS139</value>
+      </geocode>
+      <geocode>
+        <valueName>AMOC-AreaCode</valueName>
+        <value>NSW_RS140</value>
+      </geocode>
+    </area>
+  </info>
+</alert>

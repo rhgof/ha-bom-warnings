@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+            <region>New South Wales</region>
+            <office>NSWRO</office>
+            <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDN29000</identifier>
+        <issue-time-utc>2026-11-03T23:28:42Z</issue-time-utc>
+        <issue-time-local tz="EDT">2026-11-04T10:28:42+11:00</issue-time-local>
+        <sent-time>2026-11-03T23:28:42Z</sent-time>
+        <expiry-time>2026-11-05T13:00:00Z</expiry-time>
+        <validity-bgn-time-local tz="EDT">2026-11-04T10:27:00+11:00</validity-bgn-time-local>
+        <validity-end-time-local tz="EDT">2026-11-05T23:59:59+11:00</validity-end-time-local>
+        <next-routine-issue-time-utc>2026-11-04T06:00:00Z</next-routine-issue-time-utc>
+        <next-routine-issue-time-local tz="EDT">2026-11-04T17:00:00+11:00</next-routine-issue-time-local>
+        <status>O</status>
+        <service>WSP</service>
+        <sub-service>WSG</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+            <text type="warning_title">Warning to Sheep Graziers</text>
+            <text type="warning_area_summary">Central Tablelands, Southern Tablelands, South West Slopes and Snowy Mountains forecast districts</text>
+            <text type="warning_next_issue">5:00 pm EDT Wednesday</text>
+        </warning-info>
+        <!---->
+        <!--locale[NSW_EV001, allow-output=yes]-->
+        <!--hazards-exist="yes" non-warning-info-elements-exist="no"-->
+        <area aac="NSW_FA001" description="New South Wales" type="region">
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <!--locale[NSW_EV001]/period[variable]-->
+            <hazard index="1" parent-aac="NSW_EV001" phase="UPD" type="SHW" severity="STD" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T10:27:00+11:00" end-time-local="2026-11-06T00:00:00+11:00" start-time-utc="2026-11-03T23:27:00Z" end-time-utc="2026-11-05T13:00:00Z">
+                <area-list>
+                    <area aac="NSW_PW008" phase="NEW" description="Central Tablelands" type="public-district"/>
+                    <area aac="NSW_PW009" phase="REN" description="Southern Tablelands" type="public-district"/>
+                    <area aac="NSW_PW013" phase="NEW" description="South West Slopes" type="public-district"/>
+                    <area aac="NSW_PW010" phase="REN" description="Snowy Mountains" type="public-district"/>
+                </area-list>
+                <priority>W</priority>
+                <text type="warning_phenomena">Warning to Sheep Graziers</text>
+                <text type="warning_areas">Central Tablelands, Southern Tablelands, South West Slopes and Snowy Mountains forecast districts</text>
+                <text type="warning">Sheep graziers are warned that cold temperatures, showers and southwesterly winds are expected during Thursday. Areas likely to be affected include the Snowy Mountains forecast district and parts of the Central Tablelands, Southern Tablelands and South West Slopes forecast districts. There is a risk of losses of lambs and sheep exposed to these conditions.</text>
+            </hazard>
+        </area>
+    </warning>
+</product>

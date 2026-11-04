@@ -33,6 +33,7 @@ from .fire_danger import (
 )
 from .ftp import BomFtp, BomFtpError, client_from_env
 from .layer_check import LayerSchedule, read_record, write_record
+from .product_xml import ProductSummaryReader
 from .spatial import (
     LAYERS,
     RefreshResult,
@@ -83,6 +84,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self.client = client
         self._reader = WarningReader(client)
         self._fire_reader = FireDangerReader(client)
+        self._summary_reader = ProductSummaryReader(client)
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
         self._layer_schedule = LayerSchedule.loaded(None, dt_util.utcnow())
@@ -103,11 +105,13 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
     def _refresh(
         self, fire_products: set[str]
     ) -> tuple[list[CapWarning], dict[str, FireDangerProduct]]:
-        """Blocking. The warnings read decides success; the fire danger step runs after it."""
+        """Blocking. The warnings read decides success; the optional steps run after it."""
         # One connection per refresh instead of one login per file.
         with self.client.session():
             warnings = self._reader.refresh()
-            # Never raises: a failure here keeps the previous fire danger data.
+            # Neither step raises: a failure leaves a summary out, or keeps the previous fire
+            # danger data, and never reaches the failure count or the repair issue.
+            warnings = self._summary_reader.enrich(warnings, dt_util.utcnow())
             return warnings, self._fire_reader.refresh(fire_products)
 
     def _wanted_fire_products(self) -> set[str]:

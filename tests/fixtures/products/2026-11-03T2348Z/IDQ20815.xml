@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDQ20815</identifier>
+        <issue-time-utc>2026-11-03T23:12:57Z</issue-time-utc>
+        <issue-time-local tz="AEST">2026-11-04T09:12:57+10:00</issue-time-local>
+        <sent-time>2026-11-03T23:12:57Z</sent-time>
+        <expiry-time>2026-11-05T02:12:57Z</expiry-time>
+        <validity-bgn-time-local tz="AEST">2026-11-04T09:12:57+10:00</validity-bgn-time-local>
+        <validity-end-time-local tz="AEST">2026-11-05T12:12:57+10:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>FIN</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Final Flood Warning for the Logan River</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.disaster.qld.gov.au/warnings.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">This is a final warning. No further warnings will be issued for this event.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="QLD_RC025" description="Logan and Albert Rivers" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>FLOODING NO LONGER EXPECTED ALONG LOGAN RIVER AT BEAUDESERT</p>
+
+				<p/>
+				<p>Flooding is no longer expected along the Logan River at Beaudesert. No significant rainfall is forecast for the next few days.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Below Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="QLD_RC025" phase="FIN" type="FLW" severity="BLWMIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                <area-list>
+                    <area aac="QLD_RC098" phase="FIN" description="Logan River to Yarrahappini" type="river-basin"/>
+                    <area aac="QLD_RS012" phase="FIN" description="Logan River at Beaudesert" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Flooding is no longer expected along the Logan River to Yarrahappini.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="QLD_RS012" description="Logan River at Beaudesert" type="river-site" parent-aac="QLD_RC098">
+                    <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                        <text type="flood_status">The Logan River at Beaudesert is currently at 0.57 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Logan River at Beaudesert is expected to remain below the minor flood level (7.00 m). </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z"/>
+                </area>      
+  
+            <area aac="QLD_RO0242" description="Albert River at Lumeah" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Albert River at Lumeah</element>
+                    <element type="obs_site_latitude">-28.0614</element>
+                    <element type="obs_site_longitude">153.0408</element>
+                    <element type="obs_river_height">1.01</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0244" description="Albert River at Bromfleet" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Albert River at Bromfleet</element>
+                    <element type="obs_site_latitude">-27.9108</element>
+                    <element type="obs_site_longitude">153.1047</element>
+                    <element type="obs_river_height">0.70</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:16 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0196" description="Albert River at Wolffdene" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Albert River at Wolffdene</element>
+                    <element type="obs_site_latitude">-27.7828</element>
+                    <element type="obs_site_longitude">153.1889</element>
+                    <element type="obs_river_height">1.05</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:46 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0999" description="Albert River at Beenleigh" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Albert River at Beenleigh</element>
+                    <element type="obs_site_latitude">-27.7258</element>
+                    <element type="obs_site_longitude">153.2192</element>
+                    <element type="obs_river_height">0.57</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:52 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0809" description="Burnett Creek at Maroon Dam" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Burnett Creek at Maroon Dam</element>
+                    <element type="obs_site_latitude">-28.1842</element>
+                    <element type="obs_site_longitude">152.6539</element>
+                    <element type="obs_river_height">0.05</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0222" description="Logan River at Forest Home" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Forest Home</element>
+                    <element type="obs_site_latitude">-28.2033</element>
+                    <element type="obs_site_longitude">152.77</element>
+                    <element type="obs_river_height">0.92</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0250" description="Logan River at Rathdowney" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Rathdowney</element>
+                    <element type="obs_site_latitude">-28.2153</element>
+                    <element type="obs_site_longitude">152.8681</element>
+                    <element type="obs_river_height">1.15</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0780" description="Christmas Creek at Tramway Lane" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Christmas Creek at Tramway Lane</element>
+                    <element type="obs_site_latitude">-28.1492</element>
+                    <element type="obs_site_longitude">152.9717</element>
+                    <element type="obs_river_height">1.42</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0185" description="Logan River at Round Mountain" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Round Mountain</element>
+                    <element type="obs_site_latitude">-28.0708</element>
+                    <element type="obs_site_longitude">152.9272</element>
+                    <element type="obs_river_height">2.77</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0245" description="Logan River at Beaudesert" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Beaudesert</element>
+                    <element type="obs_site_latitude">-27.9681</element>
+                    <element type="obs_site_longitude">152.9861</element>
+                    <element type="obs_river_height">0.57</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">1:58 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0252" description="Teviot Brook at Boonah" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Teviot Brook at Boonah</element>
+                    <element type="obs_site_latitude">-28.0033</element>
+                    <element type="obs_site_longitude">152.6875</element>
+                    <element type="obs_river_height">2.33</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:55 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0979" description="Teviot Brook at Wyaralong Dam" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Teviot Brook at Wyaralong Dam</element>
+                    <element type="obs_site_latitude">-27.9092</element>
+                    <element type="obs_site_longitude">152.8806</element>
+                    <element type="obs_river_height">0.06</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:00 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0197" description="Logan River at Yarrahappini" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Yarrahappini</element>
+                    <element type="obs_site_latitude">-27.8336</element>
+                    <element type="obs_site_longitude">152.9878</element>
+                    <element type="obs_river_height">1.99</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">7:25 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0241" description="Logan River at Maclean Bridge" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Maclean Bridge</element>
+                    <element type="obs_site_latitude">-27.7864</element>
+                    <element type="obs_site_longitude">153.0161</element>
+                    <element type="obs_river_height">0.99</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:44 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0989" description="Logan River at Logan Village" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Logan Village</element>
+                    <element type="obs_site_latitude">-27.7711</element>
+                    <element type="obs_site_longitude">153.1019</element>
+                    <element type="obs_river_height">1.61</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:27 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0234" description="Logan River at Waterford" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Waterford</element>
+                    <element type="obs_site_latitude">-27.6947</element>
+                    <element type="obs_site_longitude">153.1364</element>
+                    <element type="obs_river_height">1.10</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:43 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0653" description="Slacks Creek at Loganlea Road" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Slacks Creek at Loganlea Road</element>
+                    <element type="obs_site_latitude">-27.6475</element>
+                    <element type="obs_site_longitude">153.1475</element>
+                    <element type="obs_river_height">0.75</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:22 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">rising</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO1083" description="Logan River at Parklands" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Parklands</element>
+                    <element type="obs_site_latitude">-27.6989</element>
+                    <element type="obs_site_longitude">153.1925</element>
+                    <element type="obs_river_height">0.59</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">8:50 am Wed 04/11/26</element>
+                    <element type="obs_river_height_tendency">falling</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0183" description="Logan River at Eagleby" type="river-obs-site" parent-aac="QLD_RC025">
+                <forecast-period start-time-local="2026-11-04T09:12:57+10:00" end-time-local="2026-11-05T12:12:57+10:00" start-time-utc="2026-11-03T23:12:57Z" end-time-utc="2026-11-05T02:12:57Z">
+                    <element type="obs_site_description">Logan River at Eagleby</element>
+                    <element type="obs_site_latitude">-27.6956</element>
+                    <element type="obs_site_longitude">153.1978</element>
+                    <element type="obs_river_height"></element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time"></element>
+                    <element type="obs_river_height_tendency"></element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

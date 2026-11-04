@@ -63,6 +63,24 @@ one for yours. `area` is left out when none of those areas has a name. Names com
 shapefiles, never area codes. An entry made before this existed looks its names up once, the first
 time it loads.
 
+### Summary and attribution
+
+Each item in a `warnings` list also has a `summary`: the first paragraph of the warning's text from
+BoM, on one line and cut to 300 characters at a word boundary, with an ellipsis if it was longer.
+A marine wind warning has no text in the CAP file, so its summary is read from the Bureau's product
+XML beside it, for example "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast,
+Sydney Coast, Illawarra Coast and Batemans Coast". `summary` is left out when BoM sends no text
+and that XML cannot be read; the warning itself is unaffected. Check for it with
+`{% if w.summary %}` or `w.summary | default('')` in a template. The Most severe warning sensor and
+each per-warning-type sensor also show their top warning's `summary` as an attribute, so a tile can
+show it with `state_content: summary`; the warning count sensor and the warning binary sensor show it
+only inside the list.
+
+Every warning entity carries the attribution "Australian Government Bureau of Meteorology" as its
+`attribution` attribute, as the fire danger sensors do. Home Assistant shows it in the entity's
+details; a tile does not. The text is the Bureau's, under its own terms
+(<http://www.bom.gov.au/other/copyright.shtml>).
+
 ### Choosing the warnings that matter
 
 Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about":
@@ -78,6 +96,9 @@ warnings.
 - **Other warnings** covers any type with no entry of its own, such as tsunami, and any type BoM
   adds later.
 - **Hide final and cancelled warnings** is separate: it is about a warning's phase, not its type.
+  A final flood warning is recognised from the phase in BoM's product XML, because its CAP file
+  gives it no "Final" in the headline. If that XML cannot be read, it shows as a current warning
+  until BoM removes it.
 
 Saving reloads the entry, with no restart. Entries from before the checklist are converted when
 they load: an empty type filter becomes every type on, and a filter with names becomes just those
@@ -95,7 +116,7 @@ state is the highest level among them, or `none`. The states, lowest first:
 | `unrated` | BoM sends the severity `unknown` for Severe Thunderstorm and Severe Weather warnings. It is shown as `unrated`, because `unknown` is Home Assistant's own no-value state. It ranks between `moderate` and `severe`. |
 
 The top warning's `headline`, `expires`, `product_id` and `event` are attributes (all empty when the
-state is `none`), so a tile can show them. The `warnings` attribute lists every current warning of the
+state is `none`), so a tile can show them. Its `summary` is there too when BoM sent text for it. The `warnings` attribute lists every current warning of the
 type with its severity, phase and times. The sensors have no unit and keep no history statistics.
 
 In an automation, trigger when the state changes to the levels you care about, for example to close
@@ -133,8 +154,10 @@ so. Both marine sensors rate a warning only when the location's circle reaches a
 zone, so a land point never turns them on. Tsunami comes with #25.
 
 **Marine wind strength.** CAP severity has only two levels for marine wind (a gale and a strong wind
-are both Moderate), so the sensor state cannot tell them apart. The class is in the headline, and
-the Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
+are both Moderate), so the sensor state cannot tell them apart. The class comes from the code in
+BoM's product XML (`STR` for strong, `GALE` for gale; no code for storm or hurricane has been seen),
+and from the headline when that XML cannot be read or has a code this integration does not know.
+The Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
 `gale`, `storm` or `hurricane` (none when the state is `none` or the warning is a cancellation).
 Each Wind entry in a `warnings` list carries the same `strength` field; no other event has it. A
 class this code does not know is shown as BoM wrote it. BoM publishes no speed per warning. Its

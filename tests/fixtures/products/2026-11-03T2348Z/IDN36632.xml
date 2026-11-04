@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product version="1.7" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.bom.gov.au/schema/v1.7/product.xsd">
+    <amoc>
+        <source>
+            <sender>Australian Government Bureau of Meteorology</sender>
+			<region>National Water Operations</region>
+			<office>NWOT</office>
+           <copyright>http://www.bom.gov.au/other/copyright.shtml</copyright>
+            <disclaimer>http://www.bom.gov.au/other/disclaimer.shtml</disclaimer>
+        </source>
+        <identifier>IDN36632</identifier>
+        <issue-time-utc>2026-11-03T01:45:43Z</issue-time-utc>
+        <issue-time-local tz="Australian Eastern Daylight Time">2026-11-03T12:45:43+11:00</issue-time-local>
+        <sent-time>2026-11-03T01:45:43Z</sent-time>
+        <expiry-time>2026-11-06T04:45:43Z</expiry-time>
+        <validity-bgn-time-local tz="Australian Eastern Daylight Time">2026-11-03T12:45:43+11:00</validity-bgn-time-local>
+        <validity-end-time-local tz="Australian Eastern Daylight Time">2026-11-06T15:45:43+11:00</validity-end-time-local>
+        <status>O</status>
+        <service>HFW</service>
+        <sub-service>WFL</sub-service>
+        <product-type>W</product-type>
+        <phase>UPD</phase>
+    </amoc>
+    <warning>
+        <warning-info>
+			
+			
+            <text type="warning_title">Minor Flood Warning for the Paroo River (NSW)</text>
+            <text type="warning_subtitle"></text>
+  	        
+<text type="warning_advice">
+<p>Don't drive, walk, swim or play in floodwater because it is dangerous.</p>
+<p>Stay away from flooded drains, rivers, streams and waterways.</p>
+<p>Obey road closure signs. Plan ahead so you don&#39;t drive on flooded roads.</p>
+<p>Check the ABC and local media for updates. The situation can change quickly, so stay informed.</p>
+<p>For local emergency management warnings and advice visit www.ses.nsw.gov.au.</p>
+</text>
+<text type="warning_advice_contact">
+<p>For emergency assistance call SES on telephone number 132 500. In life-threatening emergencies, call 000 (triple zero) immediately.
+
+</p>
+</text>
+            <text type="warning_next_issue">The next warning will be issued by 12:00 PM AEDT on Wednesday 04 November 2026.</text>
+            <text type="product_footer">
+<p>This advice is also available by dialling 1300 659 219. Warning, rainfall and river information are available at http://www.bom.gov.au/australia/flood.</p>
+			</text>
+        </warning-info>
+        <area aac="NSW_RC032" description="Paroo River (NSW)" type="river-basin">
+            <!--===================-->
+            <!--NON-HAZARD ELEMENTS-->
+            <!--===================-->
+	    <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                
+				<element type="warning_sequence">2</element>
+                <text type="warning_situation">
+				<p>MINOR FLOODING LIKELY AT WILLARA CROSSING FROM EARLY WEDNESDAY MORNING</p>
+
+				<p/>
+				<p>The flood peak from rain over the previous week in the Paroo Catchment in Queensland is now around Hungerford. This is likely to cause minor flooding at Willara Crossing from early Wednesday morning.</p>
+
+				<p/>
+
+                </text>
+                <element type="severity">Minor</element>
+            </forecast-period>
+            <!--===============-->
+            <!--HAZARD ELEMENTS-->
+            <!--===============-->
+            <hazard index="1" parent-aac="NSW_RC032" phase="UPD" type="FLW" severity="MIN" urgency="UNK" certainty="UNK" start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                <area-list>
+                    <area aac="NSW_RC032" phase="UPD" description="Paroo River (NSW)" type="river-basin"/>
+                    <area aac="NSW_RS142" phase="UPD" description="Paroo River at Willara Crossing" type="river-site"/>
+
+                </area-list>
+                <priority>W</priority>
+                <text type="warning">Minor flooding is likely at Willara Crossing.</text>
+            </hazard>
+          </area>   
+        
+                <area aac="NSW_RS142" description="Paroo River at Willara Crossing" type="river-site" parent-aac="NSW_RC032">
+                    <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                        <text type="flood_status">The Paroo River at Willara Crossing is currently at 0.07 m and steady, below the minor flood level.</text>
+                        <text type="warning_prediction">The Paroo River at Willara Crossing is likely to exceed the minor flood level (0.70 m) early Wednesday morning. The river may peak near 1.00 m Thursday evening, with minor flooding. </text>
+                    </forecast-period>
+					
+                <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z"/>
+                <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z"/>
+                </area>      
+  
+            <area aac="NSW_RO0232" description="Cuttaburra Channel at Turra" type="river-obs-site" parent-aac="NSW_RC032">
+                <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                    <element type="obs_site_description">Cuttaburra Channel at Turra</element>
+                    <element type="obs_site_latitude">-29.0586</element>
+                    <element type="obs_site_longitude">145.4075</element>
+                    <element type="obs_river_height">3.11</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:30 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0326" description="Paroo River at Eulo" type="river-obs-site" parent-aac="NSW_RC032">
+                <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                    <element type="obs_site_description">Paroo River at Eulo</element>
+                    <element type="obs_site_latitude">-28.1604</element>
+                    <element type="obs_site_longitude">145.0463</element>
+                    <element type="obs_river_height">1.92</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:55 am Sat 31/10/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="QLD_RO0833" description="Paroo River at Caiwarro" type="river-obs-site" parent-aac="NSW_RC032">
+                <forecast-period start-time-local="2026-11-03T11:45:43+10:00" end-time-local="2026-11-06T14:45:43+10:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                    <element type="obs_site_description">Paroo River at Caiwarro</element>
+                    <element type="obs_site_latitude">-28.6833</element>
+                    <element type="obs_site_longitude">144.7833</element>
+                    <element type="obs_river_height">1.33</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">9:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="NSW_RO0229" description="Paroo River at Hungerford" type="river-obs-site" parent-aac="NSW_RC032">
+                <forecast-period start-time-local="2026-11-03T11:45:43+10:00" end-time-local="2026-11-06T14:45:43+10:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                    <element type="obs_site_description">Paroo River at Hungerford</element>
+                    <element type="obs_site_latitude">-28.9972</element>
+                    <element type="obs_site_longitude">144.4094</element>
+                    <element type="obs_river_height">1.08</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">6:00 am Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>            <area aac="NSW_RO0230" description="Paroo River at Willara Crossing" type="river-obs-site" parent-aac="NSW_RC032">
+                <forecast-period start-time-local="2026-11-03T12:45:43+11:00" end-time-local="2026-11-06T15:45:43+11:00" start-time-utc="2026-11-03T01:45:43Z" end-time-utc="2026-11-06T04:45:43Z">
+                    <element type="obs_site_description">Paroo River at Willara Crossing</element>
+                    <element type="obs_site_latitude">-29.2416</element>
+                    <element type="obs_site_longitude">144.4553</element>
+                    <element type="obs_river_height">0.07</element>
+                    <element type="obs_river_datum">LGH</element>
+                    <element type="observation_time">12:30 pm Tue 03/11/26</element>
+                    <element type="obs_river_height_tendency">steady</element>
+                </forecast-period>
+            </area>
+
+    </warning>
+</product>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDW20100-2026-11-03T23:01:02+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-03T23:01:02+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-02T17:01:01+00:00,2026-11-02T17:01:01+00:00 CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-02T23:01:03+00:00,2026-11-02T23:01:03+00:00 CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-03T00:41:35+00:00,2026-11-03T00:41:35+00:00 CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-03T05:01:04+00:00,2026-11-03T05:01:04+00:00 CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-03T11:01:02+00:00,2026-11-03T11:01:02+00:00 CAP.Message@bom.gov.au,AusBoM-IDW20100-2026-11-03T17:01:01+00:00,2026-11-03T17:01:01+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Wind</event>
+        <urgency>Unknown</urgency>
+        <severity>Moderate</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>wind</value>
+        </eventCode>
+        <effective>2026-11-04T16:00:00+00:00</effective>
+        <expires>2026-11-05T16:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Strong Wind Warning for coastal waters between Jurien Bay and Cape Naturaliste for 05 November</headline>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Western Australia: Lancelin Coast, Perth Coast and Bunbury Geographe Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>WA_MW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>WA_MW009</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>WA_MW010</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Wind</event>
+        <urgency>Unknown</urgency>
+        <severity>Minor</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>wind</value>
+        </eventCode>
+        <effective>2026-11-03T23:00:00+00:00</effective>
+        <expires>2026-11-04T16:00:00+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Wind Warning for coastal waters between Cape Cuvier and Kalbarri for 04 November</headline>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>Western Australia: Gascoyne Coast</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>WA_MW006</value>
+            </geocode>
+        </area>
+    </info>
+</alert>
