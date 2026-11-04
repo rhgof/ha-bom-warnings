@@ -46,6 +46,8 @@ class Info:
     area_desc: str
     area_codes: frozenset[str]
     phase: Phase
+    # Last, with a default, so existing constructors keep working. Marine wind has none.
+    description: str = ""
 
     def is_active(self, now: datetime) -> bool:
         if self.phase in (Phase.CANCELLED, Phase.FINAL):
@@ -145,6 +147,7 @@ def _parse_info(el: ET.Element, message_phase: Phase) -> Info:
         area_desc="; ".join(d for d in descs if d),
         area_codes=frozenset(codes),
         phase=_info_phase(headline, message_phase),
+        description=_text(el, "description"),
     )
 
 

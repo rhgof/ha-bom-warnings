@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from . import BomWarningsConfigEntry
 from .active_warnings import warning_attributes
 from .const import (
+    ATTRIBUTION,
     DOMAIN,
 )
 from .coordinator import BomWarningsCoordinator
@@ -31,6 +32,7 @@ async def async_setup_entry(
 
 class _DeviceBinarySensor(CoordinatorEntity[BomWarningsCoordinator], BinarySensorEntity):
     _attr_has_entity_name = True
+    _attr_attribution = ATTRIBUTION
     _attr_device_class = BinarySensorDeviceClass.SAFETY
 
     def __init__(

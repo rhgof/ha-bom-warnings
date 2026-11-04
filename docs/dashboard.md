@@ -20,7 +20,12 @@ looping over a list attribute well enough to give you something correct.
 warnings covering your location. Each item has `product_id`, `event`, `severity`, `level`
 (`minor`, `moderate`, `unknown`, `severe`, `extreme`), `icon` (an `mdi:` name), `color` (hex),
 `headline`, `phase`, `sent`, `effective` and `expires`, and `area` (the names of your location's
-areas the warning covers, such as `Illawarra`; left out when none has a name). With the option to
+areas the warning covers, such as `Illawarra`; left out when none has a name) and `summary` (the
+first paragraph of BoM's text, at most 300 characters; left out when BoM sent none, as for marine
+wind). `sensor.<title>_most_severe_warning` and each per-type sensor repeat their top warning's
+`summary` as a top-level attribute, so a tile can show it (`state_content: [state, summary]`); the
+count sensor does not. Every warning entity carries the attribution "Australian Government Bureau of
+Meteorology" in its `attribution` attribute; a tile does not show it. With the option to
 keep final and cancelled warnings, ended ones come after the current ones with `phase` set to
 `final` or `cancelled`.
 

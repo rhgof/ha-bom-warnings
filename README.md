@@ -63,6 +63,21 @@ one for yours. `area` is left out when none of those areas has a name. Names com
 shapefiles, never area codes. An entry made before this existed looks its names up once, the first
 time it loads.
 
+### Summary and attribution
+
+Each item in a `warnings` list also has a `summary`: the first paragraph of the warning's text from
+BoM, on one line and cut to 300 characters at a word boundary, with an ellipsis if it was longer.
+It is left out when BoM sends no text, which today is every marine wind warning. Check for it with
+`{% if w.summary %}` or `w.summary | default('')` in a template. The Most severe warning sensor and
+each per-warning-type sensor also show their top warning's `summary` as an attribute, so a tile can
+show it with `state_content: summary`; the warning count sensor and the warning binary sensor show it
+only inside the list.
+
+Every warning entity carries the attribution "Australian Government Bureau of Meteorology" as its
+`attribution` attribute, as the fire danger sensors do. Home Assistant shows it in the entity's
+details; a tile does not. The text is the Bureau's, under its own terms
+(<http://www.bom.gov.au/other/copyright.shtml>).
+
 ### Choosing the warnings that matter
 
 Open the entry's **Configure** (three-dot menu). The form is a checklist, "Warnings I care about":
@@ -95,7 +110,7 @@ state is the highest level among them, or `none`. The states, lowest first:
 | `unrated` | BoM sends the severity `unknown` for Severe Thunderstorm and Severe Weather warnings. It is shown as `unrated`, because `unknown` is Home Assistant's own no-value state. It ranks between `moderate` and `severe`. |
 
 The top warning's `headline`, `expires`, `product_id` and `event` are attributes (all empty when the
-state is `none`), so a tile can show them. The `warnings` attribute lists every current warning of the
+state is `none`), so a tile can show them. Its `summary` is there too when BoM sent text for it. The `warnings` attribute lists every current warning of the
 type with its severity, phase and times. The sensors have no unit and keep no history statistics.
 
 In an automation, trigger when the state changes to the levels you care about, for example to close

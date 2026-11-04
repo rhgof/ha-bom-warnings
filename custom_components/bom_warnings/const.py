@@ -1,6 +1,8 @@
 """Constants for the BoM Warnings integration."""
 
 DOMAIN = "bom_warnings"
+# Shown by every warning and fire danger entity, because the text and ratings are BoM's.
+ATTRIBUTION = "Australian Government Bureau of Meteorology"
 CONF_LATITUDE = "latitude"
 CONF_LONGITUDE = "longitude"
 CONF_STATE = "state"
