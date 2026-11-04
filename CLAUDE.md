@@ -11,6 +11,8 @@ Private custom component, official sources only. General HA rules are in `../CLA
 ## Architecture
 
 - Start with `docs/architecture.md`: what is built, the data flow, module map and known gaps.
+- `docs/warning-products.md`: what CAP, `.txt` and product XML each hold, from real captures in
+  `tests/fixtures/products/`. Read it before reading any file beside the CAP file.
 - Warnings come from anonymous FTP: `LIST *.cap.xml` in `/anon/gen/fwo/`, then fetch only new or
   changed files. Location matching uses the static shapefiles in `/anon/home/adfd/spatial/`;
   the `AAC` field equals the CAP `AMOC-AreaCode`.
@@ -28,7 +30,8 @@ Private custom component, official sources only. General HA rules are in `../CLA
 - CAP files can be empty (0 bytes) or missing. A 550 on a missing file is normal, because warning
   files exist only while the hazard is current.
 - Phase is not a CAP field. It comes from `msgType` plus headlines ("Final", "Cancellation of").
-  Flood "final" is unconfirmed: `IDQ20827` has no "Final" headline.
+  A final flood warning has no "Final" in its CAP headline and CAP severity `Unknown`; the product
+  XML says `phase="FIN"` (8 flood products on 4 Nov 2026, see `docs/warning-products.md`).
 - Force `cp1252` when reading shapefiles: `IDM00014` ships a `.cpg` labelled "ansi 1252".
 - Marine zones (`IDM00003`) are water areas, so a land point never falls inside one.
 - One CAP file can hold several `<info>` blocks. Geocodes include non-AMOC names (e.g. `AU-WA`).
