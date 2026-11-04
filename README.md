@@ -164,6 +164,16 @@ class this code does not know is shown as BoM wrote it. BoM publishes no speed p
 warning products guide says marine wind warnings are issued for winds of 26 knots or stronger, and
 the strength is the class (strong wind, gale, storm force, hurricane force), not a measured speed.
 
+## Dashboard
+
+Two ways to show the warnings on a dashboard, both described in [docs/dashboard.md](docs/dashboard.md):
+
+- **A card:** [ha-bom-warnings-card](https://github.com/rhgof/ha-bom-warnings-card) is a Lovelace
+  card installed through HACS. It lists the warnings, most severe first, with a coloured icon per
+  severity, and is added and configured from the dashboard editor with no YAML.
+- **Built-in cards:** a ready-made section made from Home Assistant's own Markdown, tile and
+  conditional cards, for when you would rather not install a card.
+
 ## Dev instance
 
 A throwaway Home Assistant (2026.10.4, the live version) that loads this integration straight
