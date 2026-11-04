@@ -16,6 +16,36 @@ end of this page). What that showed:
 Replace `<title>` with your entry's slug. For an entry titled `Home` the entity is
 `sensor.home_warning_count`.
 
+## The card
+
+[ha-bom-warnings-card](https://github.com/rhgof/ha-bom-warnings-card) is a Lovelace card for this
+integration, and the richer of the two options on this page. It lists the warnings from the count
+sensor, most severe first, with an icon in the colour of its severity, the event, level, headline,
+area names and summary. Ended warnings are dimmed. There is no template to write, and no
+`<font>` workaround: the card draws its own icons, so the sanitiser plays no part.
+
+To use it:
+
+1. In HACS, add `https://github.com/rhgof/ha-bom-warnings-card` as a custom repository with the
+   category **Dashboard**, download it, and hard-refresh the browser.
+2. Edit a dashboard, choose **Add card**, open the **By card** tab and pick **BoM Warnings**. The
+   editor starts with one of your warning count sensors chosen. You can set a title, and turn each
+   warning's summary off. Or in YAML:
+
+   ```yaml
+   type: custom:bom-warnings-card
+   entity: sensor.<title>_warning_count
+   ```
+
+The card needs HACS. If you would rather not install anything, use the section below, which is
+built from Home Assistant's own cards. The card and the section read the same attributes, and a
+test here checks the shared fixture (`tests/fixtures/dashboard/states.json`) against what the
+integration really produces, so a change to the attributes cannot slip past either one.
+
+Checked on Home Assistant 2026.10.4 in Chrome: the card installs through HACS and renders live
+warnings in a light and a dark theme, and a card added from the picker and editor saved as the
+short YAML above plus the chosen title. Not covered: the card on a phone or in the mobile app.
+
 ## Ready-made section
 
 [`dashboards/warnings-section.yaml`](dashboards/warnings-section.yaml) is one dashboard section
