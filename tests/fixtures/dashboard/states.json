@@ -1,0 +1,119 @@
+{
+  "active": {
+    "sensor.home_warning_count": {
+      "state": "3",
+      "attributes": {
+        "areas": ["Illawarra", "Sydney", "Hunter"],
+        "warnings": [
+          {
+            "product_id": "IDN36000",
+            "event": "Extreme Heat",
+            "headline": "Severe heatwave warning for Greater Sydney",
+            "severity": "severe",
+            "phase": "update",
+            "effective": "2026-11-04T13:00:00+00:00",
+            "expires": "2026-11-05T13:00:00+00:00",
+            "level": "severe",
+            "icon": "mdi:thermometer-alert",
+            "color": "#D32F2F",
+            "sent": "2026-11-04T00:24:50+00:00",
+            "area": "Sydney",
+            "summary": "A severe heatwave is expected through Thursday."
+          },
+          {
+            "product_id": "IDN20400",
+            "event": "Wind",
+            "headline": "Strong Wind Warning for coastal waters between Wooli and Montague Island for 05 November",
+            "severity": "moderate",
+            "phase": "update",
+            "effective": "2026-11-04T13:00:00+00:00",
+            "expires": "2026-11-05T13:00:00+00:00",
+            "level": "moderate",
+            "icon": "mdi:weather-windy",
+            "color": "#FB8C00",
+            "sent": "2026-11-04T00:24:50+00:00",
+            "strength": "strong",
+            "area": "Illawarra Coast; Sydney Coast; Hunter Coast",
+            "summary": "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast, Sydney Coast, Illawarra Coast and Batemans Coast"
+          },
+          {
+            "product_id": "IDQ20829",
+            "event": "Riverine Flood",
+            "headline": "Moderate Flood Warning for the Lower Condamine River",
+            "severity": "moderate",
+            "phase": "final",
+            "effective": "2026-11-03T23:27:00+00:00",
+            "expires": "2026-11-04T13:00:00+00:00",
+            "level": "moderate",
+            "icon": "mdi:home-flood",
+            "color": "#FB8C00",
+            "sent": "2026-11-03T23:28:42+00:00",
+            "area": "Lower Condamine River"
+          }
+        ]
+      }
+    },
+    "sensor.home_marine_wind_warning": {
+      "state": "moderate",
+      "attributes": {"strength": "strong", "warnings": []}
+    },
+    "sensor.home_thunderstorm_warning": {
+      "state": "none",
+      "attributes": {"warnings": []}
+    },
+    "sensor.home_fire_danger_today": {
+      "state": "high",
+      "attributes": {
+        "level": "high",
+        "color": "#FEDD3A",
+        "icon": "mdi:fire",
+        "fire_behaviour_index": 31,
+        "district": "Greater Hunter"
+      }
+    },
+    "sensor.home_fire_danger_tomorrow": {
+      "state": "extreme",
+      "attributes": {
+        "level": "extreme",
+        "color": "#F78100",
+        "icon": "mdi:fire-alert",
+        "fire_behaviour_index": 61,
+        "district": "Greater Hunter"
+      }
+    }
+  },
+  "none": {
+    "sensor.home_warning_count": {
+      "state": "0",
+      "attributes": {"areas": ["Illawarra", "Sydney", "Hunter"], "warnings": []}
+    },
+    "sensor.home_marine_wind_warning": {
+      "state": "none",
+      "attributes": {"warnings": []}
+    },
+    "sensor.home_thunderstorm_warning": {
+      "state": "none",
+      "attributes": {"warnings": []}
+    },
+    "sensor.home_fire_danger_today": {
+      "state": "no_rating",
+      "attributes": {
+        "level": "no_rating",
+        "color": "#949494",
+        "icon": "mdi:fire-off",
+        "fire_behaviour_index": 3,
+        "district": "Greater Hunter"
+      }
+    },
+    "sensor.home_fire_danger_tomorrow": {
+      "state": "no_rating",
+      "attributes": {
+        "level": "no_rating",
+        "color": "#949494",
+        "icon": "mdi:fire-off",
+        "fire_behaviour_index": 3,
+        "district": "Greater Hunter"
+      }
+    }
+  }
+}
