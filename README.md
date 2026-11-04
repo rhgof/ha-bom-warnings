@@ -96,6 +96,9 @@ warnings.
 - **Other warnings** covers any type with no entry of its own, such as tsunami, and any type BoM
   adds later.
 - **Hide final and cancelled warnings** is separate: it is about a warning's phase, not its type.
+  A final flood warning is recognised from the phase in BoM's product XML, because its CAP file
+  gives it no "Final" in the headline. If that XML cannot be read, it shows as a current warning
+  until BoM removes it.
 
 Saving reloads the entry, with no restart. Entries from before the checklist are converted when
 they load: an empty type filter becomes every type on, and a filter with names becomes just those

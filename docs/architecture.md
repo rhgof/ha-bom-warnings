@@ -55,11 +55,13 @@ BoM FTP  ──zip──▶  spatial cache  ──▶  resolve_area_codes  ─�
    options.
 4. Entities read the entry coordinator.
 4a. `ProductSummaryReader` (`product_xml.py`) is a separate, optional step in the same FTP session,
-   run after the warnings read and before fire danger. A marine wind CAP file has no `description`,
-   so for each product with a current block that has none it lists `<ID>.xml` by exact name,
-   fetches it, and gives each block the `warning_phenomena for warning_areas` text of the XML
-   hazard whose area codes overlap the block (`Info.xml_summary`, used by `covering` when the CAP has
-   no description). It is keyed on the CAP issue's identifier, so an unchanged product costs no
+   run after the warnings read and before fire danger. It reads a product's XML for two reasons. A
+   marine wind CAP file has no `description`, so each block takes the `warning_phenomena for
+   warning_areas` text and the severity code (`GALE`, `STR`) of the XML hazard whose area codes
+   overlap it (`Info.xml_summary` and `Info.xml_severity`, used by `covering` and by the strength
+   rule). A flood block is marked `Phase.FINAL` when its hazard says `FIN`, because a final flood
+   warning has CAP severity `Unknown` and no "Final" in its headline (`XML_PHASE_EVENTS`). For
+   each product with such a current block it lists `<ID>.xml` by exact name and fetches it. It is keyed on the CAP issue's identifier, so an unchanged product costs no
    request at all, and a product with no XML is remembered the same way. An XML that fails, is
    empty or unreadable, or is older than its CAP file (the CAP landed first) leaves the summary out
    and is tried again on the next poll. It never raises, so it cannot touch `consecutive_failures`,

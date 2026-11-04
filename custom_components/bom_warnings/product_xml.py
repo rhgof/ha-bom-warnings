@@ -1,13 +1,17 @@
-"""BoM's product XML (the `.xml` beside a CAP file), and the summary it gives a marine wind block.
+"""BoM's product XML (the `.xml` beside a CAP file), and what it adds to a block.
 
-A marine wind CAP file has no `description`, so its blocks would have nothing to show. The product
-XML of the same name carries, for each hazard, the phenomenon ("Strong Wind Warning"), the areas it
-covers in words, and the area codes. A block takes the text of the hazard whose codes overlap its
-own, for example "Strong Wind Warning for Coffs Coast, ... and Batemans Coast".
+The XML of a product carries, for each hazard, BoM's type, phase and severity codes, its areas with
+their codes, and some text. Two things CAP lacks are read from it:
+
+- A marine wind CAP file has no `description`, so its blocks would have nothing to show. A block
+  takes the text of the hazard whose codes overlap its own, for example "Strong Wind Warning for
+  Coffs Coast, ... and Batemans Coast", and that hazard's strength code (`GALE`, `STR`).
+- A final flood warning has CAP severity `Unknown` and no "Final" in its headline, but its hazard
+  says `FIN`, so its block is marked final.
 
 No Home Assistant imports, and the reader never raises: this step is optional, so whatever goes
-wrong leaves the summary out and cannot reach the warnings refresh, its failure count or the repair
-issue.
+wrong leaves the block as the CAP file says and cannot reach the warnings refresh, its failure
+count or the repair issue.
 """
 
 from __future__ import annotations
@@ -18,7 +22,7 @@ from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from xml.etree import ElementTree as ET
 
-from .cap import CapWarning, Info, parse_xml
+from .cap import CapWarning, Info, Phase, parse_xml
 from .ftp import BomFtpClient, BomFtpError
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,6 +30,12 @@ _LOGGER = logging.getLogger(__name__)
 # The thunderstorm XML embeds a map image (70 to 297 KB) and heatwave products run to 500 KB, so a
 # file over this is not worth fetching on every change. Marine wind and flood files are far smaller.
 MAX_XML_BYTES = 400_000
+
+# Events whose block is marked final from the XML even though the CAP file has a description: a
+# final flood warning has CAP severity `Unknown` and no "Final" in its headline, but its XML hazard
+# says `FIN` (8 of the 16 flood products captured on 3 Nov 2026).
+XML_PHASE_EVENTS = frozenset({"Riverine Flood"})
+_FINAL_PHASE = "FIN"
 
 _PHENOMENA = "warning_phenomena"
 _AREAS = "warning_areas"
@@ -120,20 +130,42 @@ def parse_product(data: bytes) -> Product | None:
     )
 
 
-def _hazard_for(info: Info, hazards: Sequence[Hazard]) -> Hazard | None:
-    """The hazard with a summary line sharing the most area codes with the block, if any shares."""
+def _hazard_for(info: Info, hazards: Sequence[Hazard], *, with_summary: bool) -> Hazard | None:
+    """The hazard sharing the most area codes with the block, or None when none shares any.
+
+    With `with_summary` only a hazard that has a summary line is considered, as for marine wind.
+    """
     best = max(
-        (h for h in hazards if h.summary),
+        (h for h in hazards if h.summary or not with_summary),
         key=lambda h: len(h.codes & info.area_codes),
         default=None,
     )
     return best if best and best.codes & info.area_codes else None
 
 
-class ProductSummaryReader:
-    """Fills `Info.xml_summary` for blocks the CAP file gives no description.
+def _needs_xml(info: Info, now: datetime) -> bool:
+    """A current block whose CAP file leaves something the product XML supplies."""
+    return info.is_active(now) and (not info.description or info.event in XML_PHASE_EVENTS)
 
-    It reads a product's XML only when a current block has no description, and then once per CAP
+
+def _enriched(info: Info, hazards: Sequence[Hazard]) -> Info:
+    if not info.description and (hazard := _hazard_for(info, hazards, with_summary=True)):
+        info = replace(info, xml_summary=hazard.summary, xml_severity=hazard.severity)
+    if (
+        info.event in XML_PHASE_EVENTS
+        and info.phase is not Phase.FINAL
+        and (hazard := _hazard_for(info, hazards, with_summary=False))
+        and hazard.phase == _FINAL_PHASE
+    ):
+        info = replace(info, phase=Phase.FINAL)
+    return info
+
+
+class ProductSummaryReader:
+    """Fills in what the product XML supplies: a summary and strength code for a block the CAP file
+    gives no description (marine wind), and the final phase of a flood warning.
+
+    It reads a product's XML only when a current block needs it, and then once per CAP
     issue: the issue's identifier changes whenever BoM re-issues, so an unchanged product costs no
     request, and a product found to have no XML is remembered the same way.
     """
@@ -170,20 +202,13 @@ class ProductSummaryReader:
         seen = self._seen.get(warning.product_id)
         if seen is None or seen[0] != warning.identifier:
             return warning
-        infos = tuple(
-            replace(info, xml_summary=hazard.summary, xml_severity=hazard.severity)
-            if not info.description and (hazard := _hazard_for(info, seen[1]))
-            else info
-            for info in warning.infos
-        )
+        infos = tuple(_enriched(info, seen[1]) for info in warning.infos)
         return replace(warning, infos=infos)
 
     def enrich(self, warnings: Sequence[CapWarning], now: datetime) -> list[CapWarning]:
         """Blocking, so run it in an executor. Returns the warnings with summaries filled in."""
         wanted = {
-            w.product_id: w
-            for w in warnings
-            if any(not i.description and i.is_active(now) for i in w.infos)
+            w.product_id: w for w in warnings if any(_needs_xml(info, now) for info in w.infos)
         }
         self._seen = {
             pid: seen

@@ -31,7 +31,8 @@ Private custom component, official sources only. General HA rules are in `../CLA
   files exist only while the hazard is current.
 - Phase is not a CAP field. It comes from `msgType` plus headlines ("Final", "Cancellation of").
   A final flood warning has no "Final" in its CAP headline and CAP severity `Unknown`; the product
-  XML says `phase="FIN"` (8 flood products on 4 Nov 2026, see `docs/warning-products.md`).
+  XML says `phase="FIN"` (8 flood products on 4 Nov 2026, see `docs/warning-products.md`), which
+  `product_xml.py` reads to mark the block final.
 - Force `cp1252` when reading shapefiles: `IDM00014` ships a `.cpg` labelled "ansi 1252".
 - Marine zones (`IDM00003`) are water areas, so a land point never falls inside one.
 - One CAP file can hold several `<info>` blocks. Geocodes include non-AMOC names (e.g. `AU-WA`).

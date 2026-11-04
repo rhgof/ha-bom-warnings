@@ -133,7 +133,7 @@ def test_a_reissued_product_is_read_again() -> None:
 
 def test_a_block_with_a_description_costs_no_request() -> None:
     fake = FakeFtp({})
-    warning = cap("IDQ20829.cap.xml")
+    warning = cap("IDN29000.cap.xml")
 
     (result,) = ProductSummaryReader(fake).enrich([warning], NOW)
 
