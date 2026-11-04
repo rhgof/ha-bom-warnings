@@ -126,6 +126,8 @@ def test_the_icon_follows_the_event_with_a_default_for_one_we_do_not_know() -> N
 def test_a_type_with_no_warnings_has_empty_top_attributes() -> None:
     attributes = type_attributes("Flood", [])
     expected: dict[str, Any] = {
+        "level": "none",
+        "color": None,
         "headline": None,
         "expires": None,
         "product_id": None,

@@ -16,11 +16,13 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.bom_warnings.active_warnings import (
     LEVEL_OPTIONS,
     ActiveWarning,
+    type_attributes,
 )
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import (
     CONF_HIDE_FINAL,
     CONF_WARNING_TYPES,
+    LEVEL_COLORS,
 )
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
@@ -108,6 +110,51 @@ async def test_with_no_warning_the_state_is_none_and_the_attributes_are_empty(
     assert state.attributes["warnings"] == []
     for key in ("headline", "expires", "product_id", "event"):
         assert state.attributes[key] is None, key
+
+
+async def test_with_no_warning_the_level_is_none_and_there_is_no_colour(
+    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
+) -> None:
+    state = await start(hass, mock_config_entry)
+
+    assert state.attributes["level"] == NONE
+    assert state.attributes["color"] is None
+
+
+@pytest.mark.parametrize("area_codes", [["QLD_ME008"]])
+async def test_an_active_warning_gives_its_level_and_the_colour_of_that_level(
+    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
+) -> None:
+    state = await start(hass, mock_config_entry)
+
+    assert state.attributes["level"] == UNRATED
+    assert state.attributes["color"] == LEVEL_COLORS["unknown"]
+
+
+@pytest.mark.parametrize("severity", list(Severity))
+def test_each_level_has_its_own_colour(severity: Severity) -> None:
+    attributes = type_attributes("Thunderstorm", [warning(severity)])
+
+    assert attributes["level"] == ("unrated" if severity is Severity.UNKNOWN else severity.value)
+    assert attributes["color"] == LEVEL_COLORS[severity.value]
+
+
+@pytest.mark.parametrize("phase", [Phase.CANCELLED, Phase.FINAL])
+def test_an_ended_warning_leaves_the_level_none_and_no_colour(phase: Phase) -> None:
+    attributes = type_attributes("Thunderstorm", [warning(Severity.SEVERE, phase=phase)])
+
+    assert attributes["level"] == NONE
+    assert attributes["color"] is None
+
+
+def test_the_colour_follows_the_highest_current_warning() -> None:
+    attributes = type_attributes(
+        "Thunderstorm",
+        [warning(Severity.MINOR), warning(Severity.EXTREME, product_id="IDQ00002")],
+    )
+
+    assert attributes["level"] == "extreme"
+    assert attributes["color"] == LEVEL_COLORS["extreme"]
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008", "QLD_PW013"]])

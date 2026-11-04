@@ -55,11 +55,26 @@
     },
     "sensor.home_marine_wind_warning": {
       "state": "moderate",
-      "attributes": {"strength": "strong", "warnings": []}
+      "attributes": {
+        "level": "moderate",
+        "color": "#FB8C00",
+        "headline": "Strong Wind Warning for coastal waters between Wooli and Montague Island for 05 November",
+        "strength": "strong",
+        "warnings": []
+      }
+    },
+    "sensor.home_extreme_heat_warning": {
+      "state": "severe",
+      "attributes": {
+        "level": "severe",
+        "color": "#D32F2F",
+        "headline": "Severe heatwave warning for Greater Sydney",
+        "warnings": []
+      }
     },
     "sensor.home_thunderstorm_warning": {
       "state": "none",
-      "attributes": {"warnings": []}
+      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
     },
     "sensor.home_fire_danger_today": {
       "state": "high",
@@ -89,11 +104,11 @@
     },
     "sensor.home_marine_wind_warning": {
       "state": "none",
-      "attributes": {"warnings": []}
+      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
     },
     "sensor.home_thunderstorm_warning": {
       "state": "none",
-      "attributes": {"warnings": []}
+      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
     },
     "sensor.home_fire_danger_today": {
       "state": "no_rating",

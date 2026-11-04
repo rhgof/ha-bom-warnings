@@ -283,11 +283,15 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
     """The attributes of one type's level sensor: its top warning's fields, then every warning.
 
     The top warning is the highest-ranked one still in force. A type whose row has a strength rule
-    (marine wind) carries a strength, and a type whose row has a note carries that.
+    (marine wind) carries a strength, and a type whose row has a note carries that. The level and
+    its colour are there so a card can colour itself from the sensor: the colour is None while no
+    warning is in force, and the card decides how a quiet state looks.
     """
     current = rank_warnings(w for w in warnings if w.is_current)
     top = current[0] if current else None
     attributes: dict[str, Any] = {
+        "level": highest_level(warnings),
+        "color": LEVEL_COLORS[level_of(top)] if top else None,
         "headline": top.headline if top else None,
         "expires": top.expires.isoformat() if top and top.expires else None,
         "product_id": top.product_id if top else None,
