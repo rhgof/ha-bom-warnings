@@ -171,7 +171,7 @@ class ProductSummaryReader:
         if seen is None or seen[0] != warning.identifier:
             return warning
         infos = tuple(
-            replace(info, xml_summary=hazard.summary)
+            replace(info, xml_summary=hazard.summary, xml_severity=hazard.severity)
             if not info.description and (hazard := _hazard_for(info, seen[1]))
             else info
             for info in warning.infos

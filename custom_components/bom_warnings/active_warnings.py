@@ -15,7 +15,7 @@ from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
 from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
-from .warning_types import type_of
+from .warning_types import XML_WIND_STRENGTHS, type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,6 +36,8 @@ class ActiveWarning:
     area: str = ""
     # A line for display, from the CAP description. None when the block has no description.
     summary: str | None = None
+    # The product XML's severity code for this block, empty when the XML was not read.
+    xml_severity: str = ""
 
     @property
     def is_current(self) -> bool:
@@ -44,9 +46,15 @@ class ActiveWarning:
 
     @property
     def strength(self) -> str | None:
-        """The class of a marine wind warning (strong, gale, storm), read from its headline."""
+        """The class of a marine wind warning (strong, gale, storm).
+
+        BoM's XML code is preferred, since CAP gives gale and strong wind the same severity. The
+        headline is the fallback, and the only source for a class whose code has not been seen.
+        """
         row = type_of(self.event)
-        return row.strength(self.headline) if row and row.strength else None
+        if row is None or not row.strength:
+            return None
+        return XML_WIND_STRENGTHS.get(self.xml_severity) or row.strength(self.headline)
 
 
 _ENDED = (Phase.CANCELLED, Phase.FINAL)
@@ -164,6 +172,7 @@ def covering(
             phase=info.phase,
             area=_matched_names(info, area_codes, area_names),
             summary=summary_of(info.description) or summary_of(info.xml_summary),
+            xml_severity=info.xml_severity,
         )
         for warning in warnings
         for info in warning.infos

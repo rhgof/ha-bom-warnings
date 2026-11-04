@@ -151,8 +151,10 @@ so. Both marine sensors rate a warning only when the location's circle reaches a
 zone, so a land point never turns them on. Tsunami comes with #25.
 
 **Marine wind strength.** CAP severity has only two levels for marine wind (a gale and a strong wind
-are both Moderate), so the sensor state cannot tell them apart. The class is in the headline, and
-the Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
+are both Moderate), so the sensor state cannot tell them apart. The class comes from the code in
+BoM's product XML (`STR` for strong, `GALE` for gale; no code for storm or hurricane has been seen),
+and from the headline when that XML cannot be read or has a code this integration does not know.
+The Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
 `gale`, `storm` or `hurricane` (none when the state is `none` or the warning is a cancellation).
 Each Wind entry in a `warnings` list carries the same `strength` field; no other event has it. A
 class this code does not know is shown as BoM wrote it. BoM publishes no speed per warning. Its

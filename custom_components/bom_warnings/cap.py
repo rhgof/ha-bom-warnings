@@ -50,6 +50,9 @@ class Info:
     description: str = ""
     # A one-line summary read from the product XML, only for a block with no description.
     xml_summary: str = ""
+    # BoM's severity code for the matching hazard in the product XML (`GALE`, `STR` for marine
+    # wind), where CAP gives gale and strong wind the same severity.
+    xml_severity: str = ""
 
     def is_active(self, now: datetime) -> bool:
         if self.phase in (Phase.CANCELLED, Phase.FINAL):

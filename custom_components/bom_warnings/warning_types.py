@@ -35,6 +35,11 @@ _CLASSES = {
 }
 _HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
 
+# The product XML's severity code for a marine wind hazard. Only these two have been seen (NSW
+# product IDN20400, 4 Nov 2026); a storm or hurricane code is unconfirmed, so those classes still
+# come from the headline.
+XML_WIND_STRENGTHS = {"STR": "strong", "GALE": "gale"}
+
 
 def wind_strength(headline: str) -> str | None:
     """The strength class of a Wind warning's headline, or None.
