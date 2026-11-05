@@ -5,7 +5,7 @@ Anything an agent does here is read-only, through the Home Assistant MCP server.
 or the MCP URL in a file, a commit or a ticket comment.
 
 The throwaway instance already proved the warning scenario with real shapefiles
-(`live-verification-c1.md`). This checklist only answers what that could not: does it install and
+(`architecture.md`, "Testing"). This checklist only answers what that could not: does it install and
 run on the real host, can the host reach BoM, and does it behave with your real data and locations.
 
 Written for the build on `main` at `06005af` (3 Nov 2026). It covers the three kinds of location, the

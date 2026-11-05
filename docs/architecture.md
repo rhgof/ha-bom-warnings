@@ -262,8 +262,22 @@ Home Assistant layer:
   tests patch `location.resolve_location` (the `resolve` fixture) rather than ship shapefiles. Time is frozen because
   the recorded warnings expire in early November 2026, so refresh them if tests start failing
   after that.
-- `scripts/ha-dev.sh` runs a throwaway Home Assistant on `127.0.0.1:8124` (README "Dev instance");
-  `docs/live-verification-c1.md` has the walkthrough and the recorded result.
+- `scripts/ha-dev.sh` runs a throwaway Home Assistant on `127.0.0.1:8124` (`docs/development.md`, "Dev instance");
+  the fake server section there is the walkthrough.
+- The first end-to-end run (2026-11-02, dev instance on 2026.10.4, real shapefile layers served by
+  the fake server, location `-21.5, 142.0` in `QLD_PW003`, config flow driven over REST):
+
+  | Step | Fake server | binary sensor | count | most severe |
+  | --- | --- | --- | --- | --- |
+  | 1 | `baseline` | off | 0 | none |
+  | 2 | `warning_appears` (IDQ21013 Extreme Heat) | on, lists Extreme Heat | 1 | Severe heatwave warning for Queensland |
+  | 3 | `baseline` again (warning removed) | off | 0 | none |
+  | 4 | server stopped | unavailable (all four entities) | | |
+
+  A `new` event fired on the event entity in step 2. Each step forced a refresh with
+  `homeassistant.update_entity`, because the poll interval is 10 minutes. Step 3 removes the warning
+  from the feed rather than serving a cancel message, because no recorded `Cancel` file covers this
+  district.
 - The single location resolver (`location.py`) was checked on 3 November 2026 without booting Home
   Assistant: the old route (open a session, `resolve_coordinate`, then `state_of`) and
   `resolve_location` were run on the same eight points, with the real `BomFtp` client against the

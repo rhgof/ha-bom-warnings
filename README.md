@@ -5,14 +5,73 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
 *Unofficial and for personal use. The warning data belongs to the Bureau of Meteorology: see
 [Licence](#licence).*
 
+## Contents
+
+- [Key features](#key-features): what it does, with screenshots ([On your dashboard](#on-your-dashboard))
+- [Install](#install): HACS or manual, and adding the integration
+- [Locations](#locations): home, typed coordinates or a zone ([Coastal waters](#coastal-waters))
+- [Dashboard](#dashboard): the card, or built-in cards
+- [Entities](#entities): the sensors and the event entity
+  - [Which areas a location covers](#which-areas-a-location-covers)
+  - [Summary and attribution](#summary-and-attribution)
+  - [Choosing the warnings that matter](#choosing-the-warnings-that-matter)
+  - [Per-warning-type level sensors](#per-warning-type-level-sensors)
+- [Development](#development)
+- [Licence](#licence)
+
+## Key features
+
+- **Official warnings, for the places you care about.** Severe thunderstorm, fire weather, flood,
+  heatwave, frost, tropical cyclone, marine wind, hazardous surf and the other Bureau of Meteorology
+  warning types arrive as Home Assistant entities, checked every 10 minutes.
+  The data comes straight from the Bureau's own warning feed, with no account or API key.
+- **Warnings for the right area.** A warning is matched against the Bureau's own area boundaries
+  (forecast districts, metro areas, flood catchments, fire weather districts and coastal waters), so
+  you hear about warnings that cover you, not every warning in the state.
+- **One location per place.** Add your Home Assistant home, a typed latitude and longitude, or any
+  Home Assistant zone: Home, Work, a holiday house, your parents' place. A zone's circle can cover
+  several districts, up to a 50 km radius, and the entry follows the zone if you move or resize it.
+  Each location gets its own entities.
+- **Sensors you can build on.**
+  - A *warning* binary sensor that is on while any current warning covers the location.
+  - A *warning count* and a *most severe warning* sensor, with the headline, expiry and a one-line
+    summary as attributes.
+  - One sensor per warning type (thunderstorm, flood, fire weather and so on) whose state is the
+    level: `none`, `minor`, `moderate`, `severe` or `extreme`. This is the one to use in
+    automations, for example to close the blinds when a thunderstorm warning goes severe.
+  - An *event* entity that fires when a warning appears or changes, for notifications.
+  - Today's and tomorrow's fire danger rating, for locations in NSW and the ACT.
+- **Pick the warnings that matter.** Tick the types you want in the entry's options. The rest are
+  ignored everywhere and their sensors are removed. You can also hide final and cancelled warnings.
+- **It says which area a warning is for.** Each warning lists the names of the districts it covers
+  (for example `Illawarra`), so a warning for the next district over looks different from one for
+  yours.
+- **Made for dashboards.** The companion [BoM Warnings Card](https://github.com/rhgof/ha-bom-warnings-card)
+  shows the warnings, most severe first, with icons in the colour of each severity. No YAML is needed.
+
+### On your dashboard
+
+The warnings can be listed most severe first, with an icon in the colour of each warning's level.
+These are two moderate warnings and one severe warning, in a light and a dark theme:
+
+| Light | Dark |
+| --- | --- |
+| ![Two moderate warnings, light theme](docs/images/dashboard/warning-list-two-moderate-light.png) | ![Two moderate warnings, dark theme](docs/images/dashboard/warning-list-two-moderate-dark.png) |
+| ![One severe warning, light theme](docs/images/dashboard/warning-list-severe-light.png) | ![One severe warning, dark theme](docs/images/dashboard/warning-list-severe-dark.png) |
+
+Those were made with Home Assistant's own Markdown card, using the ready-made section in
+[docs/dashboard.md](docs/dashboard.md). The companion
+[BoM Warnings Card](https://github.com/rhgof/ha-bom-warnings-card), installed through HACS, draws the
+same list without any template, and adds a tile for a single warning type.
+
 ## Install
 
 Tested on Home Assistant 2026.10.4 only; no other version has been tried. Home Assistant needs
 outbound access to the Bureau's FTP server (`ftp.bom.gov.au`, port 21).
 
 **HACS:** add this repository in HACS as a custom repository of type Integration, download
-BoM Warnings, and restart Home Assistant. The release and HACS checks are not set up yet
-(ticket #38), so this route may not work.
+BoM Warnings, and restart Home Assistant. This route has not been tried yet, so use the manual
+install if it fails.
 
 **Manual:** copy the `custom_components/bom_warnings` folder from this repository into the
 `custom_components` folder of your Home Assistant configuration directory, using whatever
@@ -20,7 +79,6 @@ file access your install offers, then restart Home Assistant.
 
 Then go to Settings > Devices & services > Add integration > **BoM Warnings**. The first location
 you add downloads the Bureau's area boundary files, so allow a minute. Take a full backup first.
-The step-by-step checklist is in `docs/live-verification-c6.md`.
 
 ## Locations
 
@@ -70,17 +128,15 @@ radius is visible straight away: grow it over a second district and that distric
 shrink it and the name goes. Each item in a `warnings` list also has an `area`, the names of the
 location's areas that warning covers, so a warning for a neighbouring district looks different from
 one for yours. `area` is left out when none of those areas has a name. Names come from BoM's
-shapefiles, never area codes. An entry made before this existed looks its names up once, the first
-time it loads.
+shapefiles, never area codes.
 
 ### Summary and attribution
 
 Each item in a `warnings` list also has a `summary`: the first paragraph of the warning's text from
-BoM, on one line and cut to 300 characters at a word boundary, with an ellipsis if it was longer.
-A marine wind warning has no text in the CAP file, so its summary is read from the Bureau's product
-XML beside it, for example "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast,
-Sydney Coast, Illawarra Coast and Batemans Coast". `summary` is left out when BoM sends no text
-and that XML cannot be read; the warning itself is unaffected. Check for it with
+BoM, on one line and cut to 300 characters with an ellipsis if it was longer. For a marine wind
+warning it is the one-line description of the warning, for example "Strong Wind Warning for Coffs
+Coast, Macquarie Coast, Hunter Coast, Sydney Coast, Illawarra Coast and Batemans Coast". `summary`
+is left out when BoM sends no text; the warning itself is unaffected. Check for it with
 `{% if w.summary %}` or `w.summary | default('')` in a template. The Most severe warning sensor and
 each per-warning-type sensor also show their top warning's `summary` as an attribute, so a tile can
 show it with `state_content: summary`; the warning count sensor and the warning binary sensor show it
@@ -106,13 +162,10 @@ warnings.
 - **Other warnings** covers any type with no entry of its own, such as tsunami, and any type BoM
   adds later.
 - **Hide final and cancelled warnings** is separate: it is about a warning's phase, not its type.
-  A final flood warning is recognised from the phase in BoM's product XML, because its CAP file
-  gives it no "Final" in the headline. If that XML cannot be read, it shows as a current warning
-  until BoM removes it.
+  A final flood warning is recognised even though its headline does not say "Final". If BoM's
+  details for it cannot be read, it shows as a current warning until BoM removes it.
 
-Saving reloads the entry, with no restart. Entries from before the checklist are converted when
-they load: an empty type filter becomes every type on, and a filter with names becomes just those
-types; Marine wind and Hazardous surf are on only if coastal waters were on.
+Saving reloads the entry, with no restart.
 
 ### Per-warning-type level sensors
 
@@ -161,18 +214,14 @@ Its `note` attribute says so. It is still a good thing to show on a dashboard.
 **Marine wind is not wind at your house.** BoM's Wind event is for coastal and local waters; damaging
 winds on land arrive as the Severe weather warning. The Marine wind sensor's `note` attribute says
 so. Both marine sensors rate a warning only when the location's circle reaches a coastal or local water
-zone, so a land point never turns them on. Tsunami comes with #25.
+zone, so a land point never turns them on.
 
-**Marine wind strength.** CAP severity has only two levels for marine wind (a gale and a strong wind
-are both Moderate), so the sensor state cannot tell them apart. The class comes from the code in
-BoM's product XML (`STR` for strong, `GALE` for gale; no code for storm or hurricane has been seen),
-and from the headline when that XML cannot be read or has a code this integration does not know.
-The Marine wind sensor has a top-level `strength` attribute for its top current warning: `strong`,
-`gale`, `storm` or `hurricane` (none when the state is `none` or the warning is a cancellation).
-Each Wind entry in a `warnings` list carries the same `strength` field; no other event has it. A
-class this code does not know is shown as BoM wrote it. BoM publishes no speed per warning. Its
-warning products guide says marine wind warnings are issued for winds of 26 knots or stronger, and
-the strength is the class (strong wind, gale, storm force, hurricane force), not a measured speed.
+**Marine wind strength.** A gale and a strong wind are both Moderate, so the sensor state cannot
+tell them apart. The Marine wind sensor has a `strength` attribute for its top current warning:
+`strong`, `gale`, `storm` or `hurricane` (none when the state is `none` or the warning is a
+cancellation). Each Wind entry in a `warnings` list carries it too. It is the class, not a measured
+speed: BoM publishes no speed per warning, and issues marine wind warnings for winds of 26 knots or
+stronger.
 
 ## Development
 
