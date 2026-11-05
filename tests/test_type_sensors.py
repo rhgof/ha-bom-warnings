@@ -185,6 +185,7 @@ async def test_attributes_list_each_warning_of_the_type_with_the_highest_severit
         "phase",
         "effective",
         "expires",
+        "in_force",
         "summary",
     }
     assert 0 < len(brisbane["summary"]) <= 300

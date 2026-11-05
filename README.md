@@ -15,6 +15,7 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
 - [Entities](#entities): the sensors and the event entity
   - [Which areas a location covers](#which-areas-a-location-covers)
   - [Summary and attribution](#summary-and-attribution)
+  - [Warnings that have not started yet](#warnings-that-have-not-started-yet)
   - [Choosing the warnings that matter](#choosing-the-warnings-that-matter)
   - [Per-warning-type level sensors](#per-warning-type-level-sensors)
 - [Development](#development)
@@ -182,6 +183,24 @@ Every warning entity carries the attribution "Australian Government Bureau of Me
 `attribution` attribute, as the fire danger sensors do. Home Assistant shows it in the entity's
 details; a tile does not. The text is the Bureau's, under its own terms
 (<http://www.bom.gov.au/other/copyright.shtml>).
+
+### Warnings that have not started yet
+
+A warning counts from the moment the Bureau issues it, even when it says it starts later. Marine
+wind warnings, for example, are often sent a day ahead. That gives you advance notice: the warning
+sensor turns on and the level sensors rise when the warning is issued, not when it begins.
+
+To tell an upcoming warning from one already in force, each warning in a `warnings` list has
+`in_force` (`false` until its start time, `true` after) and an `effective` start time. The Most
+severe warning sensor and each per-warning-type sensor show `in_force` for their top warning too.
+Because Home Assistant reads the Bureau every 10 minutes, `in_force` can be up to 10 minutes late
+changing to `true`. To act only on warnings already in force:
+
+```yaml
+conditions:
+  - condition: template
+    value_template: "{{ state_attr('sensor.home_thunderstorm_warning', 'in_force') }}"
+```
 
 ### Choosing the warnings that matter
 

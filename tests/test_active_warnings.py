@@ -30,13 +30,14 @@ def info(
     phase: Phase = Phase.NEW,
     severity: Severity = Severity.SEVERE,
     expires: datetime | None = LATER,
+    effective: datetime | None = EARLIER,
     headline: str = "Severe Thunderstorm Warning for Brisbane",
 ) -> Info:
     return Info(
         event=event,
         headline=headline,
         severity=severity,
-        effective=EARLIER,
+        effective=effective,
         expires=expires,
         area_desc="Brisbane",
         area_codes=codes,
@@ -66,6 +67,18 @@ def test_a_current_matching_block_is_reported_with_its_fields() -> None:
         sent=EARLIER,
         phase=Phase.NEW,
     )
+
+
+@pytest.mark.parametrize(
+    ("effective", "in_force"),
+    [(EARLIER, True), (NOW, True), (None, True), (LATER, False)],
+    ids=["started", "starts now", "no start time", "starts later"],
+)
+def test_a_warning_is_reported_before_it_starts_but_is_not_in_force(
+    effective: datetime | None, in_force: bool
+) -> None:
+    (found,) = covering([warning(info(effective=effective))], HERE, NOW)
+    assert found.in_force is in_force
 
 
 def test_a_warning_names_only_the_areas_the_entry_matched() -> None:

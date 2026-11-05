@@ -3,6 +3,7 @@
 Dashboards read these, so every key and value is pinned.
 """
 
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -27,7 +28,16 @@ WARNING_TYPE_NOTES = {t.event: t.note for t in WARNING_TYPES if t.note}
 NOW = datetime(2026, 11, 3, 6, 0, tzinfo=UTC)
 EARLIER = NOW - timedelta(hours=1)
 LATER = NOW + timedelta(hours=1)
-LEAN_KEYS = {"product_id", "event", "headline", "severity", "phase", "effective", "expires"}
+LEAN_KEYS = {
+    "product_id",
+    "event",
+    "headline",
+    "severity",
+    "phase",
+    "effective",
+    "expires",
+    "in_force",
+}
 RANKED_EXTRAS = {"level", "icon", "color", "sent"}
 
 
@@ -63,7 +73,14 @@ def test_a_lean_item_is_exactly_these_fields() -> None:
         "phase": "new",
         "effective": EARLIER.isoformat(),
         "expires": LATER.isoformat(),
+        "in_force": True,
     }
+
+
+def test_an_item_for_a_warning_that_has_not_started_says_so() -> None:
+    upcoming = replace(active(), effective=LATER, in_force=False)
+    item = warning_attributes(upcoming)
+    assert (item["in_force"], item["effective"]) == (False, LATER.isoformat())
 
 
 def test_an_item_names_the_areas_it_matched_and_only_then() -> None:
@@ -132,6 +149,7 @@ def test_a_type_with_no_warnings_has_empty_top_attributes() -> None:
         "expires": None,
         "product_id": None,
         "event": None,
+        "in_force": None,
         "warnings": [],
     }
     if note := WARNING_TYPE_NOTES.get("Flood"):
@@ -199,3 +217,10 @@ def test_a_lean_item_without_times_has_them_as_none() -> None:
     open_ended = ActiveWarning("IDQ1", "Flood", "Flood Watch", Severity.MINOR, None, None)
     item = warning_attributes(open_ended)
     assert (item["effective"], item["expires"]) == (None, None)
+
+
+def test_a_type_sensor_says_whether_its_top_warning_is_in_force() -> None:
+    upcoming = replace(active(event="Thunderstorm"), in_force=False)
+    assert type_attributes("Thunderstorm", [upcoming])["in_force"] is False
+    assert type_attributes("Thunderstorm", [active(event="Thunderstorm")])["in_force"] is True
+    assert type_attributes("Thunderstorm", [])["in_force"] is None

@@ -38,6 +38,11 @@ class ActiveWarning:
     summary: str | None = None
     # The product XML's severity code for this block, empty when the XML was not read.
     xml_severity: str = ""
+    # False for a warning BoM has issued but whose `effective` time is still ahead, such as a
+    # marine wind warning sent a day early. It still counts everywhere, so advance notice is kept;
+    # this lets a template or card tell it from one already in force. Worked out when the
+    # warnings are read, so it can lag a start time by up to one refresh.
+    in_force: bool = True
 
     @property
     def is_current(self) -> bool:
@@ -112,6 +117,7 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
         "phase": str(warning.phase),
         "effective": warning.effective.isoformat() if warning.effective else None,
         "expires": warning.expires.isoformat() if warning.expires else None,
+        "in_force": warning.in_force,
     }
     if ranked:
         level = level_of(warning)
@@ -173,6 +179,7 @@ def covering(
             area=_matched_names(info, area_codes, area_names),
             summary=summary_of(info.description) or summary_of(info.xml_summary),
             xml_severity=info.xml_severity,
+            in_force=info.effective is None or info.effective <= now,
         )
         for warning in warnings
         for info in warning.infos
@@ -296,6 +303,7 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "expires": top.expires.isoformat() if top and top.expires else None,
         "product_id": top.product_id if top else None,
         "event": top.event if top else None,
+        "in_force": top.in_force if top else None,
         "warnings": [warning_attributes(w) for w in warnings],
     }
     # At the top level too, because a tile can show an attribute but not reach into the list.

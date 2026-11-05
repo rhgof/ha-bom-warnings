@@ -142,6 +142,13 @@ Home Assistant layer:
 - **Current vs listed.** A warning is current if `Info.is_active(now)`: not cancelled/final and
   not past `expires`. With the option `hide_final_cancelled` off, ended warnings are only added to
   attribute lists; they never turn the binary sensor on or count (`ActiveWarning.is_current`).
+- **In force vs issued (#70).** `is_active` ignores `effective`, on purpose: a warning counts from
+  the moment BoM issues it, so the binary sensor, count and levels give advance notice of, say, a
+  marine wind warning sent a day early. `ActiveWarning.in_force` (set in `covering`:
+  `effective` is None or not after `now`) tells those from warnings already started. It is an
+  attribute on every list item and on the Most severe and type sensors' top level (the type
+  sensor's is None when it has no warning). No state, count or event changes with it. It is fixed
+  when the feed is read, so it can lag a start time by up to one refresh (10 minutes).
 - **Event entity.** Diffs `coordinator.states` (every covering product in any phase, one per
   product, represented by its most severe block) against the previous refresh. Baseline is taken
   when the entity is added, so startup and reload fire nothing. A type that is off in the
