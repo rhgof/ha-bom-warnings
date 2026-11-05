@@ -149,6 +149,9 @@ Two ways to show the warnings on a dashboard, both described in [docs/dashboard.
 - **Built-in cards:** a ready-made section made from Home Assistant's own Markdown, tile and
   conditional cards, for when you would rather not install a card.
 
+For tiles, notifications, automations and voice with several warnings at a location, see
+[Using several warnings at a location](docs/dashboard.md#using-several-warnings-at-a-location).
+
 ## Entities
 
 Each location gets a warning binary sensor (on while any current warning covers it), a warning

@@ -69,6 +69,115 @@ A test renders the section's Markdown cards against recorded attribute payloads
 I left out a `flex-table-card` or `custom:button-card` variant: I do not know their config for
 looping over a list attribute well enough to give you something correct.
 
+## Using several warnings at a location
+
+A location can have a thunderstorm warning, a flood warning and a marine wind warning at once.
+Four ways to use them, each with Home Assistant's own triggers and conditions, not templates over
+the `warnings` attribute. `home` stands for your entry's slug.
+
+| Use | What to read |
+| --- | --- |
+| Tiles and a list | A tile on each per-type sensor, and the ranked list for everything current |
+| Notifications | The event entity, `event.home_warning_event` |
+| Automations | A state trigger on a per-type sensor |
+| Voice | A per-type sensor exposed to Assist |
+
+Two types need care. **Marine wind** is for coastal waters only, and a land location never
+turns it on; damaging wind on land is the **Severe weather** warning. **Severe weather** is a
+display type: BoM uses one event for severe weather and coastal hazard warnings, so the sensor
+cannot tell them apart. Show it, but do not trigger an automation from it.
+
+### Tiles and a list
+
+A tile on a per-type sensor, shown only while that type has a warning, with the ranked list below
+it for everything current (Severe weather included). Repeat the tile for each type you care about:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: tile
+    entity: sensor.home_thunderstorm_warning
+    state_content: [state, headline]
+    visibility:
+      - condition: state
+        entity: sensor.home_thunderstorm_warning
+        state_not: "none"
+  - type: tile
+    entity: sensor.home_flood_warning
+    state_content: [state, headline]
+    visibility:
+      - condition: state
+        entity: sensor.home_flood_warning
+        state_not: "none"
+  - type: custom:bom-warnings-card
+    entity: sensor.home_warning_count
+```
+
+The built-in tile does not take the warning's colour. The card's `custom:bom-warning-tile` does, and
+can replace each tile above. Without the card, use the ready-made section or the Markdown card
+earlier on this page for the list. `dashboards/warnings-section.yaml` already has a tile for every
+type, each hidden while that type is quiet.
+
+### Notifications
+
+The event entity fires when a warning appears (`new`), changes (`update`) or ends (`final`,
+`cancelled`). Its event data has `product_id`, `event`, `severity` and `headline`. Warnings already
+present when Home Assistant starts or the entry reloads fire nothing.
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: event.home_warning_event
+conditions:
+  - condition: state
+    entity_id: event.home_warning_event
+    attribute: event_type
+    state: [new, update]
+actions:
+  - action: notify.notify
+    data:
+      title: "BoM warning: {{ state_attr('event.home_warning_event', 'event') }}"
+      message: "{{ state_attr('event.home_warning_event', 'headline') }}"
+```
+
+Drop the condition to be told about ended warnings too.
+
+### Automations
+
+A per-type sensor's state is the highest level among its current warnings: `none`, `minor`,
+`moderate`, `unrated`, `severe` or `extreme`. Trigger on it going to the levels you care about, and
+`to: [severe, extreme]` is "only if severe". This closes the blinds for a thunderstorm warning at
+severe or above, or when BoM leaves it unrated, which it does for Severe Thunderstorm warnings:
+
+```yaml
+triggers:
+  - trigger: state
+    entity_id: sensor.home_thunderstorm_warning
+    to: [unrated, severe, extreme]
+actions:
+  - action: cover.close_cover
+    target:
+      area_id: living_room
+```
+
+A warning counts from the moment BoM issues it, even if it starts later. To act only once it has
+started, add a condition on the sensor's `in_force` attribute:
+
+```yaml
+conditions:
+  - condition: state
+    entity_id: sensor.home_thunderstorm_warning
+    attribute: in_force
+    state: true
+```
+
+### Voice
+
+Expose a per-type sensor to Assist (Settings > Voice assistants > Expose) and ask for it by name,
+for example "what is the thunderstorm warning at home?". Its state is the level, so the answer is
+`none`, `severe` and so on. This has not been tried on a voice assistant here. A sentence that reads
+out the headline is the optional spoken summary sensor, which is not built (see #35).
+
 ## What the data looks like
 
 `state_attr('sensor.<title>_warning_count', 'warnings')` is a list, most severe first, only for
