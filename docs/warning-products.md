@@ -136,10 +136,17 @@ capture script when one is current.
 - One fetch for each CAP file whose whole listing line changed (the listing has no year, so the line
   is the change signal). The first poll fetches all current files, 26 and about 90 KB on 4 Nov;
   later polls fetch the few that changed.
-- The integration never fetches a `.txt`, `.xml` or `.pdf` for warnings. The only sibling it reads
-  is the fire danger product, by exact name, when its listing line changes.
+- The integration never fetches a `.txt` or `.pdf`. It reads two sibling `.xml` files, both by exact
+  name and both optional, so neither can fail the warnings refresh:
+  - A flood or marine wind product's XML (`<ID>.xml`), listed and fetched once per new issue of a
+    product that has a current block of that type (`product_xml.ProductSummaryReader`). Marine wind
+    XML is about 5 KB and flood 7 to 26 KB. A file over 400 KB (`MAX_XML_BYTES`) is skipped, which
+    keeps out the thunderstorm XML with its embedded map (70 to 297 KB) and the heatwave products.
+    It supplies the marine wind description and strength code, and marks a final flood warning.
+  - A fire danger product, listed on every poll for each state with a location in a fire weather
+    district, and fetched only when its listing line changes (`fire_danger.FireDangerReader`).
 - After about 100 requests in a few minutes the server starts timing out data connections, so any
-  sibling fetch must be rare, size-capped and kept out of the warnings path.
+  sibling fetch must stay rare, size-capped and kept out of the warnings path.
 
 ## Attribution
 

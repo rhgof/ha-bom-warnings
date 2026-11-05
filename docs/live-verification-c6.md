@@ -8,12 +8,13 @@ The throwaway instance already proved the warning scenario with real shapefiles
 (`architecture.md`, "Testing"). This checklist only answers what that could not: does it install and
 run on the real host, can the host reach BoM, and does it behave with your real data and locations.
 
-Written for the build on `main` at `06005af` (3 Nov 2026). It covers the three kinds of location, the
-options checklist, the level sensors, the repair issues and the entry migration (entry version 3).
+Written for the build on `main` at `5abe6cd` (5 Nov 2026). It covers the three kinds of location, the
+options checklist, the level sensors (including `in_force`), the repair issues and the entry
+migration (entry version 3).
 
 ## Before you start
 
-- [ ] The version you will install is the one on `main` (`git log -1` shows `06005af` or later). CI on
+- [ ] The version you will install is the one on `main` (`git log -1` shows `5abe6cd` or later). CI on
       that commit is green.
 - [ ] Note the host's Home Assistant version (Settings > About). The integration has been run on
       2026.10.4 only; if yours is older, expect problems and note them. No lower version has been
@@ -131,11 +132,16 @@ The entity ids are the entry title slug plus a suffix. Check each exists and has
 - [ ] **Marine wind** (needs a zone that reaches the sea and a current marine wind warning): the
       sensor also has a `strength` attribute (`strong`, `gale`, `storm` or `hurricane`). It is the
       warning's class, not a measured speed. No other type has this attribute.
-- [ ] **Fire danger** (NSW and ACT locations only): `sensor.<title>_fire_danger_today` and
+- [ ] **Not started yet:** if a warning has been issued but not begun (marine wind warnings are often
+      sent a day ahead), its `in_force` attribute is `false` and `effective` is the start time. The
+      sensors and the count still include it. When it starts, `in_force` turns `true` within about
+      10 minutes. A warning already in force shows `true`.
+- [ ] **Fire danger** (a location inside a fire weather district, in any state):
+      `sensor.<title>_fire_danger_today` and
       `..._fire_danger_tomorrow` show a rating (no_rating, moderate, high, extreme or catastrophic)
       and the `district`. After the afternoon issue (about 16:15) "today" keeps its earlier value
-      until the end of the local day. A location outside NSW and the ACT has no fire danger
-      entities; that is expected.
+      until the end of the local day. A location outside every fire weather district has no
+      fire danger entities; that is expected.
 - [ ] None of them is `unavailable`. If they are, check the log and Settings > Repairs.
 
 A quiet day proves less: all `off` / `0` / `none` shows the data path works, not that a real
@@ -218,7 +224,7 @@ Options checklist (step 5): off removes the sensor, on restores it:   yes / no
 Entities present and not unavailable:     yes / no  (which)
 Level sensors show attributes when a warning is current:   yes / no / no warning at the time
 A warning was current at the time:        yes / no
-Fire danger present (NSW/ACT) / absent elsewhere:     yes / no / n/a
+Fire danger present (fire weather district) / absent elsewhere:     yes / no / n/a
 Repairs: zone removed, radius too large:  appeared and cleared / not as expected
 Read-only checks clean (log, repairs):    yes / no  (note)
 Diagnostics free of coordinates / name:   yes / no
