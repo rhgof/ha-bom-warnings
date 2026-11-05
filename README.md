@@ -8,6 +8,7 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
 ## Contents
 
 - [Key features](#key-features): what it does, with screenshots ([On your dashboard](#on-your-dashboard))
+- [Requirements](#requirements): Home Assistant version, disk space and what it asks the Bureau for
 - [Install](#install): HACS or manual, and adding the integration
 - [Locations](#locations): home, typed coordinates or a zone ([Coastal waters](#coastal-waters))
 - [Dashboard](#dashboard): the card, or built-in cards
@@ -40,7 +41,7 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
     level: `none`, `minor`, `moderate`, `severe` or `extreme`. This is the one to use in
     automations, for example to close the blinds when a thunderstorm warning goes severe.
   - An *event* entity that fires when a warning appears or changes, for notifications.
-  - Today's and tomorrow's fire danger rating, for locations in NSW and the ACT.
+  - Today's and tomorrow's fire danger rating, for locations in a fire weather district.
 - **Pick the warnings that matter.** Tick the types you want in the entry's options. The rest are
   ignored everywhere and their sensors are removed. You can also hide final and cancelled warnings.
 - **It says which area a warning is for.** Each warning lists the names of the districts it covers
@@ -64,10 +65,44 @@ Those were made with Home Assistant's own Markdown card, using the ready-made se
 [BoM Warnings Card](https://github.com/rhgof/ha-bom-warnings-card), installed through HACS, draws the
 same list without any template, and adds a tile for a single warning type.
 
-## Install
+## Requirements
 
-Tested on Home Assistant 2026.10.4 only; no other version has been tried. Home Assistant needs
-outbound access to the Bureau's FTP server (`ftp.bom.gov.au`, port 21).
+- **Home Assistant 2026.10.4.** This is the only version it has been tested on. An older or newer
+  one may work, but nobody has tried. Nothing else needs installing: the one Python library it uses
+  (`pyshp`) is fetched by Home Assistant itself, and it uses Home Assistant's built-in Zones.
+- **Outbound access to the Bureau's FTP server**, `ftp.bom.gov.au` on port 21 (passive mode, so
+  your firewall must also allow the data connection FTP opens). No account, key or inbound port is
+  needed. A network that blocks FTP, or a proxy that cannot pass it, will stop it working.
+- **About 60 MB of disk space** in your Home Assistant configuration folder, under
+  `bom_warnings/spatial`. It holds the Bureau's area boundary files, which are used to work out
+  which warnings cover your location. Allow about 50 MB more free while a boundary file is being
+  replaced, which happens only when the Bureau changes one. The warnings themselves are held in
+  memory, and fire danger ratings take a few kilobytes of Home Assistant storage per location.
+- **A one-off download of about 28 MB** the first time you add a location, for those boundary
+  files. Allow a minute. It is not repeated unless the Bureau updates a file.
+
+### What it asks the Bureau for
+
+Every 10 minutes the integration makes one FTP connection and checks for changes. The interval is
+fixed and cannot be changed, so it cannot be set to hammer the Bureau's server. The checks are
+shared by every location you add: five locations cost the same as one, except for fire danger,
+which is one file for each state your locations are in.
+
+| When | Requests | Size |
+| --- | --- | --- |
+| Every poll (every 10 minutes) | One listing of the current warning files | About 1 KB |
+| Each new or changed warning | One fetch of that warning's file | 2 to 6 KB each (median 3 KB) |
+| A flood or marine wind warning, once per new issue | One listing and one fetch of its detail file, for the description and strength | 5 to 26 KB (a file over 400 KB is skipped) |
+| Every poll, for each state with a fire danger location | One listing of that state's fire danger file, and a fetch only if it changed | 19 to 77 KB when fetched |
+| The first poll after a restart | Every current warning file | About 90 KB when 26 warnings are current |
+| Weekly | A modified-time check of each of the six boundary files, and a download only of one that changed | 2 to 13 MB, only if changed |
+
+A quiet day is about 144 polls of roughly 1 KB each, well under 1 MB in total. A day with many
+warnings is still a few hundred kilobytes, because only new or changed files are fetched. The
+Bureau's server starts timing out after about a hundred requests in a few minutes, and this stays
+far below that.
+
+## Install
 
 **HACS:** add this repository in HACS as a custom repository of type Integration, download
 BoM Warnings, and restart Home Assistant. This route has not been tried yet, so use the manual
@@ -117,7 +152,8 @@ Two ways to show the warnings on a dashboard, both described in [docs/dashboard.
 
 Each location gets a warning binary sensor (on while any current warning covers it), a warning
 count, a most severe warning sensor and an event entity that fires when a warning appears or
-changes. Locations in NSW and the ACT also get today's and tomorrow's fire danger rating.
+changes. Locations in a fire weather district (every state, and the ACT through NSW) also get today's and
+tomorrow's fire danger rating.
 
 ### Which areas a location covers
 
