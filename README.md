@@ -250,20 +250,24 @@ triggers:
     to: [unrated, severe, extreme]
 ```
 
-| Sensor | BoM warning |
-| --- | --- |
-| Thunderstorm warning | Severe Thunderstorm Warning |
-| Fire weather warning | Fire Weather Warning (Severe, Extreme, Catastrophic) |
-| Extreme heat warning | Heatwave warnings |
-| Frost warning | Frost Warning |
-| Hazardous road conditions warning | Road Weather Alert |
-| Flood warning | Riverine flood warnings |
-| Sheep grazier warning | Warning to Sheep Graziers |
-| Exposure warning | Exposure warnings |
-| Tropical cyclone warning | Tropical Cyclone Watch and Warning |
-| Severe weather warning | Severe Weather Warning (**for display**, see below) |
-| Marine wind warning | Strong, Gale Force and Storm Force Wind Warnings for coastal waters (**marine only**) |
-| Hazardous surf warning | Hazardous Surf Warning |
+| Sensor | Entity id | BoM warning |
+| --- | --- | --- |
+| Severe thunderstorm warning | `sensor.<title>_thunderstorm_warning` | Severe Thunderstorm Warning |
+| Fire weather warning | `sensor.<title>_fire_weather_warning` | Fire Weather Warning (Severe, Extreme, Catastrophic) |
+| Heatwave warning | `sensor.<title>_extreme_heat_warning` | Heatwave Warning |
+| Frost warning | `sensor.<title>_frost_warning` | Frost Warning |
+| Road weather alert | `sensor.<title>_hazardous_road_conditions_warning` | Road Weather Alert |
+| Flood warning | `sensor.<title>_flood_warning` | Riverine flood warnings |
+| Warning to sheep graziers | `sensor.<title>_sheep_grazier_warning` | Warning to Sheep Graziers |
+| Exposure warning | `sensor.<title>_exposure_warning` | Exposure warnings |
+| Tropical cyclone warning | `sensor.<title>_tropical_cyclone_warning` | Tropical Cyclone Watch and Warning |
+| Severe weather warning | `sensor.<title>_severe_weather_warning` | Severe Weather Warning (**for display**, see below) |
+| Marine wind warning | `sensor.<title>_marine_wind_warning` | Strong, Gale Force and Storm Force Wind Warnings for coastal waters (**marine only**) |
+| Hazardous surf warning | `sensor.<title>_hazardous_surf_warning` | Hazardous Surf Warning |
+
+Each sensor is named after the Bureau's own product, so a name never reads as a level: a Heatwave
+warning can be `severe`, which a name like "Extreme heat" would contradict. The entity ids keep
+their original form, which is why `sensor.<title>_extreme_heat_warning` is the Heatwave warning.
 
 **Severe weather warning is for display, not for automations.** BoM uses one event, Weather, for both
 Severe Weather Warnings and Coastal Hazard Warnings, so the sensor cannot tell which a warning is.

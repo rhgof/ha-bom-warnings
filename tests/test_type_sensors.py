@@ -24,6 +24,7 @@ from custom_components.bom_warnings.const import (
     CONF_WARNING_TYPES,
     LEVEL_COLORS,
 )
+from custom_components.bom_warnings.warning_types import sensor_types
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -59,6 +60,18 @@ def warning(severity: Severity, **overrides: Any) -> ActiveWarning:
     return ActiveWarning(**{**fields, **overrides})
 
 
+async def test_renamed_sensors_keep_their_entity_ids(
+    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+
+    for warning_type in sensor_types():
+        entity_id = f"sensor.home_{warning_type.key}"
+        state = hass.states.get(entity_id)
+        assert state is not None, entity_id
+        assert state.attributes["friendly_name"] == f"Home {warning_type.sensor_name}"
+
+
 async def test_the_sensor_is_enabled_from_the_start(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry
 ) -> None:
@@ -77,7 +90,7 @@ async def test_the_sensor_turns_on_for_a_covering_warning(
     state = await start(hass, mock_config_entry)
 
     assert state.state == UNRATED
-    assert state.attributes["friendly_name"] == "Home Thunderstorm warning"
+    assert state.attributes["friendly_name"] == "Home Severe thunderstorm warning"
 
 
 @pytest.mark.parametrize(

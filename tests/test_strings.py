@@ -87,7 +87,7 @@ def test_every_warning_type_sensor_is_named_and_translates_every_level(
 ) -> None:
     key = warning_type.key
     sensor = load(STRINGS)["entity"]["sensor"][key]
-    assert sensor["name"] == f"{warning_type.label} warning"
+    assert sensor["name"] == warning_type.sensor_name
     assert set(sensor["state"]) == set(LEVEL_OPTIONS)
     assert all(text.strip() for text in sensor["state"].values())
     # The type sensors are level sensors now; no binary sensor of that name may linger.
@@ -116,3 +116,28 @@ def test_the_options_form_is_two_fields() -> None:
         "warning_types",
     }
     assert "include_marine" not in strings["config"]["step"]["zone"]["data"]
+
+
+# The names BoM uses for its own products, so a person who knows the Bureau's wording finds them.
+# Event names such as "Extreme Heat" are CAP vocabulary, and "extreme" would read as a level.
+BOM_SENSOR_NAMES = {
+    "thunderstorm_warning": "Severe thunderstorm warning",
+    "fire_weather_warning": "Fire weather warning",
+    "extreme_heat_warning": "Heatwave warning",
+    "frost_warning": "Frost warning",
+    "hazardous_road_conditions_warning": "Road weather alert",
+    "flood_warning": "Flood warning",
+    "sheep_grazier_warning": "Warning to sheep graziers",
+    "exposure_warning": "Exposure warning",
+    "tropical_cyclone_warning": "Tropical cyclone warning",
+    "severe_weather_warning": "Severe weather warning",
+    "marine_wind_warning": "Marine wind warning",
+    "hazardous_surf_warning": "Hazardous surf warning",
+}
+
+
+def test_the_sensor_names_are_the_bureaus_product_names() -> None:
+    names = {key: sensor["name"] for key, sensor in load(STRINGS)["entity"]["sensor"].items()}
+
+    assert {key: names[key] for key in BOM_SENSOR_NAMES} == BOM_SENSOR_NAMES
+    assert {t.key: t.sensor_name for t in sensor_types()} == BOM_SENSOR_NAMES

@@ -81,8 +81,15 @@ class SensorType(WarningType):
     # translations, because the options dialog does not always load a selector's translations and
     # then shows the raw key.
     label: str
+    # The sensor's name where it is not just the label and "warning", for a product BoM calls an
+    # alert or words differently. It must match the name in `strings.json`, which a test checks.
+    name: str | None = None
     # The marine rows only ever match a location whose area codes reach a coastal water zone.
     marine: bool = False
+
+    @property
+    def sensor_name(self) -> str:
+        return self.name or f"{self.label} warning"
 
 
 # BoM's Wind event is marine wind, which is not wind at the house. Its Weather event is both the
@@ -104,22 +111,29 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         "Thunderstorm",
         "mdi:weather-lightning-rainy",
         key="thunderstorm_warning",
-        label="Thunderstorm",
+        label="Severe thunderstorm",
     ),
     SensorType("Fire Weather", "mdi:fire-alert", key="fire_weather_warning", label="Fire weather"),
+    # BoM's product is the Heatwave Warning. "Extreme Heat" is only the CAP event, and "extreme"
+    # in a name reads as a level beside a sensor whose state may be `severe`.
     SensorType(
-        "Extreme Heat", "mdi:thermometer-alert", key="extreme_heat_warning", label="Extreme heat"
+        "Extreme Heat", "mdi:thermometer-alert", key="extreme_heat_warning", label="Heatwave"
     ),
     SensorType("Frost", "mdi:snowflake-alert", key="frost_warning", label="Frost"),
     SensorType(
         "Hazardous Road Conditions",
         "mdi:car-brake-alert",
         key="hazardous_road_conditions_warning",
-        label="Hazardous road conditions",
+        label="Road weather",
+        name="Road weather alert",
     ),
     SensorType("Riverine Flood", "mdi:home-flood", key="flood_warning", label="Flood"),
     SensorType(
-        "Sheep Grazier Warning", "mdi:sheep", key="sheep_grazier_warning", label="Sheep grazier"
+        "Sheep Grazier Warning",
+        "mdi:sheep",
+        key="sheep_grazier_warning",
+        label="Sheep graziers",
+        name="Warning to sheep graziers",
     ),
     SensorType("Exposure", "mdi:snowflake-thermometer", key="exposure_warning", label="Exposure"),
     SensorType(

@@ -149,6 +149,14 @@ Home Assistant layer:
   attribute on every list item and on the Most severe and type sensors' top level (the type
   sensor's is None when it has no warning). No state, count or event changes with it. It is fixed
   when the feed is read, so it can lag a start time by up to one refresh (10 minutes).
+- **Sensor names and ids.** A type sensor is named after BoM's own product ("Heatwave warning",
+  "Road weather alert", "Severe thunderstorm warning"), not after its CAP event, because a name such
+  as "Extreme heat" reads as a level beside a state that may be `severe`. `SensorType.sensor_name`
+  is the label plus " warning" unless the row sets `name`, and `strings.json` must match it. Home
+  Assistant builds an entity id from the name, so the type sensor overrides `suggested_object_id`
+  to return its translation key with spaces. That keeps `sensor.<title>_extreme_heat_warning` for
+  the Heatwave warning on every setup, new or old; remove the override and a new setup's ids would
+  differ from an old one's.
 - **Event entity.** Diffs `coordinator.states` (every covering product in any phase, one per
   product, represented by its most severe block) against the previous refresh. Baseline is taken
   when the entity is added, so startup and reload fire nothing. A type that is off in the

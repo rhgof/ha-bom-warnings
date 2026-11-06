@@ -84,7 +84,7 @@
         }
       },
       "thunderstorm_warning": {
-        "name": "Thunderstorm warning",
+        "name": "Severe thunderstorm warning",
         "state": {
           "none": "None",
           "minor": "Minor",
@@ -106,7 +106,7 @@
         }
       },
       "extreme_heat_warning": {
-        "name": "Extreme heat warning",
+        "name": "Heatwave warning",
         "state": {
           "none": "None",
           "minor": "Minor",
@@ -128,7 +128,7 @@
         }
       },
       "hazardous_road_conditions_warning": {
-        "name": "Hazardous road conditions warning",
+        "name": "Road weather alert",
         "state": {
           "none": "None",
           "minor": "Minor",
@@ -150,7 +150,7 @@
         }
       },
       "sheep_grazier_warning": {
-        "name": "Sheep grazier warning",
+        "name": "Warning to sheep graziers",
         "state": {
           "none": "None",
           "minor": "Minor",

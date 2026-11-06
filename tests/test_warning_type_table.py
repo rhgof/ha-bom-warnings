@@ -25,13 +25,13 @@ from custom_components.bom_warnings.warning_types import (
 
 # Today's rows, in the order the options checklist lists them and the sensors are created.
 ROWS = [
-    ("Thunderstorm", "thunderstorm_warning", "Thunderstorm"),
+    ("Thunderstorm", "thunderstorm_warning", "Severe thunderstorm"),
     ("Fire Weather", "fire_weather_warning", "Fire weather"),
-    ("Extreme Heat", "extreme_heat_warning", "Extreme heat"),
+    ("Extreme Heat", "extreme_heat_warning", "Heatwave"),
     ("Frost", "frost_warning", "Frost"),
-    ("Hazardous Road Conditions", "hazardous_road_conditions_warning", "Hazardous road conditions"),
+    ("Hazardous Road Conditions", "hazardous_road_conditions_warning", "Road weather"),
     ("Riverine Flood", "flood_warning", "Flood"),
-    ("Sheep Grazier Warning", "sheep_grazier_warning", "Sheep grazier"),
+    ("Sheep Grazier Warning", "sheep_grazier_warning", "Sheep graziers"),
     ("Exposure", "exposure_warning", "Exposure"),
     ("Tropical Cyclone", "tropical_cyclone_warning", "Tropical cyclone"),
     ("Weather", "severe_weather_warning", "Severe weather"),

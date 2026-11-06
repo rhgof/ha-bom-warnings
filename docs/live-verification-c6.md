@@ -95,8 +95,8 @@ Outcomes of any add:
 
 Open each entry's three-dot menu > Configure. The form is titled "Warnings I care about".
 
-- [ ] One switch per warning type (Thunderstorm, Fire weather, Extreme heat, Frost, Hazardous road
-      conditions, Flood, Sheep grazier, Exposure, Tropical cyclone, Severe weather, Marine wind,
+- [ ] One switch per warning type (Severe thunderstorm, Fire weather, Heatwave, Frost, Road
+      weather, Flood, Sheep graziers, Exposure, Tropical cyclone, Severe weather, Marine wind,
       Hazardous surf), then "Other warnings", then "Hide final and cancelled warnings". Everything is
       on for a new entry.
 - [ ] What **on** means: the type counts everywhere (the warning sensor, the count, the most severe

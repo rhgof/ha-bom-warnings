@@ -190,6 +190,13 @@ class WarningTypeSensor(_WarningSensor):
         super().__init__(coordinator, entry)
 
     @property
+    def suggested_object_id(self) -> str:
+        # Home Assistant builds the entity id from the name, so renaming a sensor would give a new
+        # setup a different id from an old one. The key is what the name once said, and using it
+        # keeps every dashboard and automation working.
+        return str(self._attr_translation_key).replace("_", " ")
+
+    @property
     def _warnings(self) -> tuple[ActiveWarning, ...]:
         return self.coordinator.by_event.get(self._event, ())
 
