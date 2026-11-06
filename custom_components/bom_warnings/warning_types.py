@@ -41,6 +41,14 @@ _HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
 XML_WIND_STRENGTHS = {"STR": "strong", "GALE": "gale"}
 
 
+# A Fire Weather Warning's grade is one step off its CAP severity. The Warning Products User Guide
+# (Table 24) pairs them: High is CAP Moderate, Extreme is CAP Severe and Catastrophic is CAP
+# Extreme, while the headline and the product XML (`HIGH`, `EXT`, `CAT`) carry the grade itself.
+# That makes the grade recoverable from the CAP severity alone, with no extra request. The words
+# are the fire danger rating's, so they take its colours (`FIRE_DANGER_COLORS`).
+FIRE_WEATHER_GRADES = {"moderate": "high", "severe": "extreme", "extreme": "catastrophic"}
+
+
 def wind_strength(headline: str) -> str | None:
     """The strength class of a Wind warning's headline, or None.
 
@@ -69,6 +77,9 @@ class WarningType:
     note: str | None = None
     # Reads a class out of a warning's headline, for the one type that names its strength there.
     strength: Callable[[str], str | None] | None = None
+    # The type's own grade for each CAP severity, where the Bureau grades a warning in words that
+    # CAP's do not match. A severity with no entry keeps CAP's word.
+    grades: Mapping[str, str] | None = None
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -113,7 +124,13 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="thunderstorm_warning",
         label="Severe thunderstorm",
     ),
-    SensorType("Fire Weather", "mdi:fire-alert", key="fire_weather_warning", label="Fire weather"),
+    SensorType(
+        "Fire Weather",
+        "mdi:fire-alert",
+        key="fire_weather_warning",
+        label="Fire weather",
+        grades=FIRE_WEATHER_GRADES,
+    ),
     # BoM's product is the Heatwave Warning. "Extreme Heat" is only the CAP event, and "extreme"
     # in a name reads as a level beside a sensor whose state may be `severe`.
     SensorType(

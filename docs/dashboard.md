@@ -182,7 +182,8 @@ out the headline is the optional spoken summary sensor, which is not built (see 
 
 `state_attr('sensor.<title>_warning_count', 'warnings')` is a list, most severe first, only for
 warnings covering your location. Each item has `product_id`, `event`, `severity`, `level`
-(`minor`, `moderate`, `unknown`, `severe`, `extreme`), `icon` (an `mdi:` name), `color` (hex),
+(`minor`, `moderate`, `unknown`, `severe`, `extreme`; a Fire Weather Warning shows `high`,
+`extreme` or `catastrophic`), `icon` (an `mdi:` name), `color` (hex),
 `headline`, `phase`, `sent`, `effective` and `expires`, and `area` (the names of your location's
 areas the warning covers, such as `Illawarra`; left out when none has a name) and `summary` (the
 first paragraph of BoM's text, at most 300 characters; for marine wind, which has no text in its CAP
@@ -199,7 +200,8 @@ covers, in code order. It is there with no warning active, so it shows what a zo
 
 Each per-type sensor (thunderstorm, flood, marine wind and so on) has a top-level `level` and
 `color`, so a card can colour itself from the sensor alone. `level` is the sensor's state (`none`,
-`minor`, `moderate`, `unrated`, `severe` or `extreme`), and `color` is that level's hex colour, the
+`minor`, `moderate`, `unrated`, `severe` or `extreme`; the fire weather sensor shows the Bureau's fire
+grade instead, `high`, `extreme` or `catastrophic`), and `color` is that level's hex colour, the
 same as in the count sensor's list. `color` is `None` while no warning of the type is in force
 (ended warnings do not count), and the card decides how a quiet state looks.
 

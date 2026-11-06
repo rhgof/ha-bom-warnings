@@ -253,7 +253,7 @@ triggers:
 | Sensor | Entity id | BoM warning |
 | --- | --- | --- |
 | Severe thunderstorm warning | `sensor.<title>_thunderstorm_warning` | Severe Thunderstorm Warning |
-| Fire weather warning | `sensor.<title>_fire_weather_warning` | Fire Weather Warning (Severe, Extreme, Catastrophic) |
+| Fire weather warning | `sensor.<title>_fire_weather_warning` | Fire Weather Warning (**graded High, Extreme or Catastrophic**, see below) |
 | Heatwave warning | `sensor.<title>_extreme_heat_warning` | Heatwave Warning |
 | Frost warning | `sensor.<title>_frost_warning` | Frost Warning |
 | Road weather alert | `sensor.<title>_hazardous_road_conditions_warning` | Road Weather Alert |
@@ -268,6 +268,27 @@ triggers:
 Each sensor is named after the Bureau's own product, so a name never reads as a level: a Heatwave
 warning can be `severe`, which a name like "Extreme heat" would contradict. The entity ids keep
 their original form, which is why `sensor.<title>_extreme_heat_warning` is the Heatwave warning.
+
+**Fire weather warning uses the Bureau's fire grades, not the levels above.** The Bureau grades a
+Fire Weather Warning High, Extreme or Catastrophic, the same words as the fire danger rating, but
+its CAP severity is one step lower: an "Extreme Fire Weather Warning" is CAP `Severe`. So this
+sensor's state is the grade, and its colour is the fire danger rating's:
+
+| State | Fire danger colour | CAP severity it comes from |
+| --- | --- | --- |
+| `none` | no colour | no current warning |
+| `high` | yellow | Moderate |
+| `extreme` | orange | Severe |
+| `catastrophic` | red | Extreme |
+
+A warning with no grade keeps the level words above (`minor` for a cancellation, `unrated` when the
+Bureau sends `unknown`). The `severity` attribute of each warning still shows what CAP said, and
+warnings still rank by CAP severity across all types.
+
+If you have an automation on the fire weather sensor that triggers on `severe` or `extreme`, change
+it: an Extreme warning used to read `severe` and now reads `extreme`, and a Catastrophic one used to
+read `extreme` and now reads `catastrophic`. The grades come from the Bureau's Warning Products User
+Guide (Table 24).
 
 **Severe weather warning is for display, not for automations.** BoM uses one event, Weather, for both
 Severe Weather Warnings and Coastal Hazard Warnings, so the sensor cannot tell which a warning is.

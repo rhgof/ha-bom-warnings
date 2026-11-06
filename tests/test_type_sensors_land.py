@@ -12,6 +12,7 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings import warning_types
+from custom_components.bom_warnings.active_warnings import level_options
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
@@ -56,7 +57,6 @@ LAND_TYPES = [
     ("Weather", "severe_weather_warning", "Severe weather warning", "IDN21037", "NSW_PW006"),
 ]
 LAND_IDS = [event for event, *_ in LAND_TYPES]
-SEVERITIES = {"minor", "moderate", "unrated", "severe", "extreme"}
 
 
 @pytest.fixture(autouse=True)
@@ -106,7 +106,7 @@ async def test_each_type_turns_on_for_a_warning_of_its_type(
 
     state = hass.states.get(sensor_id(key))
     assert state is not None
-    assert state.state in SEVERITIES
+    assert state.state in set(level_options(event)) - {"none"}
     assert state.attributes["event"] == event
     assert state.attributes["product_id"] == product_id
     listed = {(w["product_id"], w["event"]) for w in state.attributes["warnings"]}

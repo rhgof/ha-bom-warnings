@@ -157,6 +157,16 @@ Home Assistant layer:
   to return its translation key with spaces. That keeps `sensor.<title>_extreme_heat_warning` for
   the Heatwave warning on every setup, new or old; remove the override and a new setup's ids would
   differ from an old one's.
+- **Fire weather grades.** A Fire Weather Warning's grade (High, Extreme, Catastrophic) is one step
+  above its CAP severity (Moderate, Severe, Extreme), per the Bureau's Table 24 (see
+  `docs/warning-products.md`). `WarningType.grades` maps a CAP severity to a type's own word, and
+  only the Fire Weather row sets it (`FIRE_WEATHER_GRADES`). `level_of` returns the grade, so the
+  `level` attribute and the type sensor's state use it, and `color_of` takes the fire danger
+  rating's colour for a grade (`FIRE_DANGER_COLORS`) and CAP's (`LEVEL_COLORS`) otherwise.
+  `level_options(event)` is the sensor's enum, so the fire sensor offers `none`, `minor`, `high`,
+  `unrated`, `extreme`, `catastrophic`. Ranking, the event entity and each item's `severity`
+  stay on CAP severity, because the grades rank the same. The grade is read from CAP severity
+  alone, not the XML `EXT`/`CAT` code or the headline word, since the table is one to one.
 - **Event entity.** Diffs `coordinator.states` (every covering product in any phase, one per
   product, represented by its most severe block) against the previous refresh. Baseline is taken
   when the entity is added, so startup and reload fire nothing. A type that is off in the

@@ -125,7 +125,9 @@ The entity ids are the entry title slug plus a suffix. Check each exists and has
       `sensor.<title>_thunderstorm_warning`). The state is the highest level among the type's
       current warnings, one of `none`, `minor`, `moderate`, `unrated`, `severe`, `extreme`. `unrated`
       is BoM's `unknown` severity (sent for Severe Thunderstorm and Severe Weather warnings); it
-      ranks between `moderate` and `severe`.
+      ranks between `moderate` and `severe`. The fire weather sensor is different: its state is the
+      Bureau's grade, `high`, `extreme` or `catastrophic`, in the fire danger rating's colours (an
+      "Extreme Fire Weather Warning" reads `extreme`, though its CAP `severity` is `severe`).
 - [ ] With a warning of that type current: the sensor's attributes `headline`, `expires`,
       `product_id` and `event` are filled in, `expires` is in the future, and all four are empty
       when the state is `none`. The `warnings` attribute lists every current warning of the type.

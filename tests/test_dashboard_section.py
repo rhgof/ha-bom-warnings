@@ -24,7 +24,7 @@ from custom_components.bom_warnings.active_warnings import (
     warning_attributes,
 )
 from custom_components.bom_warnings.cap import Severity
-from custom_components.bom_warnings.const import LEVEL_COLORS
+from custom_components.bom_warnings.const import FIRE_DANGER_COLORS, LEVEL_COLORS
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, SensorType
 
 from .conftest import NOW
@@ -191,7 +191,10 @@ async def test_every_type_sensor_says_its_level_and_colour(
         state = hass.states.get(entity_id)
         assert state is not None, entity_id
         assert state.attributes["level"] == state.state, entity_id
-        assert state.attributes["color"] == colour_for(state.state), entity_id
+        # Fire weather shows the Bureau's grade, in the colours of the fire danger rating.
+        fire = entity_id.endswith("fire_weather_warning") and state.state in FIRE_DANGER_COLORS
+        expected = FIRE_DANGER_COLORS[state.state] if fire else colour_for(state.state)
+        assert state.attributes["color"] == expected, entity_id
         levels.add(state.state)
     # The spread of locations puts more than one level on the sensors, so this is not all `none`.
     assert len(levels - {"none"}) >= 2

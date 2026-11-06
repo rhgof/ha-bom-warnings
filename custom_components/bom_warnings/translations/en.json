@@ -99,10 +99,10 @@
         "state": {
           "none": "None",
           "minor": "Minor",
-          "moderate": "Moderate",
+          "high": "High",
           "unrated": "Unrated",
-          "severe": "Severe",
-          "extreme": "Extreme"
+          "extreme": "Extreme",
+          "catastrophic": "Catastrophic"
         }
       },
       "extreme_heat_warning": {

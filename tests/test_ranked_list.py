@@ -17,6 +17,7 @@ from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
     DEFAULT_EVENT_ICON,
+    FIRE_DANGER_COLORS,
     LEVEL_COLORS,
     NO_WARNING_ICON,
 )
@@ -78,8 +79,15 @@ def rows(hass: HomeAssistant, entity_id: str = COUNT) -> list[tuple[str, str, st
     ]
 
 
-def row(product_id: str, level: str, icon: str) -> tuple[str, str, str, str]:
-    return (product_id, level, icon, LEVEL_COLORS[level])
+def row(
+    product_id: str, level: str, icon: str, colour: str | None = None
+) -> tuple[str, str, str, str]:
+    return (product_id, level, icon, colour or LEVEL_COLORS[level])
+
+
+def fire_row(grade: str) -> tuple[str, str, str, str]:
+    """A Fire Weather row, which shows the Bureau's grade in the fire danger rating's colour."""
+    return row("IDN22000", grade, EVENT_ICONS["Fire Weather"], FIRE_DANGER_COLORS[grade])
 
 
 async def test_home_codes_list_only_what_covers_the_location(hass: HomeAssistant) -> None:
@@ -87,7 +95,8 @@ async def test_home_codes_list_only_what_covers_the_location(hass: HomeAssistant
 
     # The Greater Sydney fire block is the only warning on Home's codes; the other states' samples
     # and western NSW's must never appear.
-    assert rows(hass) == [row("IDN22000", "severe", EVENT_ICONS["Fire Weather"])]
+    # CAP calls this warning Severe; the Bureau's grade for it is Extreme.
+    assert rows(hass) == [fire_row("extreme")]
     assert state_of(hass, COUNT).state == "1"
     listed = {w["product_id"] for w in state_of(hass, COUNT).attributes["warnings"]}
     assert not listed & OUTSIDE_NSW
@@ -111,8 +120,8 @@ async def test_every_severity_level_is_ranked_with_unknown_between_moderate_and_
     await setup_entry(hass, entry_with(SPREAD_CODES))
 
     assert rows(hass) == [
-        row("IDN22000", "extreme", EVENT_ICONS["Fire Weather"]),
-        row("IDN22000", "severe", EVENT_ICONS["Fire Weather"]),
+        fire_row("catastrophic"),
+        fire_row("extreme"),
         row("IDN21037", "unknown", EVENT_ICONS["Weather"]),
         row("IDS20240", "moderate", EVENT_ICONS["Hazardous Road Conditions"]),
         row("IDN36631", "minor", EVENT_ICONS["Riverine Flood"]),
@@ -155,8 +164,8 @@ async def test_most_severe_sensor_shows_the_top_item_with_icon_level_and_colour(
     assert most.state == top["headline"]
     assert (most.attributes["icon"], most.attributes["level"], most.attributes["color"]) == (
         EVENT_ICONS["Fire Weather"],
-        "extreme",
-        LEVEL_COLORS["extreme"],
+        "catastrophic",
+        FIRE_DANGER_COLORS["catastrophic"],
     )
     assert most.attributes["product_id"] == "IDN22000"
     assert most.attributes["severity"] == "extreme"

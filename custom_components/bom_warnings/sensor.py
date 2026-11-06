@@ -21,6 +21,7 @@ from .active_warnings import (
     current_then_ended,
     event_icon,
     highest_level,
+    level_options,
     type_attributes,
     warning_attributes,
 )
@@ -186,6 +187,7 @@ class WarningTypeSensor(_WarningSensor):
         key: str,
     ) -> None:
         self._attr_translation_key = key
+        self._attr_options = level_options(event)
         self._event = event
         super().__init__(coordinator, entry)
 

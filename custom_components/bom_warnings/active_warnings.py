@@ -14,7 +14,7 @@ from types import MappingProxyType
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
-from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
+from .const import DEFAULT_EVENT_ICON, FIRE_DANGER_COLORS, LEVEL_COLORS
 from .warning_types import XML_WIND_STRENGTHS, type_of
 
 
@@ -124,7 +124,7 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
         attributes |= {
             "level": level,
             "icon": event_icon(warning.event),
-            "color": LEVEL_COLORS[level],
+            "color": color_of(warning),
             "sent": warning.sent.isoformat() if warning.sent else None,
         }
     # Only marine wind has one, so no other event gains the field.
@@ -250,8 +250,34 @@ LEVEL_OPTIONS = [
 ]
 
 
+def _grades(event: str) -> Mapping[str, str]:
+    row = type_of(event)
+    return (row.grades if row else None) or {}
+
+
 def level_of(warning: ActiveWarning) -> str:
-    return warning.severity.value
+    """The level word a warning shows: its type's own grade where it has one, else CAP's severity.
+
+    Ranking never uses this. It stays on `warning.severity`, because the grades are CAP's severities
+    under other names and rank the same.
+    """
+    return _grades(warning.event).get(warning.severity.value, warning.severity.value)
+
+
+def color_of(warning: ActiveWarning) -> str:
+    """A graded warning takes the fire danger rating's colour for its grade, else CAP's colour."""
+    level = level_of(warning)
+    if level in _grades(warning.event).values():
+        return FIRE_DANGER_COLORS[level]
+    return LEVEL_COLORS[level]
+
+
+def level_options(event: str) -> list[str]:
+    """The states of one type's sensor, lowest first. A graded type offers its grades."""
+    if not _grades(event):
+        return LEVEL_OPTIONS
+    words = (_grades(event).get(severity.value, severity.value) for severity in SEVERITY_ORDER)
+    return [STATE_NONE, *dict.fromkeys("unrated" if word == "unknown" else word for word in words)]
 
 
 def rank_warnings(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
@@ -259,7 +285,7 @@ def rank_warnings(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
     return sorted(
         warnings,
         key=lambda w: (
-            -_LEVEL_RANK[level_of(w)],
+            -_LEVEL_RANK[w.severity.value],
             w.sent is None,
             -(w.sent or _EPOCH).timestamp(),
             w.product_id,
@@ -298,7 +324,7 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
     top = current[0] if current else None
     attributes: dict[str, Any] = {
         "level": highest_level(warnings),
-        "color": LEVEL_COLORS[level_of(top)] if top else None,
+        "color": color_of(top) if top else None,
         "headline": top.headline if top else None,
         "expires": top.expires.isoformat() if top and top.expires else None,
         "product_id": top.product_id if top else None,

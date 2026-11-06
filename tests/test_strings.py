@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from custom_components.bom_warnings.active_warnings import LEVEL_OPTIONS
+from custom_components.bom_warnings.active_warnings import level_options
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
 from custom_components.bom_warnings.warning_types import WarningType, sensor_types
 
@@ -88,7 +88,7 @@ def test_every_warning_type_sensor_is_named_and_translates_every_level(
     key = warning_type.key
     sensor = load(STRINGS)["entity"]["sensor"][key]
     assert sensor["name"] == warning_type.sensor_name
-    assert set(sensor["state"]) == set(LEVEL_OPTIONS)
+    assert set(sensor["state"]) == set(level_options(warning_type.event))
     assert all(text.strip() for text in sensor["state"].values())
     # The type sensors are level sensors now; no binary sensor of that name may linger.
     assert key not in load(STRINGS)["entity"]["binary_sensor"]

@@ -111,7 +111,35 @@ Across the 23 captured product XML files (marine wind 5, flood 16, sheep grazier
   is `Unknown`, the CAP headline does not contain the word "final", and the `.txt` title does
   ("Final Flood Warning for the Boyne and Burnett Rivers").
 - **Not seen:** a storm force or hurricane force marine wind code, any thunderstorm code, any
-  cyclone, fire weather, frost, road or tsunami code.
+  cyclone, frost, road or tsunami code. Fire weather was seen once, `EXT` (below).
+
+## The Bureau's grade is not always CAP's severity
+
+The headline's first word is the Bureau's own severity description, and the guide says so: "The
+SEVERITY DESCRIPTION is an AMOC severity not a CAP severity." Table 24 of the Warning Products User
+Guide (page 62, `../bom-docs/`) pairs the three for each hazard. For a Fire Weather Warning:
+
+| Severity code (XML) | Headline word | CAP `<severity>` |
+| --- | --- | --- |
+| `UNK` | Alert status unknown | Unknown |
+| `CAN` | Cancellation | Minor |
+| `HIGH` | High | Moderate |
+| `EXT` | Extreme | Severe |
+| `CAT` | Catastrophic | Extreme |
+
+So a fire warning's CAP severity is one step below its grade. A live file confirms it:
+`IDN22000` on 6 Nov 2026 had the headline "Extreme Fire Weather Warning for Greater Hunter and Upper
+Central West Plains…", CAP severity `Severe` and, in its product XML, hazard `severity="EXT"`. The
+old sample (`cap_samples/IDN22000.cap.xml`) pairs "Catastrophic" with CAP `Extreme` and "Extreme"
+with CAP `Severe`. Only `EXT` has been seen live; `HIGH` and `CAT` are documented in the same table.
+
+The table is one to one, so the grade can be read back from the CAP severity alone, with no XML
+request, and the integration does that (`warning_types.FIRE_WEATHER_GRADES`). The guide also says
+Fire Weather Warnings are issued when the Fire Danger Rating is Extreme or greater, and that their
+`<description>` is omitted.
+
+The heatwave grades match CAP instead: "Extreme heatwave warning" is CAP `Extreme` and "Severe
+heatwave warning" is CAP `Severe` (6 Nov 2026), so only fire weather needs the translation.
 
 ## RSS
 
