@@ -3,7 +3,7 @@
 # Usage: scripts/ha-dev.sh setup|start|stop|status|logs
 set -euo pipefail
 
-HA_VERSION="2026.10.4" # keep equal to the live instance (docs/interfaces.md)
+HA_VERSION="2026.11.1" # keep equal to the live instance (docs/interfaces.md)
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VENV="$ROOT/.ha-venv"
 CONFIG="$ROOT/config"
