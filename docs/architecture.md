@@ -102,7 +102,7 @@ Home Assistant layer:
 | `coordinator.py` | `BomWarningsCoordinator`: listens to the feed, re-resolves the entry's location through `location.resolve_location` (a `LocationUnavailable` is retried on the next poll), and derives its warnings and fire danger. |
 | `fire_store.py` | `FireStore`: loads, saves and removes one entry's `FireMemory` in Home Assistant storage. The only place that knows the storage key, version and shape. |
 | `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location through `location.resolve_location`, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
-| `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
+| `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), carries a zone rename into the entry title and the device (only while the title still equals the `zone_name` last followed, so a title the user chose stays; entries without `zone_name` use their title for it), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
 | `binary_sensor.py`, `sensor.py`, `event.py` | The entities above. |
 | `diagnostics.py` | Download with coordinates, name, title, zone entity id, `unique_id` and the stored area names redacted (the radius and the area codes stay). |
 | `const.py`, `strings.json`, `translations/en.json` | Constants and text. The two JSON files must match (`tests/test_strings.py`). |

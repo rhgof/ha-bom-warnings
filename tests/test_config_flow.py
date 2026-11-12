@@ -24,6 +24,7 @@ from custom_components.bom_warnings.const import (
     CONF_RADIUS,
     CONF_STATE,
     CONF_ZONE,
+    CONF_ZONE_NAME,
     DOMAIN,
     MAX_RADIUS_M,
 )
@@ -218,6 +219,7 @@ async def test_zone_creates_an_entry_that_follows_it(
     assert result["result"].unique_id == "zone.holiday"
     assert result["data"] == {
         CONF_ZONE: "zone.holiday",
+        CONF_ZONE_NAME: "Holiday house",
         CONF_LATITUDE: -33.8688,
         CONF_LONGITUDE: 151.2093,
         CONF_RADIUS: 2000.0,

@@ -37,6 +37,7 @@ from .const import (
     CONF_STATE,
     CONF_WARNING_TYPES,
     CONF_ZONE,
+    CONF_ZONE_NAME,
     DOMAIN,
     MAX_RADIUS_M,
     SPATIAL_CACHE_DIR,
@@ -123,7 +124,7 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         state.attributes["latitude"],
                         state.attributes["longitude"],
                         radius_m=min(float(state.attributes.get("radius", 0)), MAX_RADIUS_M),
-                        extra={CONF_ZONE: zone_id},
+                        extra={CONF_ZONE: zone_id, CONF_ZONE_NAME: state.name},
                     )
                 except _LocationError as err:
                     errors["base"] = err.key

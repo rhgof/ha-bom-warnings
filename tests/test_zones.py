@@ -11,6 +11,7 @@ from unittest.mock import MagicMock
 import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import issue_registry as ir
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -22,6 +23,7 @@ from custom_components.bom_warnings.const import (
     CONF_RADIUS,
     CONF_STATE,
     CONF_ZONE,
+    CONF_ZONE_NAME,
     DOMAIN,
     MAX_RADIUS_M,
 )
@@ -47,12 +49,13 @@ def set_zone(
     lon: float = 153.021,
     radius: float = 2000.0,
     entity_id: str = ZONE,
+    name: str = "Holiday house",
 ) -> None:
     hass.states.async_set(
         entity_id,
         "0",
         {
-            "friendly_name": "Holiday house",
+            "friendly_name": name,
             "latitude": lat,
             "longitude": lon,
             "radius": radius,
@@ -153,6 +156,52 @@ async def test_editing_the_zone_re_resolves_without_a_restart(
     assert zone_entry.data[CONF_RADIUS] == expected["radius_m"]
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_ME008", "QLD_PW001"]
     assert hass.states.get(SENSOR).state == STATE_ON  # type: ignore[union-attr]
+
+
+@pytest.mark.parametrize("renamed", ["while_running", "while_stopped"])
+async def test_renaming_the_zone_renames_the_entry_its_device_and_entities(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    zone_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    renamed: str,
+) -> None:
+    set_zone(hass)
+    await setup_entry(hass, zone_entry)
+    if renamed == "while_stopped":
+        assert await hass.config_entries.async_unload(zone_entry.entry_id)
+        set_zone(hass, name="Garden cottage")
+        assert await hass.config_entries.async_setup(zone_entry.entry_id)
+        await hass.async_block_till_done()
+    else:
+        await change_zone(hass, name="Garden cottage")
+
+    assert zone_entry.title == "Garden cottage"
+    assert zone_entry.data[CONF_ZONE_NAME] == "Garden cottage"
+    device = dr.async_get(hass).async_get_device_by_identifier((DOMAIN, ZONE), zone_entry.entry_id)
+    assert device is not None
+    assert device.name == "Garden cottage"
+    # Entity ids are fixed when an entity is created, so a rename must not move them.
+    state = hass.states.get(SENSOR)
+    assert state is not None
+    assert state.attributes["friendly_name"].startswith("Garden cottage")
+
+
+async def test_a_title_the_user_chose_survives_a_zone_rename(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    zone_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+) -> None:
+    set_zone(hass)
+    await setup_entry(hass, zone_entry)
+    hass.config_entries.async_update_entry(zone_entry, title="My own name")
+
+    await change_zone(hass, name="Garden cottage")
+
+    assert zone_entry.title == "My own name"
+    # It still notes the zone's new name, so the next rename is compared with the right one.
+    assert zone_entry.data[CONF_ZONE_NAME] == "Garden cottage"
 
 
 NAMES = {"QLD_ME008": "Brisbane", "QLD_PW001": "Moreton Bay"}

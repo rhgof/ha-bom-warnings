@@ -13,6 +13,10 @@ CONF_AREA_NAMES = "area_names"
 # Set only on entries that follow a Home Assistant zone: its entity id, and its radius in metres.
 CONF_ZONE = "zone"
 CONF_RADIUS = "radius"
+# The zone name the title was last made from. It tells a title that follows the zone from one the
+# user chose, so a zone rename never overwrites a name the user picked. Entries made before it
+# existed have none, and their title stands in for it.
+CONF_ZONE_NAME = "zone_name"
 # A circle larger than this would list a whole state's warnings and make matching slow, so a
 # bigger zone is clamped and the user is told.
 MAX_RADIUS_M = 50_000.0

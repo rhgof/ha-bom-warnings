@@ -10,18 +10,20 @@ from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant
 
 from . import BomWarningsConfigEntry
-from .const import CONF_AREA_NAMES, CONF_LATITUDE, CONF_LONGITUDE, CONF_ZONE
+from .const import CONF_AREA_NAMES, CONF_LATITUDE, CONF_LONGITUDE, CONF_ZONE, CONF_ZONE_NAME
 from .fire_danger import FireDangerView
 
 # The unique id is the rounded coordinates or the zone's entity id, and the title is the zone name
-# or the coordinates. The radius alone says nothing about where the location is. The area names
-# do, which is why the codes stay (they are the same for everyone nearby) and the names go.
+# or the coordinates; the zone name is also kept in its own key. The radius alone says nothing about
+# where the location is. The area names do, which is why the codes stay (they are the same for
+# everyone nearby) and the names go.
 TO_REDACT = {
     CONF_AREA_NAMES,
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_NAME,
     CONF_ZONE,
+    CONF_ZONE_NAME,
     "title",
     "unique_id",
 }
