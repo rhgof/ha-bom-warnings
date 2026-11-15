@@ -77,7 +77,9 @@ async def test_two_entries_share_one_listing_and_one_set_of_fetches(
     # Setting up the domain sets up both entries.
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()
-    files = len(list(fake_bom.root.rglob("*.cap.xml")))
+    # The baseline's two thunderstorm products each cost a request for their broadcast text, which
+    # the fake server does not have. The absence is remembered, so it is asked once.
+    files = len(list(fake_bom.root.rglob("*.cap.xml"))) + 2
 
     assert state_of(hass, HOME) == STATE_OFF
     assert state_of(hass, WORK) == STATE_ON

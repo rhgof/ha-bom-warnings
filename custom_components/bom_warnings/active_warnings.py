@@ -15,7 +15,7 @@ from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
 from .const import DEFAULT_EVENT_ICON, FIRE_DANGER_COLORS, LEVEL_COLORS
-from .warning_types import XML_WIND_STRENGTHS, type_of
+from .warning_types import THUNDERSTORM_EVENT, XML_WIND_STRENGTHS, type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -43,6 +43,14 @@ class ActiveWarning:
     # this lets a template or card tell it from one already in force. Worked out when the
     # warnings are read, so it can lag a start time by up to one refresh.
     in_force: bool = True
+    # Thunderstorm only. The hazards the summary's paragraph names (`wind`, `hail`, `rain`,
+    # `flood`), whether that paragraph is BoM's very dangerous tier, and the facts the broadcast
+    # text adds.
+    hazards: tuple[str, ...] = ()
+    very_dangerous: bool = False
+    detailed: bool = False
+    hazard: str = ""
+    next_issue: datetime | None = None
 
     @property
     def is_current(self) -> bool:
@@ -67,28 +75,62 @@ _ENDED = (Phase.CANCELLED, Phase.FINAL)
 # Each warning is repeated on up to 15 entities, and the recorder drops a state whose attributes
 # pass 16,384 bytes, so the summary is one short paragraph and never the whole description.
 SUMMARY_LIMIT = 300
+# A detailed warning is one paragraph about a storm cell and where it is heading, about 420
+# characters on 13 Nov 2026, and the part that matters is the end of it, so it is not cut so short.
+DETAILED_SUMMARY_LIMIT = 500
 _PARAGRAPH_BREAK = re.compile(r"\n\s*\n")
+_VERY_DANGEROUS = re.compile(r"very dangerous thunderstorm", re.IGNORECASE)
+# In display order. A keyword match, so an automation can test "wind" in `hazards`.
+_HAZARD_WORDS = (("wind", "wind"), ("hail", "hail"), ("rain", "rain"), ("flood", "flood"))
 
 
-def summary_of(description: str | None) -> str | None:
-    """The first paragraph of a CAP description on one line, cut to `SUMMARY_LIMIT` characters.
+def _paragraphs(description: str | None) -> list[str]:
+    """The paragraphs of a CAP description, each on one line, none empty."""
+    parts = (" ".join(part.split()) for part in _PARAGRAPH_BREAK.split((description or "").strip()))
+    return [part for part in parts if part]
 
-    A cut falls on a word boundary and ends in an ellipsis; a single word longer than the limit is
-    cut hard. None when there is nothing to show, so the attribute is left out and never empty.
+
+def _pick(paragraphs: Sequence[str], names: Sequence[str]) -> str:
+    """The first paragraph that names one of the entry's areas, else the first paragraph.
+
+    A district's own name is tried first. The second try drops its first word, because BoM's text
+    says "Metropolitan" where the district is called "Sydney Metropolitan".
     """
-    if not description:
-        return None
-    first = _PARAGRAPH_BREAK.split(description.strip(), maxsplit=1)[0]
-    text = " ".join(first.split())
+    wanted = [name.lower() for name in names if name]
+    for tries in (wanted, [n.split(" ", 1)[1] for n in wanted if " " in n]):
+        for paragraph in paragraphs:
+            if any(name in paragraph.lower() for name in tries):
+                return paragraph
+    return paragraphs[0] if paragraphs else ""
+
+
+def _shorten(text: str, limit: int) -> str | None:
     if not text:
         return None
-    if len(text) <= SUMMARY_LIMIT:
+    if len(text) <= limit:
         return text
-    cut = text[: SUMMARY_LIMIT - 1]
-    if text[SUMMARY_LIMIT - 1] != " ":
+    cut = text[: limit - 1]
+    if text[limit - 1] != " ":
         # The cut fell inside a word, so back up to the end of the previous one.
         cut = cut.rpartition(" ")[0] or cut
     return f"{cut.rstrip()}…"
+
+
+def summary_of(
+    description: str | None, *, areas: Sequence[str] = (), limit: int = SUMMARY_LIMIT
+) -> str | None:
+    """One paragraph of a CAP description on one line, cut to `limit` characters.
+
+    The paragraph is the first one that names one of `areas`, else the first. A cut falls on a word
+    boundary and ends in an ellipsis; a single word longer than the limit is cut hard. None when
+    there is nothing to show, so the attribute is left out and never empty.
+    """
+    return _shorten(_pick(_paragraphs(description), areas), limit)
+
+
+def _hazards_in(text: str) -> tuple[str, ...]:
+    lowered = text.lower()
+    return tuple(hazard for word, hazard in _HAZARD_WORDS if word in lowered)
 
 
 # The one severity order, lowest first. It is our ranking policy, not CAP's: `unknown` sits between
@@ -134,7 +176,24 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
         attributes["area"] = warning.area
     if warning.summary:
         attributes["summary"] = warning.summary
+    attributes |= _thunderstorm_facts(warning)
     return attributes
+
+
+def _thunderstorm_facts(warning: ActiveWarning) -> dict[str, Any]:
+    """What only a thunderstorm warning has, each left out until there is something to say."""
+    facts: dict[str, Any] = {}
+    if warning.hazards:
+        facts["hazards"] = list(warning.hazards)
+    if warning.very_dangerous:
+        facts["very_dangerous"] = True
+    if warning.detailed:
+        facts["detailed"] = True
+    if warning.hazard:
+        facts["hazard"] = warning.hazard
+    if warning.next_issue:
+        facts["next_issue"] = warning.next_issue.isoformat()
+    return facts
 
 
 def _shown(info: Info, now: datetime, hide_final: bool) -> bool:
@@ -167,23 +226,48 @@ def covering(
     # Match per info block: one file can mix areas, so a warning-level match could report an
     # inactive block that happens to share the file with a matching one.
     return tuple(
-        ActiveWarning(
-            product_id=warning.product_id,
-            event=info.event,
-            headline=info.headline,
-            severity=info.severity,
-            effective=info.effective,
-            expires=info.expires,
-            sent=warning.sent,
-            phase=info.phase,
-            area=_matched_names(info, area_codes, area_names),
-            summary=summary_of(info.description) or summary_of(info.xml_summary),
-            xml_severity=info.xml_severity,
-            in_force=info.effective is None or info.effective <= now,
-        )
+        _active(warning, info, area_codes, area_names, now)
         for warning in warnings
         for info in warning.infos
         if _shown(info, now, hide_final) and info.area_codes & area_codes and type_on(info.event)
+    )
+
+
+def _active(
+    warning: CapWarning,
+    info: Info,
+    area_codes: frozenset[str],
+    area_names: Mapping[str, str],
+    now: datetime,
+) -> ActiveWarning:
+    matched = _matched_names(info, area_codes, area_names)
+    names = matched.split("; ") if matched else []
+    thunderstorm = info.event == THUNDERSTORM_EVENT
+    paragraph = _pick(_paragraphs(info.description), names) if thunderstorm else ""
+    limit = DETAILED_SUMMARY_LIMIT if info.detailed else SUMMARY_LIMIT
+    return ActiveWarning(
+        product_id=warning.product_id,
+        event=info.event,
+        headline=info.headline,
+        severity=info.severity,
+        effective=info.effective,
+        expires=info.expires,
+        sent=warning.sent,
+        phase=info.phase,
+        area=matched,
+        summary=(
+            _shorten(paragraph, limit)
+            if thunderstorm
+            else summary_of(info.description, areas=names)
+        )
+        or summary_of(info.xml_summary),
+        xml_severity=info.xml_severity,
+        in_force=info.effective is None or info.effective <= now,
+        hazards=(_hazards_in(paragraph) or _hazards_in(info.hazard)) if thunderstorm else (),
+        very_dangerous=thunderstorm and bool(_VERY_DANGEROUS.search(paragraph)),
+        detailed=info.detailed,
+        hazard=info.hazard,
+        next_issue=info.next_issue,
     )
 
 
@@ -330,11 +414,15 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "product_id": top.product_id if top else None,
         "event": top.event if top else None,
         "in_force": top.in_force if top else None,
+        # So a tile can say "+1 more" when a broad and a detailed warning are both current.
+        "current": len(current),
         "warnings": [warning_attributes(w) for w in warnings],
     }
     # At the top level too, because a tile can show an attribute but not reach into the list.
     if top and top.summary:
         attributes["summary"] = top.summary
+    if top:
+        attributes |= _thunderstorm_facts(top)
     row = type_of(event)
     if row and row.strength:
         attributes["strength"] = top.strength if top else None

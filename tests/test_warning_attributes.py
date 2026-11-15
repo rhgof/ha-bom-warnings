@@ -150,6 +150,7 @@ def test_a_type_with_no_warnings_has_empty_top_attributes() -> None:
         "product_id": None,
         "event": None,
         "in_force": None,
+        "current": 0,
         "warnings": [],
     }
     if note := WARNING_TYPE_NOTES.get("Flood"):

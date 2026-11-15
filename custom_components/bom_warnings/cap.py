@@ -53,6 +53,12 @@ class Info:
     # BoM's severity code for the matching hazard in the product XML (`GALE`, `STR` for marine
     # wind), where CAP gives gale and strong wind the same severity.
     xml_severity: str = ""
+    # From the broadcast text, which only a thunderstorm warning has read: whether this is the
+    # Detailed kind (one storm cell and where it is heading), the hazard line, and when BoM says
+    # the next warning is due. CAP carries none of them.
+    detailed: bool = False
+    hazard: str = ""
+    next_issue: datetime | None = None
 
     def is_active(self, now: datetime) -> bool:
         if self.phase in (Phase.CANCELLED, Phase.FINAL):

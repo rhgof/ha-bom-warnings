@@ -33,6 +33,7 @@ from .fire_danger import (
 )
 from .ftp import BomFtp, BomFtpError, client_from_env
 from .layer_check import LayerSchedule, read_record, write_record
+from .product_text import ProductTextReader
 from .product_xml import ProductSummaryReader
 from .spatial import (
     LAYERS,
@@ -85,6 +86,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self._reader = WarningReader(client)
         self._fire_reader = FireDangerReader(client)
         self._summary_reader = ProductSummaryReader(client)
+        self._text_reader = ProductTextReader(client)
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
         self._layer_schedule = LayerSchedule.loaded(None, dt_util.utcnow())
@@ -112,6 +114,7 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             # Neither step raises: a failure leaves a summary out, or keeps the previous fire
             # danger data, and never reaches the failure count or the repair issue.
             warnings = self._summary_reader.enrich(warnings, dt_util.utcnow())
+            warnings = self._text_reader.enrich(warnings, dt_util.utcnow())
             return warnings, self._fire_reader.refresh(fire_products)
 
     def _wanted_fire_products(self) -> set[str]:

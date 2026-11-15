@@ -27,6 +27,7 @@
         "feed.py",
         "fire_danger.py",
         "product_xml.py",
+        "product_text.py",
         "spatial.py",
         "layer_check.py",
         "location.py"

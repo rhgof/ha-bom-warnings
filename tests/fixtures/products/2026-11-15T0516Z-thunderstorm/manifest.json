@@ -1,0 +1,47 @@
+{
+  "captured_at": "2026-11-15T05:17:01.643152+00:00",
+  "source": "ftp://ftp.bom.gov.au/anon/gen/fwo/",
+  "note": "The same two products about 90 minutes after 2026-11-15T0343Z: IDN21035 (detailed, Maitland/Cessnock and Newcastle) is now a Cancel product, and IDN21033 was re-issued at 05:03 UTC with a single paragraph for the whole warning area and no very-dangerous tier. Cut from a full capture_products run; the other files are not kept.",
+  "files": [
+    {
+      "name": "IDN21033.cap.xml",
+      "size": 3564,
+      "listing": "-rw-rw-r--    1 1050     1502         3564 Nov 15 05:04 IDN21033.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.txt",
+      "size": 2350,
+      "listing": "-rw-rw-r--    1 1050     1502         2350 Nov 15 05:03 IDN21033.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.xml",
+      "size": 114006,
+      "listing": "-rw-rw-r--    1 1050     1502       114006 Nov 15 05:04 IDN21033.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.cap.xml",
+      "size": 4124,
+      "listing": "-rw-rw-r--    1 1050     1502         4124 Nov 15 04:34 IDN21035.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.txt",
+      "size": 1644,
+      "listing": "-rw-rw-r--    1 1050     1502         1644 Nov 15 04:34 IDN21035.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.xml",
+      "size": 214774,
+      "listing": "-rw-rw-r--    1 1050     1502       214774 Nov 15 04:34 IDN21035.xml",
+      "status": "saved"
+    }
+  ],
+  "products": [
+    "IDN21033",
+    "IDN21035"
+  ]
+}

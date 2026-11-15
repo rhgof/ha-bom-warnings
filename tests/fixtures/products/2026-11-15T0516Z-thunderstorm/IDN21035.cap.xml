@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN21035-2026-11-15T04:34:11+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-15T04:34:11+00:00</sent>
+    <status>Actual</status>
+    <msgType>Cancel</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN21035-2026-11-15T01:42:18+00:00,2026-11-15T01:42:18+00:00 CAP.Message@bom.gov.au,AusBoM-IDN21035-2026-11-15T02:14:29+00:00,2026-11-15T02:14:29+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Minor</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-15T04:34:05+00:00</effective>
+        <expires>2026-11-15T07:04:05+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Severe Thunderstorm Warning for Maitland/Cessnock and Newcastle</headline>
+        <description>
+          Severe thunderstorms are no longer affecting Sydney Newcastle Wollongong and surrounding areas. This warning is now cancelled.
+           
+          
+          Hail of approximately 4 cm in diameter has been reported southwest of Maitland between 2 and 3 pm.
+        </description>
+        <instruction>The State Emergency Service advises that people should:
+* Keep clear of fallen power lines.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* Beware of fallen trees or debris on the road.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Maitland/Cessnock and Greater Newcastle</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_ME015</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_ME020</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-15T04:34:05+00:00</effective>
+        <expires>2026-11-15T07:04:05+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Severe Thunderstorm Warning for New South Wales Anonymous Locale 1</headline>
+        <instruction>The State Emergency Service advises that people should:
+* Keep clear of fallen power lines.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* Beware of fallen trees or debris on the road.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: New South Wales Anonymous Locale 1</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_SP001</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

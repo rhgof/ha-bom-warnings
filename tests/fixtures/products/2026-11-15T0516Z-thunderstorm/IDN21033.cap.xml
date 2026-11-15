@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN21033-2026-11-15T05:03:52+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-15T05:03:52+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN21033-2026-11-15T01:40:10+00:00,2026-11-15T01:40:10+00:00 CAP.Message@bom.gov.au,AusBoM-IDN21033-2026-11-15T04:33:06+00:00,2026-11-15T04:33:06+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-15T05:03:47+00:00</effective>
+        <expires>2026-11-15T10:03:47+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Thunderstorm Warning for Northern Rivers, Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts</headline>
+        <description>
+          Severe thunderstorms are likely to produce damaging winds and large hailstones in the warning area over the next several hours. Locations which may be affected include Lismore, Grafton, Coffs Harbour, Port Macquarie, Taree and Tamworth.  
+          
+          
+          Hail of approximately 4 cm in diameter has been reported southwest of Maitland between 2 and 3 pm.
+        </description>
+        <instruction>The State Emergency Service advises that people should:
+* Park your car under secure cover and away from trees, powerlines and drains.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Stay indoors away from windows, and keep children and pets indoors as well.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Northern Rivers, Mid North Coast, Hunter, North West Slopes and Plains and Northern Tablelands</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW001</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW002</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW003</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW004</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW011</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

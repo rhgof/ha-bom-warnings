@@ -33,13 +33,22 @@ def put_cap(root: Path, product: str, *, mtime: float = BASE_TIME) -> Path:
 
 
 def put_captured_product(
-    root: Path, product: str, *, with_xml: bool = True, mtime: float = BASE_TIME
+    root: Path,
+    product: str,
+    *,
+    with_xml: bool = True,
+    with_text: bool = False,
+    mtime: float = BASE_TIME,
+    source: Path = PRODUCT_CAPTURES,
 ) -> None:
-    """Copy a captured product into the warnings directory: its CAP file and its product XML."""
-    names = [f"{product}.cap.xml"] + ([f"{product}.xml"] if with_xml else [])
+    """Copy a captured product into the warnings directory: its CAP file, and its product XML and
+    broadcast text when asked for. `source` is the capture folder, the 3 Nov one by default."""
+    names = [f"{product}.cap.xml"]
+    names += [f"{product}.xml"] if with_xml else []
+    names += [f"{product}.txt"] if with_text else []
     for name in names:
         target = root / WARNINGS / name
-        shutil.copyfile(PRODUCT_CAPTURES / name, target)
+        shutil.copyfile(source / name, target)
         os.utime(target, (mtime, mtime))
 
 

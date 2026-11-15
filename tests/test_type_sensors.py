@@ -200,6 +200,9 @@ async def test_attributes_list_each_warning_of_the_type_with_the_highest_severit
         "expires",
         "in_force",
         "summary",
+        # IDQ21035's recorded description says "VERY DANGEROUS THUNDERSTORMS ... large hailstones".
+        "hazards",
+        "very_dangerous",
     }
     assert 0 < len(brisbane["summary"]) <= 300
 
