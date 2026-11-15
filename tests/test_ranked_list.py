@@ -148,6 +148,10 @@ async def test_list_items_carry_the_documented_fields(hass: HomeAssistant) -> No
         "expires",
         "in_force",
         "summary",
+        "title",
+        "rank",
+        "ended",
+        "badges",
     }
     assert item["event"] == "Weather"
     assert item["severity"] == "unknown"

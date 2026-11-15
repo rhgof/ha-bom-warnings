@@ -38,7 +38,7 @@ LEAN_KEYS = {
     "expires",
     "in_force",
 }
-RANKED_EXTRAS = {"level", "icon", "color", "sent"}
+RANKED_EXTRAS = {"level", "icon", "color", "sent", "title", "rank", "ended", "badges"}
 
 
 def active(
@@ -89,7 +89,7 @@ def test_an_item_names_the_areas_it_matched_and_only_then() -> None:
     assert "area" not in warning_attributes(active())
 
 
-def test_a_ranked_item_is_the_lean_item_plus_level_icon_colour_and_sent() -> None:
+def test_a_ranked_item_is_the_lean_item_plus_the_display_fields_and_sent() -> None:
     warning = active("Thunderstorm")
     assert warning_attributes(warning, ranked=True) == {
         **warning_attributes(warning),
@@ -97,14 +97,18 @@ def test_a_ranked_item_is_the_lean_item_plus_level_icon_colour_and_sent() -> Non
         "icon": EVENT_ICONS["Thunderstorm"],
         "color": LEVEL_COLORS["severe"],
         "sent": NOW.isoformat(),
+        "title": "Severe thunderstorm warning",
+        "rank": 3,
+        "ended": False,
+        "badges": [],
     }
 
 
-def test_a_ranked_item_keeps_the_raw_unknown_level_and_its_colour() -> None:
+def test_a_ranked_item_with_no_grade_has_no_level_and_keeps_its_colour() -> None:
     item = warning_attributes(active(severity=Severity.UNKNOWN), ranked=True)
     assert (item["severity"], item["level"], item["color"]) == (
         "unknown",
-        "unknown",
+        None,
         LEVEL_COLORS["unknown"],
     )
 
@@ -150,6 +154,9 @@ def test_a_type_with_no_warnings_has_empty_top_attributes() -> None:
         "product_id": None,
         "event": None,
         "in_force": None,
+        "title": None,
+        "rank": None,
+        "badges": [],
         "current": 0,
         "warnings": [],
     }

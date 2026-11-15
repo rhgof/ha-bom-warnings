@@ -75,11 +75,11 @@ def test_the_cap_severity_stays_what_the_file_said(
     ("severity", "level", "state", "colour"),
     [
         (Severity.MINOR, "minor", "minor", LEVEL_COLORS["minor"]),
-        (Severity.UNKNOWN, "unknown", "unrated", LEVEL_COLORS["unknown"]),
+        (Severity.UNKNOWN, None, "unrated", LEVEL_COLORS["unknown"]),
     ],
 )
 def test_a_severity_with_no_grade_keeps_cap_s_word_and_colour(
-    severity: Severity, level: str, state: str, colour: str
+    severity: Severity, level: str | None, state: str, colour: str
 ) -> None:
     item = warning_attributes(fire(severity), ranked=True)
 

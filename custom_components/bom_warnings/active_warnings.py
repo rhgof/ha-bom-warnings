@@ -15,7 +15,7 @@ from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
 from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
-from .warning_types import THUNDERSTORM_EVENT, XML_WIND_STRENGTHS, type_of
+from .warning_types import THUNDERSTORM_EVENT, XML_WIND_STRENGTHS, SensorType, type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -146,10 +146,55 @@ SEVERITY_ORDER = (
 )
 
 
+def _shown_level(warning: ActiveWarning) -> str | None:
+    """The level word, or None for a warning that carries no grade (CAP `unknown`, no override)."""
+    level = level_of(warning)
+    return None if level == "unknown" else level
+
+
+def _title(warning: ActiveWarning) -> str:
+    """The name of the warning with its level in front, such as "Severe Heatwave warning".
+
+    A name that already begins with the level ("Severe weather warning" at `severe`) is left alone,
+    since the level in front would say it twice.
+    """
+    row = type_of(warning.event)
+    name = row.sensor_name if isinstance(row, SensorType) else warning.event
+    level = _shown_level(warning)
+    if level is None or name.lower().startswith(level):
+        return name
+    return f"{level.capitalize()} {name}"
+
+
+def _badges(warning: ActiveWarning) -> list[str]:
+    return [
+        *(["Very dangerous"] if warning.very_dangerous else []),
+        *(["Detailed"] if warning.detailed else []),
+    ]
+
+
+def display_fields(warning: ActiveWarning) -> dict[str, Any]:
+    """What a card needs to draw one warning without knowing its event.
+
+    The level word (None when ungraded), a title that includes it, the colour and icon, a rank that
+    orders warnings across types, whether it has ended, and the badges to show beside the title.
+    """
+    return {
+        "level": _shown_level(warning),
+        "title": _title(warning),
+        "color": color_of(warning),
+        "icon": event_icon(warning.event),
+        "rank": _LEVEL_RANK[warning.severity.value],
+        "ended": not warning.is_current,
+        "badges": _badges(warning),
+    }
+
+
 def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[str, Any]:
     """One warning as the list attributes entities show it.
 
-    The ranked list adds the level, icon, colour and sent time to the fields every list has.
+    The ranked list adds the display fields (see `display_fields`) and the sent time to the fields
+    every list has. The lean lists stay lean: each warning is repeated on up to 15 entities.
     """
     attributes: dict[str, Any] = {
         "product_id": warning.product_id,
@@ -162,13 +207,8 @@ def warning_attributes(warning: ActiveWarning, *, ranked: bool = False) -> dict[
         "in_force": warning.in_force,
     }
     if ranked:
-        level = level_of(warning)
-        attributes |= {
-            "level": level,
-            "icon": event_icon(warning.event),
-            "color": color_of(warning),
-            "sent": warning.sent.isoformat() if warning.sent else None,
-        }
+        attributes |= display_fields(warning)
+        attributes["sent"] = warning.sent.isoformat() if warning.sent else None
     # Only marine wind has one, so no other event gains the field.
     if (strength := warning.strength) is not None:
         attributes["strength"] = strength
@@ -420,6 +460,9 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "product_id": top.product_id if top else None,
         "event": top.event if top else None,
         "in_force": top.in_force if top else None,
+        "title": _title(top) if top else None,
+        "rank": _LEVEL_RANK[top.severity.value] if top else None,
+        "badges": _badges(top) if top else [],
         # So a tile can say "+1 more" when a broad and a detailed warning are both current.
         "current": len(current),
         "warnings": [warning_attributes(w) for w in warnings],
