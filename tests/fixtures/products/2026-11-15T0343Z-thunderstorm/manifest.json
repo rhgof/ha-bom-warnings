@@ -1,0 +1,47 @@
+{
+  "captured_at": "2026-11-15T03:43:40.954493+00:00",
+  "source": "ftp://ftp.bom.gov.au/anon/gen/fwo/",
+  "note": "Two live Severe Thunderstorm Warnings (IDN21033 broad, IDN21035 detailed), re-issued 2026-11-15 03:38 and 03:40 UTC. Taken by scripts/capture_products.py as part of a full run, then cut down to these two products; the other 45 files are not kept. Listing lines are for these two products only (the full listing also shows .amoc.xml, .html, .pdf and .ps siblings, not fetched).",
+  "files": [
+    {
+      "name": "IDN21033.cap.xml",
+      "size": 3517,
+      "listing": "-rw-rw-r--    1 1050     1502         3517 Nov 15 03:38 IDN21033.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.txt",
+      "size": 2736,
+      "listing": "-rw-rw-r--    1 1050     1502         2736 Nov 15 03:38 IDN21033.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.xml",
+      "size": 112128,
+      "listing": "-rw-rw-r--    1 1050     1502       112128 Nov 15 03:38 IDN21033.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.cap.xml",
+      "size": 4852,
+      "listing": "-rw-rw-r--    1 1050     1502         4852 Nov 15 03:40 IDN21035.cap.xml",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.txt",
+      "size": 2167,
+      "listing": "-rw-rw-r--    1 1050     1502         2167 Nov 15 03:40 IDN21035.txt",
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.xml",
+      "size": 246217,
+      "listing": "-rw-rw-r--    1 1050     1502       246217 Nov 15 03:41 IDN21035.xml",
+      "status": "saved"
+    }
+  ],
+  "products": [
+    "IDN21033",
+    "IDN21035"
+  ]
+}

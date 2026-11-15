@@ -1,0 +1,14 @@
+-rw-rw-r--    1 1050     1502         2164 Nov 15 03:38 IDN21033.amoc.xml
+-rw-rw-r--    1 1050     1502         3517 Nov 15 03:38 IDN21033.cap.xml
+-rw-rw-r--    1 1050     1502       112852 Nov 15 03:38 IDN21033.html
+-rw-rw-r--    1 1050     1502        91467 Nov 15 03:38 IDN21033.pdf
+-rw-rw-r--    1 1050     1502       120760 Nov 15 03:38 IDN21033.ps
+-rw-rw-r--    1 1050     1502         2736 Nov 15 03:38 IDN21033.txt
+-rw-rw-r--    1 1050     1502       112128 Nov 15 03:38 IDN21033.xml
+-rw-rw-r--    1 1050     1502         2330 Nov 15 03:40 IDN21035.amoc.xml
+-rw-rw-r--    1 1050     1502         4852 Nov 15 03:40 IDN21035.cap.xml
+-rw-rw-r--    1 1050     1502       110014 Nov 15 03:41 IDN21035.html
+-rw-rw-r--    1 1050     1502        88731 Nov 15 03:40 IDN21035.pdf
+-rw-rw-r--    1 1050     1502       116996 Nov 15 03:41 IDN21035.ps
+-rw-rw-r--    1 1050     1502         2167 Nov 15 03:40 IDN21035.txt
+-rw-rw-r--    1 1050     1502       246217 Nov 15 03:41 IDN21035.xml
