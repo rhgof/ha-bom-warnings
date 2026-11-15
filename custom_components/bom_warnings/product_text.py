@@ -12,12 +12,12 @@ from __future__ import annotations
 
 import logging
 import re
-from collections.abc import Sequence
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime, timedelta
 
 from .cap import CapWarning, Info
-from .ftp import BomFtpClient, BomFtpError
+from .ftp import BomFtpError
+from .sibling_files import PerIssueReader, Read
 from .warning_types import THUNDERSTORM_EVENT
 
 _LOGGER = logging.getLogger(__name__)
@@ -120,55 +120,36 @@ def _with_text(info: Info, text: ProductText, sent: datetime | None) -> Info:
     return replace(info, detailed=text.detailed, hazard=text.hazard, next_issue=next_issue)
 
 
-class ProductTextReader:
+class ProductTextReader(PerIssueReader[ProductText | None]):
     """Adds the broadcast text's facts to the current thunderstorm blocks of each warning.
 
     It reads a product's text only when a current thunderstorm block needs it, and then once per
-    CAP issue: the issue's identifier changes whenever BoM re-issues, so an unchanged product costs
-    no request. The file is fetched by name without listing it first, because it is 2 to 3 KB.
+    CAP issue (see `PerIssueReader`). The file is fetched by name without listing it first, because
+    it is 2 to 3 KB.
     """
 
-    def __init__(self, ftp: BomFtpClient) -> None:
-        self._ftp = ftp
-        # Product id -> (identifier of the CAP issue it was read for, what the text said; None when
-        # the file was absent or empty).
-        self._seen: dict[str, tuple[str, ProductText | None]] = {}
+    def _wants(self, info: Info, now: datetime) -> bool:
+        return _wants_text(info, now)
 
-    def _read(self, warning: CapWarning) -> None:
+    def _read(self, warning: CapWarning) -> Read[ProductText | None] | None:
         name = f"{warning.product_id}.txt"
         try:
             data = self._ftp.fetch(name)
         except BomFtpError as err:
             _LOGGER.debug("Could not read product text %s: %s", name, err)
-            return
+            return None
         # An absent or unreadable file is remembered as such until BoM re-issues the product, so it
         # costs one request and not one every refresh. The text lands with the CAP file; if it were
         # ever late, a Detailed warning would lack its facts for one 30 minute cycle.
         if (text := parse_text(data or b"")) is None:
             _LOGGER.debug("Product text %s is absent, empty or unreadable", name)
-        self._seen[warning.product_id] = (warning.identifier, text)
+        return Read(text)
 
-    def _apply(self, warning: CapWarning, now: datetime) -> CapWarning:
-        seen = self._seen.get(warning.product_id)
-        if seen is None or seen[0] != warning.identifier or seen[1] is None:
+    def _apply(self, warning: CapWarning, value: ProductText | None, now: datetime) -> CapWarning:
+        if value is None:
             return warning
         infos = tuple(
-            _with_text(info, seen[1], warning.sent) if _wants_text(info, now) else info
+            _with_text(info, value, warning.sent) if _wants_text(info, now) else info
             for info in warning.infos
         )
         return replace(warning, infos=infos)
-
-    def enrich(self, warnings: Sequence[CapWarning], now: datetime) -> list[CapWarning]:
-        """Blocking, so run it in an executor. Returns the warnings with the text's facts added."""
-        wanted = {
-            w.product_id: w for w in warnings if any(_wants_text(info, now) for info in w.infos)
-        }
-        self._seen = {
-            pid: seen
-            for pid, seen in self._seen.items()
-            if pid in wanted and seen[0] == wanted[pid].identifier
-        }
-        for product_id, warning in wanted.items():
-            if product_id not in self._seen:
-                self._read(warning)
-        return [self._apply(w, now) for w in warnings]

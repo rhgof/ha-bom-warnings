@@ -23,7 +23,8 @@ from datetime import UTC, datetime
 from xml.etree import ElementTree as ET
 
 from .cap import CapWarning, Info, Phase, parse_xml
-from .ftp import BomFtpClient, BomFtpError
+from .ftp import BomFtpError
+from .sibling_files import PerIssueReader, Read
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -161,61 +162,38 @@ def _enriched(info: Info, hazards: Sequence[Hazard]) -> Info:
     return info
 
 
-class ProductSummaryReader:
+class ProductSummaryReader(PerIssueReader[tuple[Hazard, ...]]):
     """Fills in what the product XML supplies: a summary and strength code for a block the CAP file
     gives no description (marine wind), and the final phase of a flood warning.
 
-    It reads a product's XML only when a current block needs it, and then once per CAP
-    issue: the issue's identifier changes whenever BoM re-issues, so an unchanged product costs no
-    request, and a product found to have no XML is remembered the same way.
+    It reads a product's XML only when a current block needs it, and then once per CAP issue (see
+    `PerIssueReader`). A product found to have no XML is remembered the same way.
     """
 
-    def __init__(self, ftp: BomFtpClient) -> None:
-        self._ftp = ftp
-        # Product id -> (identifier of the CAP issue it was read for, its hazards; none if absent).
-        self._seen: dict[str, tuple[str, tuple[Hazard, ...]]] = {}
+    def _wants(self, info: Info, now: datetime) -> bool:
+        return _needs_xml(info, now)
 
-    def _read(self, warning: CapWarning) -> None:
+    def _read(self, warning: CapWarning) -> Read[tuple[Hazard, ...]] | None:
         name = f"{warning.product_id}.xml"
         try:
             entry = next((e for e in self._ftp.list_files(name) if e.name == name), None)
             if entry is None or entry.size > MAX_XML_BYTES:
                 # Absent, or too big to be worth fetching: either way not asked for again until
                 # BoM re-issues the product.
-                self._seen[warning.product_id] = (warning.identifier, ())
-                return
+                return Read(())
             data = self._ftp.fetch(name)
         except BomFtpError as err:
             _LOGGER.debug("Could not read product XML %s: %s", name, err)
-            return
+            return None
         if (product := parse_product(data or b"")) is None:
             # Not remembered, so the next refresh tries the file again.
             _LOGGER.debug("Product XML %s is empty or unreadable", name)
-            return
+            return None
         if product.sent and warning.sent and product.sent < warning.sent:
             # The CAP file landed first; this is the previous issue's XML.
             _LOGGER.debug("Product XML %s is older than its CAP file", name)
-            return
-        self._seen[warning.product_id] = (warning.identifier, product.hazards)
+            return None
+        return Read(product.hazards)
 
-    def _apply(self, warning: CapWarning) -> CapWarning:
-        seen = self._seen.get(warning.product_id)
-        if seen is None or seen[0] != warning.identifier:
-            return warning
-        infos = tuple(_enriched(info, seen[1]) for info in warning.infos)
-        return replace(warning, infos=infos)
-
-    def enrich(self, warnings: Sequence[CapWarning], now: datetime) -> list[CapWarning]:
-        """Blocking, so run it in an executor. Returns the warnings with summaries filled in."""
-        wanted = {
-            w.product_id: w for w in warnings if any(_needs_xml(info, now) for info in w.infos)
-        }
-        self._seen = {
-            pid: seen
-            for pid, seen in self._seen.items()
-            if pid in wanted and seen[0] == wanted[pid].identifier
-        }
-        for product_id, warning in wanted.items():
-            if product_id not in self._seen:
-                self._read(warning)
-        return [self._apply(w) for w in warnings]
+    def _apply(self, warning: CapWarning, value: tuple[Hazard, ...], now: datetime) -> CapWarning:
+        return replace(warning, infos=tuple(_enriched(info, value) for info in warning.infos))

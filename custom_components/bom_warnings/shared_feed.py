@@ -10,7 +10,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -35,6 +35,7 @@ from .ftp import BomFtp, BomFtpError, client_from_env
 from .layer_check import LayerSchedule, read_record, write_record
 from .product_text import ProductTextReader
 from .product_xml import ProductSummaryReader
+from .sibling_files import PerIssueReader
 from .spatial import (
     LAYERS,
     RefreshResult,
@@ -85,8 +86,11 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         self.client = client
         self._reader = WarningReader(client)
         self._fire_reader = FireDangerReader(client)
-        self._summary_reader = ProductSummaryReader(client)
-        self._text_reader = ProductTextReader(client)
+        # In order, since a later reader sees what an earlier one added.
+        self._sibling_readers: tuple[PerIssueReader[Any], ...] = (
+            ProductSummaryReader(client),
+            ProductTextReader(client),
+        )
         self.consecutive_failures = 0
         # Due right after the first successful refresh, unless a recent record says otherwise.
         self._layer_schedule = LayerSchedule.loaded(None, dt_util.utcnow())
@@ -113,8 +117,8 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
             warnings = self._reader.refresh()
             # Neither step raises: a failure leaves a summary out, or keeps the previous fire
             # danger data, and never reaches the failure count or the repair issue.
-            warnings = self._summary_reader.enrich(warnings, dt_util.utcnow())
-            warnings = self._text_reader.enrich(warnings, dt_util.utcnow())
+            for sibling in self._sibling_readers:
+                warnings = sibling.enrich(warnings, dt_util.utcnow())
             return warnings, self._fire_reader.refresh(fire_products)
 
     def _wanted_fire_products(self) -> set[str]:

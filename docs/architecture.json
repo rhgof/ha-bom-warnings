@@ -28,6 +28,7 @@
         "fire_danger.py",
         "product_xml.py",
         "product_text.py",
+        "sibling_files.py",
         "spatial.py",
         "layer_check.py",
         "location.py"
