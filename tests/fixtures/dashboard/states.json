@@ -311,7 +311,9 @@
         "next_issue": "2026-11-15T04:10:00+00:00",
         "title": "Severe thunderstorm warning",
         "rank": 2,
-        "badges": [],
+        "badges": [
+          "Detailed"
+        ],
         "layout": "detail"
       }
     }

@@ -7,6 +7,7 @@ produces. The browser behaviour (which markup the card keeps) is checked by hand
 docs/dashboard.md.
 """
 
+import copy
 import json
 import re
 from datetime import datetime
@@ -130,6 +131,21 @@ async def test_card_renders_fixture(
         assert text not in rendered
 
 
+async def test_a_warning_with_no_level_shows_no_brackets_and_no_none(hass: HomeAssistant) -> None:
+    scenario = copy.deepcopy(STATES["thunderstorm"])
+    first, second = scenario[COUNT]["attributes"]["warnings"][:2]
+    first["level"] = None
+    second.update(level=None, phase="final", ended=True)
+    for entity_id, entity in scenario.items():
+        hass.states.async_set(entity_id, entity["state"], entity["attributes"])
+
+    rendered = " ".join(Template(markdown_content("Warnings"), hass).async_render().split())
+
+    assert "None" not in rendered
+    assert "**Thunderstorm**: " in rendered
+    assert "**Thunderstorm** (final): " in rendered
+
+
 async def test_list_is_ranked_in_the_order_given(hass: HomeAssistant) -> None:
     rendered = await render(hass, "active", "Warnings")
 
@@ -200,6 +216,17 @@ def test_fixture_warnings_carry_the_display_fields_the_integration_computes() ->
         assert {key: item.get(key, "<missing>") for key in real} == real, item["product_id"]
 
 
+def top_warnings(attributes: dict[str, Any]) -> list[ActiveWarning]:
+    """The warning a type sensor's top-level attributes describe.
+
+    The lean items carry no sent time, so they cannot be ranked again here: the sensor names its
+    top warning by product id. A sensor that names none has only the one item, or none.
+    """
+    items = attributes.get("warnings", [])
+    named = [w for w in items if w["product_id"] == attributes.get("product_id")]
+    return [warning_from(w) for w in named or items]
+
+
 def test_fixture_type_sensors_carry_their_top_warnings_display_fields() -> None:
     sensors = [
         (entity_id, entity)
@@ -210,9 +237,7 @@ def test_fixture_type_sensors_carry_their_top_warnings_display_fields() -> None:
     assert sensors
     for entity_id, entity in sensors:
         attributes = entity["attributes"]
-        real = type_attributes(
-            event_of(entity_id), [warning_from(w) for w in attributes.get("warnings", [])]
-        )
+        real = type_attributes(event_of(entity_id), top_warnings(attributes))
         for key in ("title", "rank", "badges"):
             assert attributes.get(key, "<missing>") == real[key], (entity_id, key)
         assert attributes.get("layout") == real.get("layout"), entity_id

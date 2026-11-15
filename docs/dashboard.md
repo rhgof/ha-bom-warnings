@@ -183,8 +183,12 @@ out the headline is the optional spoken summary sensor, which is not built (see 
 
 `state_attr('sensor.<title>_warning_count', 'warnings')` is a list, most severe first, only for
 warnings covering your location. Each item has `product_id`, `event`, `severity`, `level`
-(`minor`, `moderate`, `unknown`, `severe`, `extreme`; a Fire Weather Warning shows `high`,
-`extreme` or `catastrophic`), `icon` (an `mdi:` name), `color` (hex),
+(`minor`, `moderate`, `severe`, `extreme`, or null when BoM gives the warning no grade; a Fire
+Weather Warning shows `high`, `extreme` or `catastrophic`), `icon` (an `mdi:` name), `color` (hex),
+and the fields a card needs to draw it without knowing its event: `title` (the sensor's name with
+the level in front, such as "Severe Heatwave warning"), `rank` (0 to 4, higher is worse, comparable
+across types), `ended` (`true` for a final or cancelled warning) and `badges` (a list such as
+`["Very dangerous", "Detailed"]`), then
 `headline`, `phase`, `sent`, `effective` and `expires`, and `area` (the names of your location's
 areas the warning covers, such as `Illawarra`; left out when none has a name) and `summary` (the
 first paragraph of BoM's text, at most 300 characters; for marine wind, which has no text in its CAP
@@ -223,6 +227,13 @@ grade instead, `high`, `extreme` or `catastrophic`), and `color` is that level's
 same as in the count sensor's list. `color` is `None` while no warning of the type is in force
 (ended warnings do not count), and the card decides how a quiet state looks.
 
+The per-type sensor also repeats its top warning's `title`, `rank` and `badges` (`None`, `None` and
+`[]` while quiet), and sends `layout: "detail"` while its type asks for the detail layout and has a
+current warning (thunderstorm does). A card that sees `layout` draws the warning with its hazards,
+badges and next-update time, and never needs to look at the event. The lean `warnings` lists on the
+type sensors and the binary sensor leave the display fields out, because each warning is repeated on
+up to 15 entities and the recorder drops a state whose attributes pass 16 KB.
+
 ## Markdown card, coloured icon
 
 ```yaml
@@ -235,14 +246,14 @@ content: >-
   {% endif %}
   {% for w in items %}
   <font color="{{ w.color }}"><ha-icon icon="{{ w.icon }}"></ha-icon> &#9632;</font>
-  **{{ w.event }}**{% set detail = ([w.level] if w.level not in ['unknown', 'unrated'] else []) + ([w.phase] if w.phase in ['final', 'cancelled'] else []) %}{% if detail %} ({{ detail | join(', ') }}){% endif %}:
+  **{{ w.event }}**{% set detail = ([w.level] if w.level else []) + ([w.phase] if w.ended else []) %}{% if detail %} ({{ detail | join(', ') }}){% endif %}:
   {{ w.headline }}
 
   {% endfor %}
 ```
 
-BoM sends no grade for a thunderstorm or severe weather warning, so the level (`unknown`) is left
-out of the brackets for those; a final or cancelled one still shows its phase.
+A warning with no grade has a `level` of null, which is left out of the brackets; a final
+or cancelled one (`ended`) still shows its phase.
 
 ## Markdown card, emoji squares (fallback)
 
@@ -253,16 +264,16 @@ sanitiser could strip.
 type: markdown
 title: Warnings
 content: >-
-  {% set marks = {'minor': '🟨', 'moderate': '🟧', 'unknown': '🟧', 'severe': '🟥', 'extreme': '🟪'} %}
+  {% set marks = {'minor': '🟨', 'moderate': '🟧', 'severe': '🟥', 'extreme': '🟪'} %}
   {% for w in state_attr('sensor.<title>_warning_count', 'warnings') or [] %}
-  {{ marks[w.level] }} <ha-icon icon="{{ w.icon }}"></ha-icon>
+  {{ marks.get(w.level, '🟧') }} <ha-icon icon="{{ w.icon }}"></ha-icon>
   **{{ w.event }}**: {{ w.headline }}
 
   {% endfor %}
 ```
 
-`unknown` has no amber emoji square, so it shares orange with `moderate` here; the order of the
-rows still shows the ranking.
+A warning with no level has no amber emoji square, so it shares orange with `moderate` here; the
+order of the rows still shows the ranking.
 
 ## Colours
 

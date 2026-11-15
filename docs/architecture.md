@@ -194,7 +194,8 @@ Home Assistant layer:
   minor < moderate < unknown < severe < extreme, defined once as `SEVERITY_ORDER` in
   `active_warnings.py` (CAP `unknown` is what BoM sends for Severe Weather and Severe Thunderstorm,
   so it must outrank a minor flood). The list holds current warnings, then
-  (with `hide_final_cancelled` off) ended ones, marked by `phase`. Each item has `level`, an `icon`
+  (with `hide_final_cancelled` off) ended ones, marked by `phase` and `ended`. Each item has `level`
+  (null when ungraded), `title`, `rank`, `badges` (all from `display_fields`) and an `icon`
   chosen per CAP event (the row's `icon` in `warning_types.WARNING_TYPES`, default
   `DEFAULT_EVENT_ICON`) and a hex `color` per level (`LEVEL_COLORS` in `const.py`). The two sensors' `icon` follows the top warning, or
   `NO_WARNING_ICON`. The binary sensor is unchanged. `docs/dashboard.md` has card examples. The
@@ -405,9 +406,10 @@ districts):
 
 ## Known gaps
 
-- The ranked list's `level` attribute shows BoM's severity `unknown` as is for the types with no
-  grade, while their type sensors' state calls it `unrated` (`unknown` is Home Assistant's own
-  no-value state). Thunderstorm and severe weather say `severe` in both (changed 15 Nov 2026).
+- A type with no grade for BoM's severity `unknown` has a null `level` in the ranked list, while its
+  type sensor's state calls it `unrated` (`unknown` is Home Assistant's own no-value state).
+  Thunderstorm and severe weather say `severe` in both (changed 15 Nov 2026). A card reads the
+  `title`, `rank`, `ended` and `badges` the integration sends and keeps no level words of its own.
 - Fire danger: the midnight rollover of today/tomorrow happens at the next feed update (up to 10
   minutes late); the timezone is a fixed offset (see above).
 - Fire danger was checked on the dev instance against the fake BoM server only, not against BoM's
