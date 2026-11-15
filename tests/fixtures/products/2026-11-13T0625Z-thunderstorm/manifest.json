@@ -1,0 +1,41 @@
+{
+  "captured_at": "2026-11-13T06:25:00+00:00",
+  "source": "ftp://ftp.bom.gov.au/anon/gen/fwo/",
+  "note": "Two live Severe Thunderstorm Warnings (IDN21033 broad, IDN21035 detailed), fetched with the integration's FTP client rather than scripts/capture_products.py, so there are no listing lines. Time is to the minute. See docs/thunderstorm-live-capture-2026-11-13.md.",
+  "files": [
+    {
+      "name": "IDN21033.cap.xml",
+      "size": 6997,
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.txt",
+      "size": 3146,
+      "status": "saved"
+    },
+    {
+      "name": "IDN21033.xml",
+      "size": 119269,
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.cap.xml",
+      "size": 5257,
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.txt",
+      "size": 2597,
+      "status": "saved"
+    },
+    {
+      "name": "IDN21035.xml",
+      "size": 255693,
+      "status": "saved"
+    }
+  ],
+  "products": [
+    "IDN21033",
+    "IDN21035"
+  ]
+}

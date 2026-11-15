@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN21033-2026-11-13T06:11:38+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-13T06:11:38+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN21033-2026-11-13T02:24:06+00:00,2026-11-13T02:24:06+00:00 CAP.Message@bom.gov.au,AusBoM-IDN21033-2026-11-13T03:04:44+00:00,2026-11-13T03:04:44+00:00 CAP.Message@bom.gov.au,AusBoM-IDN21033-2026-11-13T04:53:37+00:00,2026-11-13T04:53:37+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-13T06:11:32+00:00</effective>
+        <expires>2026-11-13T11:11:32+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Thunderstorm Warning for Sydney Metropolitan, Northern Rivers, Mid North Coast, Hunter, Northern Tablelands, Central Tablelands and North West Slopes and Plains forecast districts</headline>
+        <description>
+          Severe thunderstorms are likely to produce heavy rainfall that may lead to flash flooding and damaging winds over the next several hours in parts of the Northern Rivers, Mid North Coast, Northern Tablelands and North West Slopes and Plains districts. Locations which may be affected include Dorrigo, Nymboida, Ebor and Boggabilla.  
+          
+          Severe thunderstorms are likely to produce heavy rainfall that may lead to flash flooding, damaging winds and large hailstones over the next several hours in parts of the Hunter, Metropolitan, Mid North Coast and Central Tablelands districts. Locations which may be affected include Cessnock, Penrith, Barrington Tops, Singleton, Putty and Wollombi.  
+          
+          
+          Severe thunderstorms are no longer occurring in the Illawarra and Southern Tablelands districts and the warning for these districts is CANCELLED.
+           
+        </description>
+        <instruction>The State Emergency Service advises that people should:
+* Park your car under secure cover and away from trees, powerlines and drains.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* If you are trapped by flash flooding, seek refuge in the highest available place and ring 000 if you need rescue.
+* Stay indoors away from windows, and keep children and pets indoors as well.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Northern Rivers, Mid North Coast, Hunter, Metropolitan, Central Tablelands, North West Slopes and Plains and Northern Tablelands</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW005</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW001</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW002</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW003</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW004</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW008</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW011</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-13T06:11:32+00:00</effective>
+        <expires>2026-11-13T11:11:32+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Severe Thunderstorm Warning for Illawarra and Southern Tablelands forecast districts</headline>
+        <description/>
+        <instruction>The State Emergency Service advises that people should:
+* Park your car under secure cover and away from trees, powerlines and drains.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* If you are trapped by flash flooding, seek refuge in the highest available place and ring 000 if you need rescue.
+* Stay indoors away from windows, and keep children and pets indoors as well.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Illawarra and Southern Tablelands forecast districts</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW006</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_PW009</value>
+            </geocode>
+        </area>
+    </info>
+</alert>

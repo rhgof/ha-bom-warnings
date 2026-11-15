@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+    <identifier>AusBoM-IDN21035-2026-11-13T06:13:59+00:00</identifier>
+    <sender>CAP.Message@bom.gov.au</sender>
+    <sent>2026-11-13T06:13:59+00:00</sent>
+    <status>Actual</status>
+    <msgType>Update</msgType>
+    <scope>Public</scope>
+    <code>urn:oasis:names:tc:emergency:cap:1.2:profile:CAP-AU:1.0</code>
+    <references>CAP.Message@bom.gov.au,AusBoM-IDN21035-2026-11-13T05:09:36+00:00,2026-11-13T05:09:36+00:00</references>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-13T06:13:45+00:00</effective>
+        <expires>2026-11-13T08:43:45+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Severe Thunderstorm Warning for Blue Mountains/Hawkesbury and Sydney</headline>
+        <description>
+          The Bureau of Meteorology warns that, at 5:15 pm, a severe thunderstorm likely to produce heavy rainfall that may lead to flash flooding, damaging winds and large hailstones was detected near the Wollemi National Park north of Kurrajong and Kurrajong. This thunderstorm is moving towards the east. It is forecast to affect Londonderry, Upper Colo and Castlereagh by 5:30 pm and Richmond, Windsor and Wilberforce by 5:45 pm.
+           
+        </description>
+        <instruction>The State Emergency Service advises that people should:
+* Park your car under secure cover and away from trees, powerlines and drains.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* If you are trapped by flash flooding, seek refuge in the highest available place and ring 000 if you need rescue.
+* Stay indoors away from windows, and keep children and pets indoors as well.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Blue Mountains/Hawkesbury and Sydney</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_ME014</value>
+            </geocode>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_ME017</value>
+            </geocode>
+        </area>
+    </info>
+    <info>
+        <language>en-AU</language>
+        <category>Met</category>
+        <event>Thunderstorm</event>
+        <urgency>Unknown</urgency>
+        <severity>Unknown</severity>
+        <certainty>Unknown</certainty>
+        <eventCode>
+            <valueName>https://govshare.gov.au/xmlui/handle/10772/6495</valueName>
+            <value>thunderstorm</value>
+        </eventCode>
+        <effective>2026-11-13T06:13:45+00:00</effective>
+        <expires>2026-11-13T08:43:45+00:00</expires>
+        <senderName>Australian Government Bureau of Meteorology</senderName>
+        <headline>Cancellation of Severe Thunderstorm Warning for Wollondilly/Wingecarribee</headline>
+        <description/>
+        <instruction>The State Emergency Service advises that people should:
+* Park your car under secure cover and away from trees, powerlines and drains.
+* Secure or put away loose items around your house, yard and balcony.
+* Keep at least 8 metres away from fallen power lines or objects that may be energised, such as fences.
+* Report fallen power lines to either Ausgrid (131 388), Endeavour Energy (131 003), Essential Energy (132 080) or Evoenergy (131 093) as shown on your power bill.
+* Keep clear of creeks and storm drains.
+* Don't walk, ride your bike or drive through flood water.
+* If you are trapped by flash flooding, seek refuge in the highest available place and ring 000 if you need rescue.
+* Stay indoors away from windows, and keep children and pets indoors as well.
+For emergency help in flood and storms, ring the SES on 132 500.
+Stay updated on the Hazards Near Me NSW app or the ACT ESA website (https://esa.act.gov.au).
+
+</instruction>
+        <web>http://www.bom.gov.au/australia/warnings</web>
+        <contact>http://www.bom.gov.au/inside/contacts.shtml</contact>
+        <area>
+            <areaDesc>New South Wales: Wollondilly/Wingecarribee</areaDesc>
+            <geocode>
+                <valueName>AMOC-AreaCode</valueName>
+                <value>NSW_ME013</value>
+            </geocode>
+        </area>
+    </info>
+</alert>
