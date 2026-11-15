@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
@@ -23,6 +23,7 @@ from custom_components.bom_warnings.const import (
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_STATE,
+    CONF_WARNING_RADIUS,
     CONF_ZONE,
     CONF_ZONE_NAME,
     DOMAIN,
@@ -192,7 +193,9 @@ async def start_zone(hass: HomeAssistant, entity_id: str = "zone.holiday", **cho
     )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "zone"
-    return await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ZONE: entity_id})
+    return await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_ZONE: entity_id, **choices}
+    )
 
 
 async def test_menu_offers_zones_only_when_there_are_some(hass: HomeAssistant) -> None:
@@ -222,32 +225,49 @@ async def test_zone_creates_an_entry_that_follows_it(
         CONF_ZONE_NAME: "Holiday house",
         CONF_LATITUDE: -33.8688,
         CONF_LONGITUDE: 151.2093,
-        CONF_RADIUS: 2000.0,
+        CONF_RADIUS: 0.0,
         CONF_STATE: "QLD",
         CONF_AREA_CODES: ["QLD_ME008", "QLD_PW011", "QLD_RC167"],
         CONF_AREA_NAMES: RESOLVED_NAMES,
     }
-    assert resolve.call_args.kwargs == {"lat": -33.8688, "lon": 151.2093, "radius_m": 2000.0}
+    assert resolve.call_args.kwargs == {"lat": -33.8688, "lon": 151.2093, "radius_m": 0.0}
 
 
 @pytest.mark.parametrize(
-    ("radius", "stored"),
-    [
-        (100, 100),
-        (MAX_RADIUS_M, MAX_RADIUS_M),
-        (MAX_RADIUS_M + 1, MAX_RADIUS_M),
-        (900_000, MAX_RADIUS_M),
-    ],
+    ("radius_km", "stored"),
+    [(0, 0.0), (0.1, 100.0), (15, 15_000.0), (50, MAX_RADIUS_M)],
 )
-async def test_radius_is_capped(
-    hass: HomeAssistant, resolve: MagicMock, radius: float, stored: float
+async def test_the_warning_radius_sets_the_circle_and_is_kept_as_an_option(
+    hass: HomeAssistant, resolve: MagicMock, radius_km: float, stored: float
 ) -> None:
-    set_zone(hass, radius=radius)
+    set_zone(hass)
+
+    result = await start_zone(hass, **{CONF_WARNING_RADIUS: radius_km})
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["options"] == {CONF_WARNING_RADIUS: radius_km}
+    assert result["data"][CONF_RADIUS] == stored
+    assert resolve.call_args.kwargs["radius_m"] == stored
+
+
+async def test_the_zones_own_radius_plays_no_part(hass: HomeAssistant, resolve: MagicMock) -> None:
+    set_zone(hass, radius=900_000)
 
     result = await start_zone(hass)
 
-    assert result["data"][CONF_RADIUS] == stored
-    assert resolve.call_args.kwargs["radius_m"] == stored
+    assert result["options"] == {CONF_WARNING_RADIUS: 0}
+    assert result["data"][CONF_RADIUS] == 0
+    assert resolve.call_args.kwargs["radius_m"] == 0
+
+
+@pytest.mark.parametrize("radius_km", [-1, 50.1, 900])
+async def test_a_warning_radius_outside_the_limits_is_refused(
+    hass: HomeAssistant, resolve: MagicMock, radius_km: float
+) -> None:
+    set_zone(hass)
+
+    with pytest.raises(InvalidData):
+        await start_zone(hass, **{CONF_WARNING_RADIUS: radius_km})
 
 
 async def test_the_same_zone_cannot_be_added_twice(hass: HomeAssistant, resolve: MagicMock) -> None:

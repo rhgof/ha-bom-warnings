@@ -39,7 +39,7 @@ def entry_at(code: str) -> MockConfigEntry:
     """A location whose only area code is `code`; the state comes from its prefix."""
     return MockConfigEntry(
         domain=DOMAIN,
-        version=3,
+        version=4,
         unique_id="-27.470,153.021",
         title="Home",
         data={

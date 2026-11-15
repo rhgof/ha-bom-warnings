@@ -22,10 +22,10 @@ from custom_components.bom_warnings.const import (
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_STATE,
+    CONF_WARNING_RADIUS,
     CONF_ZONE,
     CONF_ZONE_NAME,
     DOMAIN,
-    MAX_RADIUS_M,
 )
 from custom_components.bom_warnings.location import LocationUnavailable
 from scripts.fake_bom import scenarios
@@ -71,14 +71,15 @@ def zone_codes() -> list[str]:
 
 @pytest.fixture
 def zone_options() -> dict[str, Any]:
-    return {}
+    # 2 km, which is what the circle was when the zone's own radius was used.
+    return {CONF_WARNING_RADIUS: 2.0}
 
 
 @pytest.fixture
 def zone_entry(zone_codes: list[str], zone_options: dict[str, Any]) -> MockConfigEntry:
     return MockConfigEntry(
         domain=DOMAIN,
-        version=3,
+        version=4,
         unique_id=ZONE,
         title="Holiday house",
         options=zone_options,
@@ -125,15 +126,15 @@ async def test_unchanged_zone_does_not_re_resolve(
     ("change", "expected"),
     [
         ({"lat": -33.87, "lon": 151.21}, {"lat": -33.87, "lon": 151.21, "radius_m": 2000.0}),
-        ({"radius": 15_000.0}, {"lat": -27.47, "lon": 153.021, "radius_m": 15_000.0}),
+        # The zone's own radius is for presence, so it does not move the circle.
         (
             {"lat": -33.87, "lon": 151.21, "radius": 500.0},
-            {"lat": -33.87, "lon": 151.21, "radius_m": 500.0},
+            {"lat": -33.87, "lon": 151.21, "radius_m": 2000.0},
         ),
     ],
-    ids=["moved", "resized", "both"],
+    ids=["moved", "moved and resized"],
 )
-async def test_editing_the_zone_re_resolves_without_a_restart(
+async def test_moving_the_zone_re_resolves_without_a_restart(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
@@ -208,7 +209,7 @@ NAMES = {"QLD_ME008": "Brisbane", "QLD_PW001": "Moreton Bay"}
 ZONE_COUNT = "sensor.holiday_house_warning_count"
 
 
-async def test_growing_and_shrinking_the_zone_changes_the_areas_it_shows(
+async def test_moving_the_zone_changes_the_areas_it_shows(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
@@ -219,9 +220,9 @@ async def test_growing_and_shrinking_the_zone_changes_the_areas_it_shows(
     await setup_entry(hass, zone_entry)
     assert state_of(hass, ZONE_COUNT).attributes["areas"] == []
 
-    # The wider circle reaches the district with the recorded warning, which is then named.
+    # The new centre reaches the district with the recorded warning, which is then named.
     resolve.return_value = location_of("QLD_PW001", "QLD_ME008", names=NAMES)
-    await change_zone(hass, radius=15_000.0)
+    await change_zone(hass, lat=-27.5)
 
     assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Brisbane", "Moreton Bay"]
     (item,) = state_of(hass, ZONE_COUNT).attributes["warnings"]
@@ -229,7 +230,7 @@ async def test_growing_and_shrinking_the_zone_changes_the_areas_it_shows(
     assert zone_entry.data[CONF_AREA_NAMES] == NAMES
 
     resolve.return_value = location_of("QLD_PW001", names=NAMES)
-    await change_zone(hass, radius=100.0)
+    await change_zone(hass, lat=-27.47)
 
     assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Moreton Bay"]
     assert state_of(hass, ZONE_COUNT).attributes["warnings"] == []
@@ -247,14 +248,14 @@ async def test_a_new_name_for_the_same_codes_is_stored(
     await setup_entry(hass, zone_entry)
 
     resolve.return_value = location_of("QLD_PW001", names={"QLD_PW001": "Moreton Bay"})
-    await change_zone(hass, radius=3_000.0)
+    await change_zone(hass, lat=-27.48)
 
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]
     assert state_of(hass, ZONE_COUNT).attributes["areas"] == ["Moreton Bay"]
 
 
 @pytest.mark.parametrize("zone_codes", [["QLD_ME008", "QLD_PW001"]])
-async def test_shrinking_the_zone_drops_an_area(
+async def test_moving_the_zone_away_drops_an_area(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
@@ -266,24 +267,24 @@ async def test_shrinking_the_zone_drops_an_area(
     assert hass.states.get(SENSOR).state == STATE_ON  # type: ignore[union-attr]
 
     resolve.return_value = location_of("QLD_PW001")
-    await change_zone(hass, radius=100.0)
+    await change_zone(hass, lat=-27.9)
 
     assert hass.states.get(SENSOR).state == STATE_OFF  # type: ignore[union-attr]
 
 
-async def test_zone_edited_while_home_assistant_was_down_is_picked_up_at_start(
+async def test_zone_moved_while_home_assistant_was_down_is_picked_up_at_start(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     zone_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
     resolve: MagicMock,
 ) -> None:
-    set_zone(hass, lat=-33.87, lon=151.21, radius=9_000.0)
+    set_zone(hass, lat=-33.87, lon=151.21)
 
     await setup_entry(hass, zone_entry)
 
-    assert resolve.call_args.kwargs == {"lat": -33.87, "lon": 151.21, "radius_m": 9_000.0}
-    assert zone_entry.data[CONF_RADIUS] == 9_000.0
+    assert resolve.call_args.kwargs == {"lat": -33.87, "lon": 151.21, "radius_m": 2_000.0}
+    assert zone_entry.data[CONF_LATITUDE] == -33.87
 
 
 async def test_zone_with_no_area_raises_the_repair_and_keeps_the_codes(
@@ -320,7 +321,7 @@ async def test_failed_re_resolve_is_retried_on_the_next_poll(
     await setup_entry(hass, zone_entry)
 
     resolve.side_effect = LocationUnavailable("offline")
-    await change_zone(hass, radius=7_000.0)
+    await change_zone(hass, lat=-27.6)
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_PW001"]
 
     resolve.side_effect = None
@@ -328,56 +329,6 @@ async def test_failed_re_resolve_is_retried_on_the_next_poll(
     await poll(hass, freezer)
 
     assert zone_entry.data[CONF_AREA_CODES] == ["QLD_ME008", "QLD_PW001"]
-
-
-@pytest.mark.parametrize(
-    ("radius", "stored", "clamped"),
-    [
-        (2_000.0, 2_000.0, False),
-        (MAX_RADIUS_M, MAX_RADIUS_M, False),
-        (80_000.0, MAX_RADIUS_M, True),
-    ],
-)
-async def test_radius_above_the_cap_is_clamped_and_explained(
-    hass: HomeAssistant,
-    fake_bom: FakeBom,
-    zone_entry: MockConfigEntry,
-    layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,
-    radius: float,
-    stored: float,
-    clamped: bool,
-) -> None:
-    set_zone(hass, radius=radius)
-    await setup_entry(hass, zone_entry)
-
-    assert zone_entry.data[CONF_RADIUS] == stored
-    found = issue(hass, zone_entry, "radius_clamped")
-    assert (found is not None) is clamped
-    if found:
-        assert found.is_fixable is False
-        assert found.translation_placeholders == {
-            "title": "Holiday house",
-            "radius": "80",
-            "max": "50",
-        }
-
-
-async def test_shrinking_an_oversized_zone_clears_the_notice(
-    hass: HomeAssistant,
-    fake_bom: FakeBom,
-    zone_entry: MockConfigEntry,
-    layers: MagicMock,  # noqa: F811
-    resolve: MagicMock,
-) -> None:
-    set_zone(hass, radius=80_000.0)
-    await setup_entry(hass, zone_entry)
-    assert issue(hass, zone_entry, "radius_clamped") is not None
-
-    await change_zone(hass, radius=30_000.0)
-
-    assert issue(hass, zone_entry, "radius_clamped") is None
-    assert zone_entry.data[CONF_RADIUS] == 30_000.0
 
 
 @pytest.mark.parametrize("zone_codes", [["QLD_ME008", "QLD_PW001"]])
@@ -459,16 +410,15 @@ async def test_removing_the_entry_removes_its_repairs(
     layers: MagicMock,  # noqa: F811
     resolve: MagicMock,
 ) -> None:
-    set_zone(hass, radius=80_000.0)
+    set_zone(hass)
     await setup_entry(hass, zone_entry)
     hass.states.async_remove(ZONE)
     await hass.async_block_till_done(wait_background_tasks=True)
-    assert issue(hass, zone_entry, "radius_clamped") is not None
     assert issue(hass, zone_entry, "zone_removed") is not None
 
     await hass.config_entries.async_remove(zone_entry.entry_id)
 
-    for kind in ("radius_clamped", "zone_removed", "no_area"):
+    for kind in ("zone_removed", "no_area"):
         assert issue(hass, zone_entry, kind) is None
 
 

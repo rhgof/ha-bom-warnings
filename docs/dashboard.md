@@ -196,7 +196,7 @@ keep final and cancelled warnings, ended ones come after the current ones with `
 `final` or `cancelled`.
 
 `state_attr('sensor.<title>_warning_count', 'areas')` is the list of area names the location
-covers, in code order. It is there with no warning active, so it shows what a zone's radius reaches.
+covers, in code order. It is there with no warning active, so it shows what the warning radius reaches.
 
 Each per-type sensor (thunderstorm, flood, marine wind and so on) has a top-level `level` and
 `color`, so a card can colour itself from the sensor alone. `level` is the sensor's state (`none`,

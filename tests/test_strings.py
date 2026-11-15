@@ -42,7 +42,6 @@ def test_translations_match_strings() -> None:
         ("issues", "refresh_failing"),
         ("issues", "no_area"),
         ("issues", "zone_removed"),
-        ("issues", "radius_clamped"),
         ("entity.binary_sensor", "warning"),
         ("entity.event", "warning_event"),
         ("entity.sensor", "warning_count"),
@@ -67,7 +66,6 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
         "refresh_failing",
         "no_area",
         "zone_removed",
-        "radius_clamped",
         "warning",
         "warning_event",
         "warning_count",
@@ -109,10 +107,12 @@ def test_the_options_form_explains_what_on_and_off_mean(field: str) -> None:
         assert "on" in text and "off" in text
 
 
-def test_the_options_form_is_two_fields() -> None:
+def test_the_options_form_has_the_checklist_and_the_zone_radius_and_nothing_else() -> None:
     strings = load(STRINGS)
+    # `warning_radius` is shown for zone entries only (test_zone_warning_radius).
     assert set(strings["options"]["step"]["init"]["data"]) == {
         "hide_final_cancelled",
+        "warning_radius",
         "warning_types",
     }
     assert "include_marine" not in strings["config"]["step"]["zone"]["data"]

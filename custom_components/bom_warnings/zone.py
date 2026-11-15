@@ -14,10 +14,10 @@ from .const import (
     CONF_LATITUDE,
     CONF_LONGITUDE,
     CONF_RADIUS,
+    CONF_WARNING_RADIUS,
     CONF_ZONE,
     CONF_ZONE_NAME,
     DOMAIN,
-    MAX_RADIUS_M,
 )
 
 if TYPE_CHECKING:
@@ -28,17 +28,12 @@ def zone_removed_issue_id(entry: BomWarningsConfigEntry) -> str:
     return f"zone_removed_{entry.entry_id}"
 
 
-def radius_clamped_issue_id(entry: BomWarningsConfigEntry) -> str:
-    return f"radius_clamped_{entry.entry_id}"
-
-
 def delete_zone_issues(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
     ir.async_delete_issue(hass, DOMAIN, zone_removed_issue_id(entry))
-    ir.async_delete_issue(hass, DOMAIN, radius_clamped_issue_id(entry))
 
 
 class ZoneFollower:
-    """Mirrors a zone's name, centre and radius into the entry, and says when the circle changed.
+    """Mirrors a zone's name and centre into the entry, and says when the circle changed.
 
     A zone that is deleted leaves the entry on its last known circle and raises a repair issue; if
     a zone with the same entity id comes back, the entry follows it again.
@@ -89,16 +84,16 @@ class ZoneFollower:
         try:
             latitude = float(state.attributes[CONF_LATITUDE])
             longitude = float(state.attributes[CONF_LONGITUDE])
-            radius = float(state.attributes.get(CONF_RADIUS, 0))
         except KeyError, TypeError, ValueError:
-            # Not a usable zone state; keep the last known circle.
+            # Not a usable zone state; keep the last known centre.
             return
-        self._sync_radius_notice(radius)
 
+        # The zone's own radius is for presence detection and plays no part here: the warning
+        # radius is the entry's own option.
         circle = {
             CONF_LATITUDE: latitude,
             CONF_LONGITUDE: longitude,
-            CONF_RADIUS: min(radius, MAX_RADIUS_M),
+            CONF_RADIUS: float(self._entry.options.get(CONF_WARNING_RADIUS, 0)) * 1000,
         }
         if all(self._entry.data.get(key) == value for key, value in circle.items()):
             return
@@ -127,22 +122,3 @@ class ZoneFollower:
         identifier = (DOMAIN, self._entry.unique_id or self._entry.entry_id)
         if device := registry.async_get_device_by_identifier(identifier, self._entry.entry_id):
             registry.async_update_device(device.id, name=title)
-
-    def _sync_radius_notice(self, radius: float) -> None:
-        issue_id = radius_clamped_issue_id(self._entry)
-        if radius <= MAX_RADIUS_M:
-            ir.async_delete_issue(self._hass, DOMAIN, issue_id)
-            return
-        ir.async_create_issue(
-            self._hass,
-            DOMAIN,
-            issue_id,
-            is_fixable=False,
-            severity=ir.IssueSeverity.WARNING,
-            translation_key="radius_clamped",
-            translation_placeholders={
-                "title": self._entry.title,
-                "radius": f"{radius / 1000:g}",
-                "max": f"{MAX_RADIUS_M / 1000:g}",
-            },
-        )

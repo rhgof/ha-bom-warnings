@@ -32,7 +32,7 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
   you hear about warnings that cover you, not every warning in the state.
 - **One location per place.** Add your Home Assistant home, a typed latitude and longitude, or any
   Home Assistant zone: Home, Work, a holiday house, your parents' place. A zone's circle can cover
-  several districts, up to a 50 km radius, and the entry follows the zone if you move or resize it.
+  several districts, up to a 50 km radius, and the entry follows the zone if you move it.
   Each location gets its own entities.
 - **Sensors you can build on.**
   - A *warning* binary sensor that is on while any current warning covers the location.
@@ -124,11 +124,15 @@ Add a location from Settings > Devices & services. There are three kinds:
   point is inside.
 - **A Home Assistant zone** (Settings > Areas, labels & zones > Zones; Home, Work, a holiday
   house): warnings for every forecast district, metro area, flood catchment and fire weather
-  district that the zone's circle touches. The entry follows the zone, so moving or resizing it
-  needs no delete and re-add. The radius is used up to 50 km; a larger one is clamped and a repair
-  notice says so. Deleting the zone leaves the entry on its last areas and raises a repair notice.
+  district within the warning radius of the zone's centre. The entry follows the zone, so moving
+  it needs no delete and re-add. How far around the centre to look is the entry's own **Warning
+  radius** (km, 0 to 50), set when you add the zone and changed later in its options. It is kept
+  apart from the zone's own radius, which is for presence detection, so a small Home zone can
+  stay small and you do not need a second zone for a wider circle. Deleting the zone leaves the
+  entry on its last areas and raises a repair notice.
 
-Each zone is its own entry, so Home, Work and a holiday house each get their own entities.
+Each zone is its own entry, so Home, Work and a holiday house each get their own entities. To
+move an entry to a different zone, choose **Reconfigure** on it: it keeps its entities and history.
 
 ### Coastal waters
 

@@ -10,9 +10,14 @@ CONF_AREA_CODES = "area_codes"
 # The name of each stored code that has one, as {code: name}. Absent on an entry made before names
 # were stored, which is how the coordinator knows to look them up once.
 CONF_AREA_NAMES = "area_names"
-# Set only on entries that follow a Home Assistant zone: its entity id, and its radius in metres.
+# Set only on entries that follow a Home Assistant zone: its entity id, and the radius in metres
+# the entry looks around the zone's centre (the warning radius, below, in metres).
 CONF_ZONE = "zone"
 CONF_RADIUS = "radius"
+# An option of a zone entry: how far around the zone's centre to look for warning areas, in
+# kilometres. It is deliberately not the zone's own radius, which is sized for presence detection
+# (a home zone is typically 100 m) and would be confusing to change for this.
+CONF_WARNING_RADIUS = "warning_radius"
 # The zone name the title was last made from. It tells a title that follows the zone from one the
 # user chose, so a zone rename never overwrites a name the user picked. Entries made before it
 # existed have none, and their title stands in for it.

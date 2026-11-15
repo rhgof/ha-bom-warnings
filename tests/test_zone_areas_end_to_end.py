@@ -1,4 +1,4 @@
-"""A zone's radius and the areas it shows, with nothing patched.
+"""A zone entry's warning radius and the areas it shows, with nothing patched.
 
 The fake BoM server serves generated shapefile layers, so the real resolver runs over a real socket
 and the names come from the layers' `DIST_NAME` field. The `resolve` fixture used elsewhere is the
@@ -22,6 +22,7 @@ from custom_components.bom_warnings.const import (
     CONF_LONGITUDE,
     CONF_RADIUS,
     CONF_STATE,
+    CONF_WARNING_RADIUS,
     CONF_ZONE,
     DOMAIN,
 )
@@ -31,8 +32,9 @@ from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
 from .test_binary_sensor import setup_entry
+from .test_options import set_options
 from .test_sensor import state_of
-from .test_zones import SENSOR, ZONE, change_zone, set_zone
+from .test_zones import SENSOR, ZONE, set_zone
 
 pytestmark = pytest.mark.freeze_time(NOW)
 
@@ -87,7 +89,8 @@ async def test_growing_a_zone_over_a_second_district_shows_it_and_shrinking_drop
     # Stored without names, as an older version did, so setup also looks the first name up.
     entry = MockConfigEntry(
         domain=DOMAIN,
-        version=3,
+        version=4,
+        options={CONF_WARNING_RADIUS: 2.0},
         unique_id=ZONE,
         title="Holiday house",
         data={
@@ -107,13 +110,15 @@ async def test_growing_a_zone_over_a_second_district_shows_it_and_shrinking_drop
     assert state_of(hass, count).attributes["areas"] == ["Moreton Bay"]
     assert hass.states.get(SENSOR).state == STATE_OFF
 
-    await change_zone(hass, radius=15_000.0)
+    await set_options(hass, entry, **{CONF_WARNING_RADIUS: 15})
+    await hass.async_block_till_done(wait_background_tasks=True)
     attrs = state_of(hass, count).attributes
     assert attrs["areas"] == ["Brisbane", "Moreton Bay"]
     assert [w["area"] for w in attrs["warnings"]] == ["Brisbane"]
     assert hass.states.get(SENSOR).state == STATE_ON
 
-    await change_zone(hass, radius=2_000.0)
+    await set_options(hass, entry, **{CONF_WARNING_RADIUS: 2})
+    await hass.async_block_till_done(wait_background_tasks=True)
     attrs = state_of(hass, count).attributes
     assert attrs["areas"] == ["Moreton Bay"]
     assert attrs["warnings"] == []

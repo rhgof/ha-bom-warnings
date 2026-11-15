@@ -14,8 +14,12 @@ from homeassistant.helpers import issue_registry as ir
 from .const import (
     CONF_EVENT_TYPES,
     CONF_INCLUDE_MARINE,
+    CONF_RADIUS,
+    CONF_WARNING_RADIUS,
     CONF_WARNING_TYPES,
+    CONF_ZONE,
     DOMAIN,
+    MAX_RADIUS_M,
 )
 from .coordinator import BomWarningsCoordinator, no_area_issue_id
 from .fire_store import FireStore
@@ -83,8 +87,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry)
 
 async def async_migrate_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> bool:
     """Version 2 replaced the type filter and coastal waters switch with a checklist; 3 made the
-    per-type sensors level sensors instead of binary sensors."""
-    if entry.version > 3:
+    per-type sensors level sensors instead of binary sensors; 4 gave a zone entry its own warning
+    radius, where it had used the zone's."""
+    if entry.version > 4:
         return False
     if entry.version == 1:
         options = {
@@ -97,6 +102,13 @@ async def async_migrate_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry
     if entry.version == 2:
         _remove_old_binary_type_sensors(hass, entry)
         hass.config_entries.async_update_entry(entry, version=3)
+    if entry.version == 3:
+        options = dict(entry.options)
+        if CONF_ZONE in entry.data:
+            # The radius it was already looking, so nothing changes until the user changes it.
+            radius_m = min(float(entry.data.get(CONF_RADIUS, 0)), MAX_RADIUS_M)
+            options[CONF_WARNING_RADIUS] = round(radius_m / 1000, 1)
+        hass.config_entries.async_update_entry(entry, options=options, version=4)
     return True
 
 

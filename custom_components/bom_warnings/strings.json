@@ -12,9 +12,13 @@
       },
       "zone": {
         "title": "Zone",
-        "description": "Warnings are shown for every area the zone's circle touches, up to a radius of 50 km. Moving or resizing the zone updates this location. A large radius, or one near the coast, also reaches coastal waters, so marine wind and surf warnings can apply.",
+        "description": "Warnings are shown for every area within the warning radius of the zone's centre, and the location follows the zone if you move it. The zone's own radius is for presence detection and is not used here. A large radius, or one near the coast, also reaches coastal waters, so marine wind and surf warnings can apply.",
         "data": {
-          "zone": "Zone"
+          "zone": "Zone",
+          "warning_radius": "Warning radius"
+        },
+        "data_description": {
+          "warning_radius": "How far around the zone's centre to look for warning areas, in kilometres, up to 50. 0 uses only the areas the centre is in."
         }
       },
       "manual": {
@@ -23,18 +27,28 @@
           "latitude": "Latitude",
           "longitude": "Longitude"
         }
+      },
+      "reconfigure": {
+        "title": "Follow a different zone",
+        "description": "Choose the zone this location should follow. The location keeps its entities, history and warning radius, and its warning areas are looked up again around the new zone's centre.",
+        "data": {
+          "zone": "Zone"
+        }
       }
     },
     "error": {
       "no_area": "The Bureau of Meteorology has no warning areas at this location. Check that it is in Australia.",
       "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later.",
       "unknown": "Unexpected error",
-      "zone_not_found": "That zone no longer exists. Pick another one."
+      "zone_not_found": "That zone no longer exists. Pick another one.",
+      "zone_already_followed": "Another location already follows that zone. Pick a different one."
     },
     "abort": {
       "already_configured": "This location is already configured.",
       "no_area": "The Bureau of Meteorology has no warning areas at your home location. Enter a location in Australia instead.",
-      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later."
+      "cannot_connect": "Failed to connect to the Bureau of Meteorology. Try again later.",
+      "reconfigure_successful": "This location now follows the new zone.",
+      "not_a_zone_entry": "Only a location that follows a zone can be reconfigured. Remove it and add it again to use a different place."
     }
   },
   "issues": {
@@ -48,11 +62,7 @@
     },
     "zone_removed": {
       "title": "Zone for {title} was deleted",
-      "description": "The zone {zone} that {title} follows no longer exists, so {title} is staying on the warning areas it last had and will not follow any further changes.\n\nTo fix it, either:\n- Create a zone with the same name again in Settings > Areas, labels & zones > Zones. This location picks it up and this notice clears by itself.\n- Remove this location and add it again, choosing another zone."
-    },
-    "radius_clamped": {
-      "title": "Zone radius for {title} is too large",
-      "description": "The zone behind {title} has a radius of {radius} km. BoM Warnings only looks {max} km around the centre, because a larger circle would list warnings for most of a state. Warnings beyond {max} km are not shown.\n\nTo clear this notice, reduce the zone's radius to {max} km or less in Settings > Areas, labels & zones > Zones."
+      "description": "The zone {zone} that {title} follows no longer exists, so {title} is staying on the warning areas it last had and will not follow any further changes.\n\nTo fix it, either:\n- Create a zone with the same name again in Settings > Areas, labels & zones > Zones. This location picks it up and this notice clears by itself.\n- Choose Reconfigure on this location to follow another zone. It keeps its entities and history."
     }
   },
   "entity": {
@@ -243,11 +253,13 @@
         "title": "Warnings I care about",
         "data": {
           "hide_final_cancelled": "Hide final and cancelled warnings",
-          "warning_types": "Warning types"
+          "warning_types": "Warning types",
+          "warning_radius": "Warning radius"
         },
         "data_description": {
           "hide_final_cancelled": "Hide a warning once it has ended or been cancelled. This is about a warning's phase, not its type.",
-          "warning_types": "Tick the types that matter here. Severe weather also covers Coastal Hazard Warnings, so it suits a dashboard better than an automation. Marine wind means coastal and local waters, not wind at your house, and Hazardous surf is for the coast the location reaches; both need a zone whose circle reaches the sea. Other warnings covers any type without its own entry, such as tsunami, and any type BoM adds later."
+          "warning_types": "Tick the types that matter here. Severe weather also covers Coastal Hazard Warnings, so it suits a dashboard better than an automation. Marine wind means coastal and local waters, not wind at your house, and Hazardous surf is for the coast the location reaches; both need a zone whose circle reaches the sea. Other warnings covers any type without its own entry, such as tsunami, and any type BoM adds later.",
+          "warning_radius": "How far around the zone's centre to look for warning areas, in kilometres, up to 50. This is separate from the zone's own radius, so your home zone can stay small for presence detection."
         },
         "description": "Choose the warning types that matter for this location. A type that is on counts everywhere (the warning sensor, the count, the most severe warning and the events) and has its own sensor. A type that is off is ignored everywhere and its sensor is removed. Marine wind and Hazardous surf only apply when the location reaches the sea, so use a zone with a large enough radius."
       }

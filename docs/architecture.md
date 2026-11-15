@@ -101,8 +101,8 @@ Home Assistant layer:
 | `shared_feed.py` | `SharedFeed` and `FeedSnapshot`, the `FEED` key, and the lifecycle helpers (acquire, abandon, release, release-removed, shutdown). The layer check's async wiring (executor job, background task, new snapshot) lives here; its timing rules are in `layer_check.py`. |
 | `coordinator.py` | `BomWarningsCoordinator`: listens to the feed, re-resolves the entry's location through `location.resolve_location` (a `LocationUnavailable` is retried on the next poll), and derives its warnings and fire danger. |
 | `fire_store.py` | `FireStore`: loads, saves and removes one entry's `FireMemory` in Home Assistant storage. The only place that knows the storage key, version and shape. |
-| `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location through `location.resolve_location`, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius`. Options flow. |
-| `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre and radius into the entry (radius clamped to `MAX_RADIUS_M`), carries a zone rename into the entry title and the device (only while the title still equals the `zone_name` last followed, so a title the user chose stays; entries without `zone_name` use their title for it), raises or clears the `zone_removed` and `radius_clamped` repair issues. |
+| `config_flow.py` | Menu: Home Assistant home location, a zone (only if any exist), or manual lat/lon. Resolves the location through `location.resolve_location`, stores `latitude`, `longitude`, `state`, `area_codes`, and for a zone `zone` and `radius` (metres: the entry's `warning_radius` option times 1000). A zone entry's options hold `warning_radius` in km, 0 to 50, apart from the zone's own radius, which is not used. Config entry version 4 added it, migrating a zone entry's old radius into it. A reconfigure step moves a zone entry to another zone and keeps its `unique_id`, because the device and entity ids are built from it. Options flow. |
+| `zone.py` | `ZoneFollower`: watches the zone state, mirrors its centre into the entry (the radius comes from the entry's `warning_radius` option, not the zone), carries a zone rename into the entry title and the device (only while the title still equals the `zone_name` last followed, so a title the user chose stays; entries without `zone_name` use their title for it), raises or clears the `zone_removed` repair issue. |
 | `binary_sensor.py`, `sensor.py`, `event.py` | The entities above. |
 | `diagnostics.py` | Download with coordinates, name, title, zone entity id, `unique_id` and the stored area names redacted (the radius and the area codes stay). |
 | `const.py`, `strings.json`, `translations/en.json` | Constants and text. The two JSON files must match (`tests/test_strings.py`). |
@@ -416,7 +416,7 @@ districts):
   (coastal water) codes now match, for an entry whose circle (or typed point) reaches the water
   while the Marine wind or Hazardous surf type is on; high seas zones are not in the layer used.
 - A zone entry does not rename itself when the zone is renamed, and the device keeps its first name.
-- The `zone_removed` and `radius_clamped` repair issues are informational; there is no fix flow.
+- The `zone_removed` repair issue is informational; there is no fix flow.
 - Severity grades inside headlines (Catastrophic, Extreme, Minor or Moderate flood) are not parsed; only the CAP `severity` ranks. Severe Weather and Severe Thunderstorm arrive as `unknown` and rank by the unknown rule, between moderate and severe.
 - A headline over 255 characters is cut for the `most_severe_warning` state (HA would otherwise show `unknown`); the attributes keep it whole.
 - The CAP event `Weather` is ambiguous: it is used for both severe weather and coastal hazard

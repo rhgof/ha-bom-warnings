@@ -84,7 +84,7 @@ def mock_config_entry(
     """A location in a QLD forecast district that no baseline warning covers."""
     return MockConfigEntry(
         domain=DOMAIN,
-        version=3,
+        version=4,
         unique_id="-27.470,153.021",
         title="Home",
         options=entry_options,

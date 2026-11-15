@@ -272,7 +272,7 @@ async def test_an_entry_from_before_the_checklist_is_migrated(
     await setup_entry(hass, entry)
 
     assert entry.state is ConfigEntryState.LOADED
-    assert entry.version == 3
+    assert entry.version == 4
     assert set(entry.options[CONF_WARNING_TYPES]) == set(kept)
     assert entry.options[CONF_HIDE_FINAL] is False
     assert "event_types" not in entry.options
@@ -358,7 +358,7 @@ async def test_the_old_binary_type_sensors_are_removed_and_replaced_by_level_sen
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    assert entry.version == 3
+    assert entry.version == 4
     old_binaries = [
         e.entity_id
         for e in registry.entities.values()
@@ -373,7 +373,7 @@ async def test_the_old_binary_type_sensors_are_removed_and_replaced_by_level_sen
         assert hass.states.get(THUNDERSTORM) is not None
 
 
-async def test_the_zone_step_no_longer_asks_about_coastal_waters(
+async def test_the_zone_step_asks_for_the_zone_and_a_warning_radius_but_not_coastal_waters(
     hass: HomeAssistant,
     resolve: MagicMock,
 ) -> None:
@@ -385,7 +385,7 @@ async def test_the_zone_step_no_longer_asks_about_coastal_waters(
         result["flow_id"], {"next_step_id": "zone"}
     )
 
-    assert {str(key) for key in result["data_schema"].schema} == {"zone"}
+    assert {str(key) for key in result["data_schema"].schema} == {"zone", "warning_radius"}
 
 
 def test_every_choice_on_the_checklist_has_a_plain_english_label() -> None:
