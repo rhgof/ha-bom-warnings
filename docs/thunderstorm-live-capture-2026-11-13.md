@@ -17,6 +17,14 @@ A capture of two real Severe Thunderstorm Warnings, to refine the thunderstorm h
 | `IDN21035.xml` | 255,693 | 2026-11-13 06:14:11 |
 
 
+> **Since this was written** (commit `7e0c801`, then the dashboard card): fact 1 is handled by
+> reading "Detailed" from the `.txt`; facts 2 and 4 are fixed (the summary is the paragraph that
+> names your area, and a Detailed summary is not cut at 300 characters); fact 3 is handled by
+> reading `hazards` from that paragraph, not from the XML codes; fact 7 by working per block. The
+> XML is still not read for thunderstorms (5, 10). Facts 6, 8 and 9 stand, though `next_issue` now
+> tells a card when the next warning is due. The later captures, including a cancellation, are in
+> `warning-products.md`.
+
 ---
 
 # IDN21033

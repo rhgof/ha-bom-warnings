@@ -3,7 +3,11 @@
     "sensor.home_warning_count": {
       "state": "3",
       "attributes": {
-        "areas": ["Illawarra", "Sydney", "Hunter"],
+        "areas": [
+          "Illawarra",
+          "Sydney",
+          "Hunter"
+        ],
         "warnings": [
           {
             "product_id": "IDN36000",
@@ -74,7 +78,12 @@
     },
     "sensor.home_thunderstorm_warning": {
       "state": "none",
-      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
+      "attributes": {
+        "level": "none",
+        "color": null,
+        "headline": null,
+        "warnings": []
+      }
     },
     "sensor.home_fire_danger_today": {
       "state": "high",
@@ -100,15 +109,32 @@
   "none": {
     "sensor.home_warning_count": {
       "state": "0",
-      "attributes": {"areas": ["Illawarra", "Sydney", "Hunter"], "warnings": []}
+      "attributes": {
+        "areas": [
+          "Illawarra",
+          "Sydney",
+          "Hunter"
+        ],
+        "warnings": []
+      }
     },
     "sensor.home_marine_wind_warning": {
       "state": "none",
-      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
+      "attributes": {
+        "level": "none",
+        "color": null,
+        "headline": null,
+        "warnings": []
+      }
     },
     "sensor.home_thunderstorm_warning": {
       "state": "none",
-      "attributes": {"level": "none", "color": null, "headline": null, "warnings": []}
+      "attributes": {
+        "level": "none",
+        "color": null,
+        "headline": null,
+        "warnings": []
+      }
     },
     "sensor.home_fire_danger_today": {
       "state": "no_rating",
@@ -128,6 +154,201 @@
         "icon": "mdi:fire-off",
         "fire_behaviour_index": 3,
         "district": "Greater Hunter"
+      }
+    }
+  },
+  "thunderstorm": {
+    "sensor.home_warning_count": {
+      "state": "2",
+      "attributes": {
+        "areas": [
+          "Hunter",
+          "Greater Newcastle"
+        ],
+        "warnings": [
+          {
+            "product_id": "IDN21035",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Maitland/Cessnock and Newcastle",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:40:46+00:00",
+            "expires": "2026-11-15T06:10:46+00:00",
+            "in_force": true,
+            "level": "unknown",
+            "icon": "mdi:weather-lightning-rainy",
+            "color": "#FF6F00",
+            "sent": "2026-11-15T03:40:53+00:00",
+            "area": "Greater Newcastle",
+            "summary": "The Bureau of Meteorology warns that, at 2:40 pm, severe thunderstorms likely to produce damaging winds and large hailstones were detected near Kurri Kurri, West Wallsend and Boolaroo. These thunderstorms are moving towards the east. They are forecast to affect Maitland, Charlestown and Wallsend by 2:55 pm and Newcastle City, Raymond Terrace and Hexham by 3:10 pm.",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "detailed": true,
+            "hazard": "Damaging winds and large hailstones",
+            "next_issue": "2026-11-15T04:10:00+00:00"
+          },
+          {
+            "product_id": "IDN21033",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:38:29+00:00",
+            "expires": "2026-11-15T08:38:29+00:00",
+            "in_force": true,
+            "level": "unknown",
+            "icon": "mdi:weather-lightning-rainy",
+            "color": "#FF6F00",
+            "sent": "2026-11-15T03:38:36+00:00",
+            "area": "Hunter",
+            "summary": "Severe thunderstorms are likely to produce damaging winds and large hailstones over the next several hours in the Mid North Coast and parts of the Hunter, Northern Tablelands and North West Slopes and Plains districts. Locations which may be affected include Port Macquarie, Taree, Newcastle,\u2026",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "hazard": "Large, possibly giant hailstones and damaging winds",
+            "next_issue": "2026-11-15T06:40:00+00:00"
+          }
+        ]
+      }
+    },
+    "sensor.home_thunderstorm_warning": {
+      "state": "unrated",
+      "attributes": {
+        "level": "unrated",
+        "color": "#FF6F00",
+        "headline": "Severe Thunderstorm Warning for Maitland/Cessnock and Newcastle",
+        "expires": "2026-11-15T06:10:46+00:00",
+        "product_id": "IDN21035",
+        "event": "Thunderstorm",
+        "in_force": true,
+        "current": 2,
+        "warnings": [
+          {
+            "product_id": "IDN21033",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:38:29+00:00",
+            "expires": "2026-11-15T08:38:29+00:00",
+            "in_force": true,
+            "area": "Hunter",
+            "summary": "Severe thunderstorms are likely to produce damaging winds and large hailstones over the next several hours in the Mid North Coast and parts of the Hunter, Northern Tablelands and North West Slopes and Plains districts. Locations which may be affected include Port Macquarie, Taree, Newcastle,\u2026",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "hazard": "Large, possibly giant hailstones and damaging winds",
+            "next_issue": "2026-11-15T06:40:00+00:00"
+          },
+          {
+            "product_id": "IDN21035",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Maitland/Cessnock and Newcastle",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:40:46+00:00",
+            "expires": "2026-11-15T06:10:46+00:00",
+            "in_force": true,
+            "area": "Greater Newcastle",
+            "summary": "The Bureau of Meteorology warns that, at 2:40 pm, severe thunderstorms likely to produce damaging winds and large hailstones were detected near Kurri Kurri, West Wallsend and Boolaroo. These thunderstorms are moving towards the east. They are forecast to affect Maitland, Charlestown and Wallsend by 2:55 pm and Newcastle City, Raymond Terrace and Hexham by 3:10 pm.",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "detailed": true,
+            "hazard": "Damaging winds and large hailstones",
+            "next_issue": "2026-11-15T04:10:00+00:00"
+          }
+        ],
+        "summary": "The Bureau of Meteorology warns that, at 2:40 pm, severe thunderstorms likely to produce damaging winds and large hailstones were detected near Kurri Kurri, West Wallsend and Boolaroo. These thunderstorms are moving towards the east. They are forecast to affect Maitland, Charlestown and Wallsend by 2:55 pm and Newcastle City, Raymond Terrace and Hexham by 3:10 pm.",
+        "hazards": [
+          "wind",
+          "hail"
+        ],
+        "detailed": true,
+        "hazard": "Damaging winds and large hailstones",
+        "next_issue": "2026-11-15T04:10:00+00:00"
+      }
+    }
+  },
+  "thunderstorm_very_dangerous": {
+    "sensor.home_warning_count": {
+      "state": "1",
+      "attributes": {
+        "areas": [
+          "Mid North Coast"
+        ],
+        "warnings": [
+          {
+            "product_id": "IDN21033",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:38:29+00:00",
+            "expires": "2026-11-15T08:38:29+00:00",
+            "in_force": true,
+            "level": "unknown",
+            "icon": "mdi:weather-lightning-rainy",
+            "color": "#FF6F00",
+            "sent": "2026-11-15T03:38:36+00:00",
+            "area": "Mid North Coast",
+            "summary": "VERY DANGEROUS THUNDERSTORMS are likely to produce large, possibly giant hailstones and damaging winds over the next several hours in parts of the Mid North Coast district. Locations which may be affected include Forster and Seal Rocks.",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "very_dangerous": true,
+            "hazard": "Large, possibly giant hailstones and damaging winds",
+            "next_issue": "2026-11-15T06:40:00+00:00"
+          }
+        ]
+      }
+    },
+    "sensor.home_thunderstorm_warning": {
+      "state": "unrated",
+      "attributes": {
+        "level": "unrated",
+        "color": "#FF6F00",
+        "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
+        "expires": "2026-11-15T08:38:29+00:00",
+        "product_id": "IDN21033",
+        "event": "Thunderstorm",
+        "in_force": true,
+        "current": 1,
+        "warnings": [
+          {
+            "product_id": "IDN21033",
+            "event": "Thunderstorm",
+            "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
+            "severity": "unknown",
+            "phase": "update",
+            "effective": "2026-11-15T03:38:29+00:00",
+            "expires": "2026-11-15T08:38:29+00:00",
+            "in_force": true,
+            "area": "Mid North Coast",
+            "summary": "VERY DANGEROUS THUNDERSTORMS are likely to produce large, possibly giant hailstones and damaging winds over the next several hours in parts of the Mid North Coast district. Locations which may be affected include Forster and Seal Rocks.",
+            "hazards": [
+              "wind",
+              "hail"
+            ],
+            "very_dangerous": true,
+            "hazard": "Large, possibly giant hailstones and damaging winds",
+            "next_issue": "2026-11-15T06:40:00+00:00"
+          }
+        ],
+        "summary": "VERY DANGEROUS THUNDERSTORMS are likely to produce large, possibly giant hailstones and damaging winds over the next several hours in parts of the Mid North Coast district. Locations which may be affected include Forster and Seal Rocks.",
+        "hazards": [
+          "wind",
+          "hail"
+        ],
+        "very_dangerous": true,
+        "hazard": "Large, possibly giant hailstones and damaging winds",
+        "next_issue": "2026-11-15T06:40:00+00:00"
       }
     }
   }

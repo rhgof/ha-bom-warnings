@@ -184,7 +184,9 @@ is left out when BoM sends no text; the warning itself is unaffected. Check for 
 `{% if w.summary %}` or `w.summary | default('')` in a template. The Most severe warning sensor and
 each per-warning-type sensor also show their top warning's `summary` as an attribute, so a tile can
 show it with `state_content: summary`; the warning count sensor and the warning binary sensor show it
-only inside the list.
+only inside the list. For a thunderstorm warning the summary is the paragraph that names your area,
+and a thunderstorm item also has `hazards`, `very_dangerous`, `detailed`, `hazard` and `next_issue`
+(see `docs/dashboard.md`).
 
 Every warning entity carries the attribution "Australian Government Bureau of Meteorology" as its
 `attribution` attribute, as the fire danger sensors do. Home Assistant shows it in the entity's

@@ -110,8 +110,11 @@ Across the 23 captured product XML files (marine wind 5, flood 16, sheep grazier
   `IDQ20800`, `IDQ20815`, `IDQ20827`, `IDQ20835`, `IDQ20840`, `IDQ20850`). For those, the CAP severity
   is `Unknown`, the CAP headline does not contain the word "final", and the `.txt` title does
   ("Final Flood Warning for the Boyne and Burnett Rivers").
-- **Not seen:** a storm force or hurricane force marine wind code, any thunderstorm code, any
-  cyclone, frost, road or tsunami code. Fire weather was seen once, `EXT` (below).
+- **Thunderstorm** (seen 13 and 15 Nov 2026, see "Thunderstorm" below): hazard type `STW`, phase
+  `NEW`, `UPD`, `REN` or `CAN`, severity `STD` (or `CAN` on a cancelling hazard), phenomena `W`
+  (wind), `LH` (large hail) and `R` (rain).
+- **Not seen:** a storm force or hurricane force marine wind code, any cyclone, frost, road or
+  tsunami code. Fire weather was seen once, `EXT` (below).
 
 ## The Bureau's grade is not always CAP's severity
 
@@ -150,12 +153,46 @@ the only join to a CAP file is title text against headline. It is generated with
 CAP sent 00:24:50Z, RSS item 00:24:58Z). Its title can carry a phase the CAP headline lacks: "Final
 Flood Warning for the Macintyre Brook". RSS stays a fallback only.
 
-## Gaps (checked 4 Nov 2026)
+## Thunderstorm
 
-No thunderstorm, severe weather, fire weather, frost, hazardous road, cyclone or tsunami warning was
-current anywhere. The 26 products were 16 flood, 5 marine wind, 3 extreme heat and 2 sheep grazier.
-Their sibling files, and the thunderstorm cancel and renew phases, are not captured. Re-run the
-capture script when one is current.
+A Severe Thunderstorm Warning is two kinds of product. The **broad** warning (`IDN21033`) covers
+forecast districts (`NSW_PW…`), runs for 5 hours and is re-issued about every 3 hours, with one
+paragraph per group of districts. The **Detailed** warning (`IDN21035`) covers metropolitan
+sub-areas (`NSW_ME…`), runs for 2.5 hours and is re-issued about every 30 minutes, with one
+paragraph about a located storm cell and where it is heading. Both arrive as CAP `Thunderstorm`
+with severity `Unknown` and urgency and certainty `Unknown`; the product XML says `STD`. Neither
+source grades the storm, so the sensor says `unrated`.
+
+Captures: `2026-11-13T0625Z-thunderstorm`, `2026-11-15T0343Z-thunderstorm` and
+`2026-11-15T0516Z-thunderstorm` (the cancellation, below). The 13 Nov findings are in
+`thunderstorm-live-capture-2026-11-13.md`.
+
+What each file holds that the others do not:
+
+| Fact | Where | Read by the integration |
+| --- | --- | --- |
+| Detailed or not ("Detailed Severe Thunderstorm Warning") | `.txt` title and product XML `warning_title`; CAP only by inference | `.txt` |
+| The hazard line ("for LARGE, POSSIBLY GIANT HAILSTONES and DAMAGING WINDS") | `.txt`, XML `warning_phenomena_summary`; the XML codes (`W`, `LH`, `R`) have no "giant" | `.txt` |
+| When the next warning is due ("by 3:10 pm", local, no date or zone) | `.txt`, XML `warning_next_issue` | `.txt` |
+| Very dangerous tier ("VERY DANGEROUS THUNDERSTORMS" in one paragraph) | description, `.txt`; headline, CAP severity and XML severity are the same as for an ordinary storm | CAP description |
+| The SES advice | CAP `instruction`, `.txt`, XML `warning_advice` | no |
+
+- **The tier is per paragraph.** On 15 Nov the broad warning's first paragraph (Mid North Coast)
+  was very dangerous and the second (Hunter and others) was not, so a Hunter location is not
+  very dangerous. The recorded Brisbane warning `IDQ21035` also says "VERY DANGEROUS THUNDERSTORM".
+- **Cancellation.** A product can carry a cancelling block beside a current one (other districts),
+  and a whole product can become a Cancel: at 3:34 pm on 15 Nov `IDN21035` became `msgType` `Cancel`
+  with the text "Cancellation of Detailed Severe Thunderstorm Warning" and no hazard line. Each
+  CAP block carries its own phase.
+- **Renew** (`REN`) has been seen only on a hazard's areas inside an `UPD` product (13 Nov), not as a
+  product phase.
+- **Size.** The XML is 112 to 256 KB, almost all embedded base64 images; the `.txt` is 2 to 3 KB.
+
+## Gaps (checked 15 Nov 2026)
+
+No severe weather, fire weather, frost, hazardous road, cyclone or tsunami warning has been captured
+whole. On 4 Nov the 26 current products were 16 flood, 5 marine wind, 3 extreme heat and 2 sheep
+grazier. Re-run the capture script when one is current.
 
 ## The cost of one refresh
 
@@ -164,8 +201,12 @@ capture script when one is current.
 - One fetch for each CAP file whose whole listing line changed (the listing has no year, so the line
   is the change signal). The first poll fetches all current files, 26 and about 90 KB on 4 Nov;
   later polls fetch the few that changed.
-- The integration never fetches a `.txt` or `.pdf`. It reads two sibling `.xml` files, both by exact
-  name and both optional, so neither can fail the warnings refresh:
+- The integration never fetches a `.pdf`. It reads one sibling `.txt` and two sibling `.xml` files,
+  all by exact name and all optional, so none can fail the warnings refresh:
+  - A thunderstorm product's `.txt` (2 to 3 KB), fetched without a listing once per new issue of a
+    product that has a current thunderstorm block (`product_text.ProductTextReader`). An absent or
+    empty file is remembered until BoM re-issues the product, so it costs one request. It supplies
+    the Detailed flag, the hazard line and the next-issue time.
   - A flood or marine wind product's XML (`<ID>.xml`), listed and fetched once per new issue of a
     product that has a current block of that type (`product_xml.ProductSummaryReader`). Marine wind
     XML is about 5 KB and flood 7 to 26 KB. A file over 400 KB (`MAX_XML_BYTES`) is skipped, which

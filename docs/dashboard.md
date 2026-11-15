@@ -114,7 +114,8 @@ cards:
 ```
 
 The built-in tile does not take the warning's colour. The card's `custom:bom-warning-tile` does, and
-can replace each tile above. Without the card, use the ready-made section or the Markdown card
+can replace each tile above. For a current thunderstorm warning it draws its own tile, with the
+hazards, the Detailed and Very dangerous tags and "Update due by" from the attributes below. Without the card, use the ready-made section or the Markdown card
 earlier on this page for the list. `dashboards/warnings-section.yaml` already has a tile for every
 type, each hidden while that type is quiet.
 
@@ -194,6 +195,22 @@ count sensor does not. Every warning entity carries the attribution "Australian 
 Meteorology" in its `attribution` attribute; a tile does not show it. With the option to
 keep final and cancelled warnings, ended ones come after the current ones with `phase` set to
 `final` or `cancelled`.
+
+A thunderstorm warning has more, each left out until there is something to say. They are in the
+list items, and the per-type sensor repeats its top warning's at the top level:
+
+| Attribute | Meaning |
+| --- | --- |
+| `hazards` | A list from `wind`, `hail`, `rain`, `flood`, read from the paragraph that names your area, so `"wind" in hazards` works in a condition |
+| `very_dangerous` | `true` when that paragraph is BoM's "VERY DANGEROUS THUNDERSTORMS" tier. A neighbouring district's tier is not yours |
+| `detailed` | `true` for a Detailed warning, which tracks one storm cell and is re-issued about every 30 minutes |
+| `hazard` | BoM's hazard line, such as "Damaging winds and large hailstones" (the whole product, not your paragraph) |
+| `next_issue` | When BoM says the next warning is due (a UTC timestamp), usually well before `expires` |
+
+For a thunderstorm `summary` is the paragraph that names your area, not always the first, and a
+Detailed warning's is kept to 500 characters so the "forecast to affect" sentence is whole. Every
+per-type sensor also has `current`, how many warnings of that type are current: a broad and a
+Detailed thunderstorm warning can both cover you, and the sensor's own attributes are the top one's.
 
 `state_attr('sensor.<title>_warning_count', 'areas')` is the list of area names the location
 covers, in code order. It is there with no warning active, so it shows what the warning radius reaches.

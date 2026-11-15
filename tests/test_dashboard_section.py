@@ -138,6 +138,11 @@ def every_field_warning() -> ActiveWarning:
         sent=NOW_DT,
         area="Sydney Coast",
         summary="A summary.",
+        hazards=("wind", "hail"),
+        very_dangerous=True,
+        detailed=True,
+        hazard="Damaging winds and large hailstones",
+        next_issue=NOW_DT,
     )
 
 
