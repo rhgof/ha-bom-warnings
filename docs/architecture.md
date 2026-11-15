@@ -173,9 +173,11 @@ Home Assistant layer:
 - **Fire weather grades.** A Fire Weather Warning's grade (High, Extreme, Catastrophic) is one step
   above its CAP severity (Moderate, Severe, Extreme), per the Bureau's Table 24 (see
   `docs/warning-products.md`). `WarningType.grades` maps a CAP severity to a type's own word, and
-  only the Fire Weather row sets it (`FIRE_WEATHER_GRADES`). `level_of` returns the grade, so the
-  `level` attribute and the type sensor's state use it, and `color_of` takes the fire danger
-  rating's colour for a grade (`FIRE_DANGER_COLORS`) and CAP's (`LEVEL_COLORS`) otherwise.
+  the Fire Weather row (`FIRE_WEATHER_GRADES`) and the Thunderstorm and Weather rows
+  (`SEVERE_BY_NAME_GRADES`, CAP `unknown` to `severe`: severe by name) set it. `level_of` returns the
+  grade, so the `level` attribute and the type sensor's state use it. `color_of` takes a grade's own
+  colour from the row's `grade_colors` (the fire danger rating's) and otherwise the colour of the CAP
+  severity (`LEVEL_COLORS`), so an unknown thunderstorm stays orange and a real `severe` is red.
   `level_options(event)` is the sensor's enum, so the fire sensor offers `none`, `minor`, `high`,
   `unrated`, `extreme`, `catastrophic`. Ranking, the event entity and each item's `severity`
   stay on CAP severity, because the grades rank the same. The grade is read from CAP severity
@@ -403,9 +405,9 @@ districts):
 
 ## Known gaps
 
-- The ranked list's `level` attribute shows BoM's severity `unknown` as is, while the type sensors'
-  state calls it `unrated` (`unknown` is Home Assistant's own no-value state). Both are kept as
-  they are so dashboards do not change.
+- The ranked list's `level` attribute shows BoM's severity `unknown` as is for the types with no
+  grade, while their type sensors' state calls it `unrated` (`unknown` is Home Assistant's own
+  no-value state). Thunderstorm and severe weather say `severe` in both (changed 15 Nov 2026).
 - Fire danger: the midnight rollover of today/tomorrow happens at the next feed update (up to 10
   minutes late); the timezone is a fixed offset (see above).
 - Fire danger was checked on the dev instance against the fake BoM server only, not against BoM's

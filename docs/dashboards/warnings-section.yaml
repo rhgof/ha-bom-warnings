@@ -23,7 +23,7 @@ cards:
       {% endif %}
       {% for w in items %}
       <font color="{{ w.color }}"><ha-icon icon="{{ w.icon }}"></ha-icon> &#9632;</font>
-      **{{ w.event }}** ({{ w.level }}{% if w.phase in ['final', 'cancelled'] %}, {{ w.phase }}{% endif %}):
+      **{{ w.event }}**{% set detail = ([w.level] if w.level not in ['unknown', 'unrated'] else []) + ([w.phase] if w.phase in ['final', 'cancelled'] else []) %}{% if detail %} ({{ detail | join(', ') }}){% endif %}:
       {{ w.headline }}
 
       {% endfor %}

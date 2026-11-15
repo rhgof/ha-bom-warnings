@@ -146,15 +146,15 @@ Drop the condition to be told about ended warnings too.
 ### Automations
 
 A per-type sensor's state is the highest level among its current warnings: `none`, `minor`,
-`moderate`, `unrated`, `severe` or `extreme`. Trigger on it going to the levels you care about, and
-`to: [severe, extreme]` is "only if severe". This closes the blinds for a thunderstorm warning at
-severe or above, or when BoM leaves it unrated, which it does for Severe Thunderstorm warnings:
+`moderate`, `unrated`, `severe` or `extreme` (the thunderstorm and severe weather sensors never say
+`unrated`: those warnings are severe by name, so they say `severe`). Trigger on it going to the levels
+you care about. This closes the blinds for a thunderstorm warning:
 
 ```yaml
 triggers:
   - trigger: state
     entity_id: sensor.home_thunderstorm_warning
-    to: [unrated, severe, extreme]
+    to: [severe, extreme]
 actions:
   - action: cover.close_cover
     target:
@@ -217,7 +217,8 @@ covers, in code order. It is there with no warning active, so it shows what the 
 
 Each per-type sensor (thunderstorm, flood, marine wind and so on) has a top-level `level` and
 `color`, so a card can colour itself from the sensor alone. `level` is the sensor's state (`none`,
-`minor`, `moderate`, `unrated`, `severe` or `extreme`; the fire weather sensor shows the Bureau's fire
+`minor`, `moderate`, `unrated`, `severe` or `extreme`; thunderstorm and severe weather say `severe`
+for BoM's unknown severity; the fire weather sensor shows the Bureau's fire
 grade instead, `high`, `extreme` or `catastrophic`), and `color` is that level's hex colour, the
 same as in the count sensor's list. `color` is `None` while no warning of the type is in force
 (ended warnings do not count), and the card decides how a quiet state looks.
@@ -234,11 +235,14 @@ content: >-
   {% endif %}
   {% for w in items %}
   <font color="{{ w.color }}"><ha-icon icon="{{ w.icon }}"></ha-icon> &#9632;</font>
-  **{{ w.event }}** ({{ w.level }}{% if w.phase in ['final', 'cancelled'] %}, {{ w.phase }}{% endif %}):
+  **{{ w.event }}**{% set detail = ([w.level] if w.level not in ['unknown', 'unrated'] else []) + ([w.phase] if w.phase in ['final', 'cancelled'] else []) %}{% if detail %} ({{ detail | join(', ') }}){% endif %}:
   {{ w.headline }}
 
   {% endfor %}
 ```
+
+BoM sends no grade for a thunderstorm or severe weather warning, so the level (`unknown`) is left
+out of the brackets for those; a final or cancelled one still shows its phase.
 
 ## Markdown card, emoji squares (fallback)
 

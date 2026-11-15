@@ -131,7 +131,7 @@ def test_the_fire_weather_sensor_offers_the_grades_and_every_other_type_the_cap_
         "extreme",
         "catastrophic",
     ]
-    for event in ("Extreme Heat", "Weather", "Thunderstorm", "Wind"):
+    for event in ("Extreme Heat", "Wind"):
         assert level_options(event) == LEVEL_OPTIONS, event
 
 

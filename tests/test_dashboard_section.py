@@ -82,6 +82,16 @@ async def render(hass: HomeAssistant, scenario: str, title: str) -> str:
             id="list-active",
         ),
         pytest.param(
+            "thunderstorm",
+            "Warnings",
+            [
+                "**Thunderstorm** (severe): Severe Thunderstorm Warning for Maitland/Cessnock",
+                "**Thunderstorm** (severe): Severe Thunderstorm Warning for Mid North Coast",
+            ],
+            ["unknown", "unrated"],
+            id="list-thunderstorm-says-severe",
+        ),
+        pytest.param(
             "none",
             "Warnings",
             ["No warnings for this location."],
@@ -154,7 +164,7 @@ def test_fixture_warnings_match_the_integrations_attributes() -> None:
     for item in items:
         assert CARD_KEYS <= item.keys()
         assert item.keys() <= real.keys()
-        assert item["color"] == LEVEL_COLORS[item["level"]]
+        assert item["color"] == LEVEL_COLORS[item["severity"]]
 
 
 TYPE_SENSORS = {f"sensor.home_{t.key}" for t in WARNING_TYPES if isinstance(t, SensorType)}
@@ -165,6 +175,17 @@ def colour_for(level: str) -> str | None:
     if level == "none":
         return None
     return LEVEL_COLORS["unknown" if level == "unrated" else level]
+
+
+# BoM leaves these two types' CAP severity `unknown`, and the sensor says `severe` for that and for
+# a real `severe`, so the colour is the orange of one or the red of the other.
+SEVERE_BY_NAME = {"sensor.home_thunderstorm_warning", "sensor.home_severe_weather_warning"}
+
+
+def colours_for(entity_id: str, level: str) -> set[str | None]:
+    if entity_id in SEVERE_BY_NAME and level == "severe":
+        return {LEVEL_COLORS["unknown"], LEVEL_COLORS["severe"]}
+    return {colour_for(level)}
 
 
 def test_fixture_type_sensors_match_the_integrations_attributes() -> None:
@@ -182,7 +203,7 @@ def test_fixture_type_sensors_match_the_integrations_attributes() -> None:
         assert {"level", "color"} <= attributes.keys(), entity_id
         assert attributes.keys() <= real.keys(), entity_id
         assert attributes["level"] == entity["state"], entity_id
-        assert attributes["color"] == colour_for(entity["state"]), entity_id
+        assert attributes["color"] in colours_for(entity_id, entity["state"]), entity_id
 
 
 async def test_every_type_sensor_says_its_level_and_colour(
@@ -199,7 +220,10 @@ async def test_every_type_sensor_says_its_level_and_colour(
         # Fire weather shows the Bureau's grade, in the colours of the fire danger rating.
         fire = entity_id.endswith("fire_weather_warning") and state.state in FIRE_DANGER_COLORS
         expected = FIRE_DANGER_COLORS[state.state] if fire else colour_for(state.state)
-        assert state.attributes["color"] == expected, entity_id
+        if entity_id in SEVERE_BY_NAME and state.state == "severe":
+            assert state.attributes["color"] in colours_for(entity_id, state.state), entity_id
+        else:
+            assert state.attributes["color"] == expected, entity_id
         levels.add(state.state)
     # The spread of locations puts more than one level on the sensors, so this is not all `none`.
     assert len(levels - {"none"}) >= 2

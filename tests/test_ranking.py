@@ -126,6 +126,6 @@ def test_current_warnings_come_before_ended_ones_each_in_rank_order() -> None:
 
 
 def test_a_warnings_level_is_its_raw_severity() -> None:
-    # The ranked list shows `unknown` where the type sensors say `unrated`: a recorded quirk.
+    # The ranked list shows `unknown` where other types' sensors say `unrated`: a recorded quirk.
     assert level_of(active(Severity.UNKNOWN)) == "unknown"
     assert level_of(active(Severity.MODERATE)) == "moderate"

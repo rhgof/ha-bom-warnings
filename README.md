@@ -240,7 +240,7 @@ state is the highest level among them, or `none`. The states, lowest first:
 | --- | --- |
 | `none` | No current warning of this type |
 | `minor`, `moderate`, `severe`, `extreme` | The warning's CAP severity |
-| `unrated` | BoM sends the severity `unknown` for Severe Thunderstorm and Severe Weather warnings. It is shown as `unrated`, because `unknown` is Home Assistant's own no-value state. It ranks between `moderate` and `severe`. |
+| `unrated` | BoM sends the severity `unknown` for some warnings, shown as `unrated` because `unknown` is Home Assistant's own no-value state. It ranks between `moderate` and `severe`. The thunderstorm and severe weather sensors never say it: those warnings are severe by name, so they say `severe` (and keep the orange of an unknown severity, while a warning BoM marks severe is red). |
 
 The top warning's `headline`, `expires`, `product_id` and `event` are attributes (all empty when the
 state is `none`), so a tile can show them. Its `summary` is there too when BoM sent text for it. The `warnings` attribute lists every current warning of the
@@ -253,7 +253,7 @@ the blinds on a thunderstorm warning:
 triggers:
   - trigger: state
     entity_id: sensor.home_thunderstorm_warning
-    to: [unrated, severe, extreme]
+    to: [severe, extreme]
 ```
 
 | Sensor | Entity id | BoM warning |
@@ -288,7 +288,7 @@ sensor's state is the grade, and its colour is the fire danger rating's:
 | `catastrophic` | red | Extreme |
 
 A warning with no grade keeps the level words above (`minor` for a cancellation, `unrated` when the
-Bureau sends `unknown`). The `severity` attribute of each warning still shows what CAP said, and
+Bureau sends `unknown`, except thunderstorm and severe weather, which say `severe`). The `severity` attribute of each warning still shows what CAP said, and
 warnings still rank by CAP severity across all types.
 
 If you have an automation on the fire weather sensor that triggers on `severe` or `extreme`, change

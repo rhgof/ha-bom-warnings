@@ -175,7 +175,7 @@
             "effective": "2026-11-15T03:40:46+00:00",
             "expires": "2026-11-15T06:10:46+00:00",
             "in_force": true,
-            "level": "unknown",
+            "level": "severe",
             "icon": "mdi:weather-lightning-rainy",
             "color": "#FF6F00",
             "sent": "2026-11-15T03:40:53+00:00",
@@ -198,7 +198,7 @@
             "effective": "2026-11-15T03:38:29+00:00",
             "expires": "2026-11-15T08:38:29+00:00",
             "in_force": true,
-            "level": "unknown",
+            "level": "severe",
             "icon": "mdi:weather-lightning-rainy",
             "color": "#FF6F00",
             "sent": "2026-11-15T03:38:36+00:00",
@@ -215,9 +215,9 @@
       }
     },
     "sensor.home_thunderstorm_warning": {
-      "state": "unrated",
+      "state": "severe",
       "attributes": {
-        "level": "unrated",
+        "level": "severe",
         "color": "#FF6F00",
         "headline": "Severe Thunderstorm Warning for Maitland/Cessnock and Newcastle",
         "expires": "2026-11-15T06:10:46+00:00",
@@ -292,7 +292,7 @@
             "effective": "2026-11-15T03:38:29+00:00",
             "expires": "2026-11-15T08:38:29+00:00",
             "in_force": true,
-            "level": "unknown",
+            "level": "severe",
             "icon": "mdi:weather-lightning-rainy",
             "color": "#FF6F00",
             "sent": "2026-11-15T03:38:36+00:00",
@@ -310,9 +310,9 @@
       }
     },
     "sensor.home_thunderstorm_warning": {
-      "state": "unrated",
+      "state": "severe",
       "attributes": {
-        "level": "unrated",
+        "level": "severe",
         "color": "#FF6F00",
         "headline": "Severe Thunderstorm Warning for Mid North Coast, Hunter, Northern Tablelands and North West Slopes and Plains forecast districts",
         "expires": "2026-11-15T08:38:29+00:00",

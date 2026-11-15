@@ -102,7 +102,7 @@ async def test_turning_a_type_off_removes_it_everywhere_and_back_on_restores_it(
     await setup_entry(hass, mock_config_entry)
     assert events_listed(hass) == {"Extreme Heat", "Thunderstorm"}
     assert hass.states.get(COUNT).state == "2"  # type: ignore[union-attr]
-    assert hass.states.get(THUNDERSTORM).state == "unrated"  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == "severe"  # type: ignore[union-attr]
 
     await set_options(hass, mock_config_entry, thunderstorm_warning=False)
 
@@ -120,7 +120,7 @@ async def test_turning_a_type_off_removes_it_everywhere_and_back_on_restores_it(
 
     assert events_listed(hass) == {"Extreme Heat", "Thunderstorm"}
     assert registry.async_get(THUNDERSTORM) is not None
-    assert hass.states.get(THUNDERSTORM).state == "unrated"  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == "severe"  # type: ignore[union-attr]
 
 
 @pytest.mark.parametrize("area_codes", [["QLD_ME008", "QLD_PW001"]])

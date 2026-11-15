@@ -20,6 +20,7 @@ from .const import (
     CONF_EVENT_TYPES,
     CONF_INCLUDE_MARINE,
     CONF_WARNING_TYPES,
+    FIRE_DANGER_COLORS,
     OTHER_WARNINGS,
 )
 
@@ -50,6 +51,12 @@ XML_WIND_STRENGTHS = {"STR": "strong", "GALE": "gale"}
 # That makes the grade recoverable from the CAP severity alone, with no extra request. The words
 # are the fire danger rating's, so they take its colours (`FIRE_DANGER_COLORS`).
 FIRE_WEATHER_GRADES = {"moderate": "high", "severe": "extreme", "extreme": "catastrophic"}
+
+# BoM sends CAP severity `Unknown` for a Severe Thunderstorm or Severe Weather Warning, and its
+# product XML code (`STD`) grades nothing. The warning is severe by name, so its sensor says
+# `severe`. It keeps the `unknown` colour and its place in the ranking, which both come from the
+# CAP severity, so a warning BoM does mark severe is still red and still ranks above it.
+SEVERE_BY_NAME_GRADES = {"unknown": "severe"}
 
 
 def wind_strength(headline: str) -> str | None:
@@ -83,6 +90,9 @@ class WarningType:
     # The type's own grade for each CAP severity, where the Bureau grades a warning in words that
     # CAP's do not match. A severity with no entry keeps CAP's word.
     grades: Mapping[str, str] | None = None
+    # The colour of each grade, where the grades have colours of their own (the fire danger
+    # rating's). A graded type with none keeps the colour of its CAP severity.
+    grade_colors: Mapping[str, str] | None = None
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -126,6 +136,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         "mdi:weather-lightning-rainy",
         key="thunderstorm_warning",
         label="Severe thunderstorm",
+        grades=SEVERE_BY_NAME_GRADES,
     ),
     SensorType(
         "Fire Weather",
@@ -133,6 +144,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="fire_weather_warning",
         label="Fire weather",
         grades=FIRE_WEATHER_GRADES,
+        grade_colors=FIRE_DANGER_COLORS,
     ),
     # BoM's product is the Heatwave Warning. "Extreme Heat" is only the CAP event, and "extreme"
     # in a name reads as a level beside a sensor whose state may be `severe`.
@@ -168,6 +180,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="severe_weather_warning",
         label="Severe weather",
         note=_WEATHER_NOTE,
+        grades=SEVERE_BY_NAME_GRADES,
     ),
     SensorType(
         "Wind",

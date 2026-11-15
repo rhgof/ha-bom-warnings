@@ -61,7 +61,7 @@ async def test_a_broad_warning_reaches_the_sensor_with_its_text_facts(
 
     state = hass.states.get(THUNDERSTORM)
     assert state is not None
-    assert state.state == "unrated"
+    assert state.state == "severe"
     assert state.attributes["hazards"] == ["wind", "hail"]
     assert state.attributes["hazard"] == "Large, possibly giant hailstones and damaging winds"
     assert state.attributes["next_issue"] == "2026-11-15T06:40:00+00:00"

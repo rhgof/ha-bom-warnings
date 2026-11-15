@@ -122,7 +122,8 @@ async def test_every_severity_level_is_ranked_with_unknown_between_moderate_and_
     assert rows(hass) == [
         fire_row("catastrophic"),
         fire_row("extreme"),
-        row("IDN21037", "unknown", EVENT_ICONS["Weather"]),
+        # Severe by name but CAP-unknown, so it stays orange and keeps its place in the order.
+        row("IDN21037", "severe", EVENT_ICONS["Weather"], LEVEL_COLORS["unknown"]),
         row("IDS20240", "moderate", EVENT_ICONS["Hazardous Road Conditions"]),
         row("IDN36631", "minor", EVENT_ICONS["Riverine Flood"]),
     ]
@@ -231,7 +232,7 @@ async def test_list_grows_when_a_covering_warning_appears(
     scenarios.apply("all_types", fake_bom.root)
     await poll(hass, freezer)
 
-    assert ("IDN21037", "unknown") in {r[:2] for r in rows(hass)}
+    assert ("IDN21037", "severe") in {r[:2] for r in rows(hass)}
 
 
 @pytest.mark.parametrize(

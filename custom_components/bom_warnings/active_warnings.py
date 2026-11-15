@@ -14,7 +14,7 @@ from types import MappingProxyType
 from typing import Any
 
 from .cap import CapWarning, Info, Phase, Severity
-from .const import DEFAULT_EVENT_ICON, FIRE_DANGER_COLORS, LEVEL_COLORS
+from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
 from .warning_types import THUNDERSTORM_EVENT, XML_WIND_STRENGTHS, type_of
 
 
@@ -349,11 +349,17 @@ def level_of(warning: ActiveWarning) -> str:
 
 
 def color_of(warning: ActiveWarning) -> str:
-    """A graded warning takes the fire danger rating's colour for its grade, else CAP's colour."""
+    """A grade with a colour of its own (fire weather's) takes it, else the CAP severity's colour.
+
+    The CAP severity and not the level word, so a thunderstorm BoM leaves `unknown` is orange and
+    one it marks `severe` is red, though both say `severe`.
+    """
+    row = type_of(warning.event)
+    colors = row.grade_colors if row else None
     level = level_of(warning)
-    if level in _grades(warning.event).values():
-        return FIRE_DANGER_COLORS[level]
-    return LEVEL_COLORS[level]
+    if colors and level in colors:
+        return colors[level]
+    return LEVEL_COLORS[warning.severity.value]
 
 
 def level_options(event: str) -> list[str]:

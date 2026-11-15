@@ -14,7 +14,6 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.active_warnings import (
-    LEVEL_OPTIONS,
     ActiveWarning,
     type_attributes,
 )
@@ -35,9 +34,10 @@ from .test_binary_sensor import poll, setup_entry
 pytestmark = pytest.mark.freeze_time(NOW)
 
 THUNDERSTORM = "sensor.home_thunderstorm_warning"
-# BoM sends the CAP severity `unknown` for Severe Thunderstorm Warnings; it is shown as unrated.
+# BoM sends the CAP severity `unknown` for Severe Thunderstorm Warnings, which are severe by name,
+# so the thunderstorm sensor says `severe`.
 NONE = "none"
-UNRATED = "unrated"
+SEVERE_BY_NAME = "severe"
 
 
 async def start(hass: HomeAssistant, entry: MockConfigEntry, entity_id: str = THUNDERSTORM) -> Any:
@@ -89,7 +89,7 @@ async def test_the_sensor_turns_on_for_a_covering_warning(
 ) -> None:
     state = await start(hass, mock_config_entry)
 
-    assert state.state == UNRATED
+    assert state.state == SEVERE_BY_NAME
     assert state.attributes["friendly_name"] == "Home Severe thunderstorm warning"
 
 
@@ -97,8 +97,8 @@ async def test_the_sensor_turns_on_for_a_covering_warning(
     ("area_codes", "expected"),
     [
         (["QLD_PW001"], NONE),
-        (["QLD_ME008"], UNRATED),
-        (["QLD_PW013"], UNRATED),
+        (["QLD_ME008"], SEVERE_BY_NAME),
+        (["QLD_PW013"], SEVERE_BY_NAME),
     ],
     ids=["not-covered", "brisbane", "darling-downs"],
 )
@@ -140,7 +140,7 @@ async def test_an_active_warning_gives_its_level_and_the_colour_of_that_level(
 ) -> None:
     state = await start(hass, mock_config_entry)
 
-    assert state.attributes["level"] == UNRATED
+    assert state.attributes["level"] == SEVERE_BY_NAME
     assert state.attributes["color"] == LEVEL_COLORS["unknown"]
 
 
@@ -148,7 +148,7 @@ async def test_an_active_warning_gives_its_level_and_the_colour_of_that_level(
 def test_each_level_has_its_own_colour(severity: Severity) -> None:
     attributes = type_attributes("Thunderstorm", [warning(severity)])
 
-    assert attributes["level"] == ("unrated" if severity is Severity.UNKNOWN else severity.value)
+    assert attributes["level"] == ("severe" if severity is Severity.UNKNOWN else severity.value)
     assert attributes["color"] == LEVEL_COLORS[severity.value]
 
 
@@ -176,7 +176,7 @@ async def test_attributes_list_each_warning_of_the_type_with_the_highest_severit
 ) -> None:
     state = await start(hass, mock_config_entry)
 
-    assert state.state == UNRATED  # what BoM sends for these recorded files is `unknown`
+    assert state.state == SEVERE_BY_NAME  # what BoM sends for these recorded files is `unknown`
     # The top warning's fields are top-level attributes, so a tile can show them. Equal severity
     # goes to the most recently issued.
     assert state.attributes["product_id"] in {"IDQ21033", "IDQ21035"}
@@ -212,7 +212,7 @@ async def test_off_when_the_warning_file_is_removed(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
     await start(hass, mock_config_entry)
-    assert hass.states.get(THUNDERSTORM).state == UNRATED  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == SEVERE_BY_NAME  # type: ignore[union-attr]
 
     scenarios.apply("warning_removed", fake_bom.root)
     await poll(hass, freezer)
@@ -239,7 +239,7 @@ async def test_off_once_the_warning_has_expired(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
     await start(hass, mock_config_entry)
-    assert hass.states.get(THUNDERSTORM).state == UNRATED  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == SEVERE_BY_NAME  # type: ignore[union-attr]
 
     await poll(hass, freezer, minutes=70)  # the recorded warning expires at 09:03
 
@@ -261,7 +261,7 @@ async def test_a_cancelled_warning_is_not_current(
     hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freezer: Any
 ) -> None:
     await start(hass, mock_config_entry)
-    assert hass.states.get(THUNDERSTORM).state == UNRATED  # type: ignore[union-attr]
+    assert hass.states.get(THUNDERSTORM).state == SEVERE_BY_NAME  # type: ignore[union-attr]
 
     cancel_the_darling_downs_warning(fake_bom)
     await poll(hass, freezer)
@@ -308,7 +308,13 @@ async def test_the_sensor_is_a_level_sensor_not_a_safety_binary_sensor(
     state = await start(hass, mock_config_entry)
 
     assert state.attributes["device_class"] == "enum"
-    assert state.attributes["options"] == LEVEL_OPTIONS
+    assert state.attributes["options"] == [
+        "none",
+        "minor",
+        "moderate",
+        "severe",
+        "extreme",
+    ]  # severe by name
     assert "state_class" not in state.attributes
     assert state.attributes["icon"] == "mdi:weather-lightning-rainy"
     assert hass.states.get("binary_sensor.home_thunderstorm_warning") is None
