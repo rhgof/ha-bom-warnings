@@ -110,12 +110,11 @@ def test_a_warning_says_whether_it_has_ended(phase: Phase, ended: bool) -> None:
     ("extra", "badges"),
     [
         pytest.param({}, [], id="none"),
-        pytest.param({"very_dangerous": True}, ["Very dangerous"], id="very-dangerous"),
-        pytest.param({"detailed": True}, ["Detailed"], id="detailed"),
+        pytest.param({"badges": ("Very dangerous",)}, ["Very dangerous"], id="one"),
         pytest.param(
-            {"very_dangerous": True, "detailed": True},
+            {"badges": ("Very dangerous", "Detailed")},
             ["Very dangerous", "Detailed"],
-            id="both-in-a-fixed-order",
+            id="several-in-the-order-given",
         ),
     ],
 )
@@ -129,7 +128,7 @@ def test_the_sensor_carries_its_top_warnings_display_fields() -> None:
     attributes = type_attributes(
         "Thunderstorm",
         [
-            warning("Thunderstorm", Severity.UNKNOWN, very_dangerous=True),
+            warning("Thunderstorm", Severity.UNKNOWN, badges=("Very dangerous",)),
             warning("Thunderstorm", Severity.UNKNOWN, phase=Phase.CANCELLED),
         ],
     )

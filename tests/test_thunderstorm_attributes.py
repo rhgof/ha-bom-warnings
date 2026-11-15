@@ -30,12 +30,26 @@ FACTS = {"hazards", "very_dangerous", "detailed", "hazard", "next_issue"}
 
 
 def warning_at(
-    snapshot: str, product: str, code: str, name: str, now: datetime, *, detailed: bool = False
+    snapshot: str,
+    product: str,
+    code: str,
+    name: str,
+    now: datetime,
+    *,
+    detailed: bool = False,
+    hazard: str = "",
+    next_issue: datetime | None = None,
 ) -> ActiveWarning:
     cap = parse_cap((PRODUCTS / snapshot / f"{product}.cap.xml").read_bytes())
     assert cap is not None
-    if detailed:
-        cap = replace(cap, infos=tuple(replace(info, detailed=True) for info in cap.infos))
+    # What the `.txt` reader adds to a block, set here since the CAP file does not carry it.
+    cap = replace(
+        cap,
+        infos=tuple(
+            replace(info, detailed=detailed, hazard=hazard, next_issue=next_issue)
+            for info in cap.infos
+        ),
+    )
     (found,) = (
         w for w in covering([cap], frozenset({code}), now, area_names={code: name}) if w.is_current
     )
@@ -119,8 +133,9 @@ def test_the_summary_is_the_paragraph_that_names_the_entrys_area(
 
     assert found.summary is not None
     assert found.summary.startswith(starts)
-    assert found.very_dangerous is very_dangerous
-    assert list(found.hazards) == hazards
+    assert found.facts.get("very_dangerous", False) is very_dangerous
+    assert found.facts["hazards"] == hazards
+    assert list(found.badges) == (["Very dangerous"] if very_dangerous else [])
 
 
 def test_an_area_no_paragraph_names_gets_the_first_paragraph() -> None:
@@ -150,8 +165,12 @@ def test_a_broad_summary_still_stops_at_the_limit() -> None:
 def test_the_thunderstorm_facts_are_attributes_only_where_there_is_something_to_say() -> None:
     plain = warning_at(FIFTEENTH, "IDN21033", "NSW_PW003", "Hunter", FIFTEENTH_NOW)
     tiered = warning_at(FIFTEENTH, "IDN21033", "NSW_PW002", "Mid North Coast", FIFTEENTH_NOW)
-    detailed = replace(
-        warning_at(FIFTEENTH, "IDN21035", "NSW_ME015", "Newcastle", FIFTEENTH_NOW),
+    detailed = warning_at(
+        FIFTEENTH,
+        "IDN21035",
+        "NSW_ME015",
+        "Newcastle",
+        FIFTEENTH_NOW,
         detailed=True,
         hazard="Damaging winds and large hailstones",
         next_issue=datetime(2026, 11, 15, 4, 10, tzinfo=UTC),
@@ -173,8 +192,12 @@ def test_the_thunderstorm_facts_are_attributes_only_where_there_is_something_to_
 
 
 def test_a_type_sensor_carries_its_top_warnings_facts_at_the_top_level() -> None:
-    detailed = replace(
-        warning_at(FIFTEENTH, "IDN21035", "NSW_ME015", "Newcastle", FIFTEENTH_NOW),
+    detailed = warning_at(
+        FIFTEENTH,
+        "IDN21035",
+        "NSW_ME015",
+        "Newcastle",
+        FIFTEENTH_NOW,
         detailed=True,
         next_issue=datetime(2026, 11, 15, 4, 10, tzinfo=UTC),
     )
@@ -194,3 +217,13 @@ def test_a_type_sensor_says_how_many_warnings_of_its_type_are_current() -> None:
 
     assert type_attributes("Thunderstorm", [broad, detailed])["current"] == 2
     assert type_attributes("Thunderstorm", [])["current"] == 0
+
+
+def test_the_badges_follow_the_tier_then_the_detail() -> None:
+    tiered = warning_at(
+        FIFTEENTH, "IDN21033", "NSW_PW002", "Mid North Coast", FIFTEENTH_NOW, detailed=True
+    )
+    plain = warning_at(FIFTEENTH, "IDN21033", "NSW_PW003", "Hunter", FIFTEENTH_NOW)
+
+    assert warning_attributes(tiered, ranked=True)["badges"] == ["Very dangerous", "Detailed"]
+    assert warning_attributes(plain, ranked=True)["badges"] == []

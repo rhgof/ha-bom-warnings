@@ -36,7 +36,7 @@
     "active-warnings": {
       "layer": "readers",
       "purpose": "What one location sees of the parsed warnings: the active warnings that cover it, the per-product states the event entity compares between refreshes, and a warning's list attributes. Imports nothing from Home Assistant.",
-      "owns": ["active_warnings.py"]
+      "owns": ["active_warnings.py", "type_facts.py"]
     },
     "warning-format": {
       "layer": "foundation",

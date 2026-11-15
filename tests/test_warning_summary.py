@@ -12,11 +12,11 @@ import pytest
 from custom_components.bom_warnings.active_warnings import (
     ActiveWarning,
     covering,
-    summary_of,
     type_attributes,
     warning_attributes,
 )
 from custom_components.bom_warnings.cap import Phase, Severity, parse_cap
+from custom_components.bom_warnings.type_facts import summary_of
 
 CAPTURES = Path(__file__).parent / "fixtures" / "products" / "2026-11-03T2348Z"
 # Inside the validity window of every product used below.

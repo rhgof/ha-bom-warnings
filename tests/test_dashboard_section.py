@@ -165,11 +165,14 @@ def every_field_warning() -> ActiveWarning:
         sent=NOW_DT,
         area="Sydney Coast",
         summary="A summary.",
-        hazards=("wind", "hail"),
-        very_dangerous=True,
-        detailed=True,
-        hazard="Damaging winds and large hailstones",
-        next_issue=NOW_DT,
+        facts={
+            "hazards": ["wind", "hail"],
+            "very_dangerous": True,
+            "detailed": True,
+            "hazard": "Damaging winds and large hailstones",
+            "next_issue": NOW_DT.isoformat(),
+        },
+        badges=("Very dangerous", "Detailed"),
     )
 
 
@@ -184,6 +187,9 @@ def test_fixture_warnings_match_the_integrations_attributes() -> None:
         assert item["color"] == LEVEL_COLORS[item["severity"]]
 
 
+THUNDERSTORM_FACTS = {"hazards", "very_dangerous", "detailed", "hazard", "next_issue"}
+
+
 def warning_from(item: dict[str, Any]) -> ActiveWarning:
     """The warning a fixture item describes, so what the integration says of it can be compared."""
     return ActiveWarning(
@@ -194,8 +200,13 @@ def warning_from(item: dict[str, Any]) -> ActiveWarning:
         effective=None,
         expires=None,
         phase=Phase(item["phase"]),
-        very_dangerous=item.get("very_dangerous", False),
-        detailed=item.get("detailed", False),
+        facts={k: v for k, v in item.items() if k in THUNDERSTORM_FACTS},
+        # A lean item has no `badges`, so they are rebuilt from the facts that name them.
+        badges=tuple(
+            label
+            for key, label in (("very_dangerous", "Very dangerous"), ("detailed", "Detailed"))
+            if item.get(key)
+        ),
     )
 
 
