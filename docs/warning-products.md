@@ -161,7 +161,8 @@ paragraph per group of districts. The **Detailed** warning (`IDN21035`) covers m
 sub-areas (`NSW_ME…`), runs for 2.5 hours and is re-issued about every 30 minutes, with one
 paragraph about a located storm cell and where it is heading. Both arrive as CAP `Thunderstorm`
 with severity `Unknown` and urgency and certainty `Unknown`; the product XML says `STD`. Neither
-source grades the storm, so the sensor says `unrated`.
+source grades the storm, so the sensor says `severe`, the warning's own word. Other types with an
+unknown severity say `unrated`.
 
 Captures: `2026-11-13T0625Z-thunderstorm`, `2026-11-15T0343Z-thunderstorm` and
 `2026-11-15T0516Z-thunderstorm` (the cancellation, below). The 13 Nov findings are in
