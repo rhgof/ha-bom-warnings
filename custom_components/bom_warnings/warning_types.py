@@ -93,6 +93,9 @@ class WarningType:
     # The colour of each grade, where the grades have colours of their own (the fire danger
     # rating's). A graded type with none keeps the colour of its CAP severity.
     grade_colors: Mapping[str, str] | None = None
+    # Whether a card should draw this type's current warning with the detail layout (hazards,
+    # badges, when the next update is due) and not the plain tile. The sensor says so in `layout`.
+    detail: bool = False
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -137,6 +140,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="thunderstorm_warning",
         label="Severe thunderstorm",
         grades=SEVERE_BY_NAME_GRADES,
+        detail=True,
     ),
     SensorType(
         "Fire Weather",

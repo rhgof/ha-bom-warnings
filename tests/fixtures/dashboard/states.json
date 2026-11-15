@@ -22,7 +22,11 @@
             "color": "#D32F2F",
             "sent": "2026-11-04T00:24:50+00:00",
             "area": "Sydney",
-            "summary": "A severe heatwave is expected through Thursday."
+            "summary": "A severe heatwave is expected through Thursday.",
+            "title": "Severe Heatwave warning",
+            "rank": 3,
+            "ended": false,
+            "badges": []
           },
           {
             "product_id": "IDN20400",
@@ -38,7 +42,11 @@
             "sent": "2026-11-04T00:24:50+00:00",
             "strength": "strong",
             "area": "Illawarra Coast; Sydney Coast; Hunter Coast",
-            "summary": "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast, Sydney Coast, Illawarra Coast and Batemans Coast"
+            "summary": "Strong Wind Warning for Coffs Coast, Macquarie Coast, Hunter Coast, Sydney Coast, Illawarra Coast and Batemans Coast",
+            "title": "Moderate Marine wind warning",
+            "rank": 1,
+            "ended": false,
+            "badges": []
           },
           {
             "product_id": "IDQ20829",
@@ -52,7 +60,11 @@
             "icon": "mdi:home-flood",
             "color": "#FB8C00",
             "sent": "2026-11-03T23:28:42+00:00",
-            "area": "Lower Condamine River"
+            "area": "Lower Condamine River",
+            "title": "Moderate Flood warning",
+            "rank": 1,
+            "ended": true,
+            "badges": []
           }
         ]
       }
@@ -64,7 +76,10 @@
         "color": "#FB8C00",
         "headline": "Strong Wind Warning for coastal waters between Wooli and Montague Island for 05 November",
         "strength": "strong",
-        "warnings": []
+        "warnings": [],
+        "title": null,
+        "rank": null,
+        "badges": []
       }
     },
     "sensor.home_extreme_heat_warning": {
@@ -73,7 +88,10 @@
         "level": "severe",
         "color": "#D32F2F",
         "headline": "Severe heatwave warning for Greater Sydney",
-        "warnings": []
+        "warnings": [],
+        "title": null,
+        "rank": null,
+        "badges": []
       }
     },
     "sensor.home_thunderstorm_warning": {
@@ -82,7 +100,10 @@
         "level": "none",
         "color": null,
         "headline": null,
-        "warnings": []
+        "warnings": [],
+        "title": null,
+        "rank": null,
+        "badges": []
       }
     },
     "sensor.home_fire_danger_today": {
@@ -124,7 +145,10 @@
         "level": "none",
         "color": null,
         "headline": null,
-        "warnings": []
+        "warnings": [],
+        "title": null,
+        "rank": null,
+        "badges": []
       }
     },
     "sensor.home_thunderstorm_warning": {
@@ -133,7 +157,10 @@
         "level": "none",
         "color": null,
         "headline": null,
-        "warnings": []
+        "warnings": [],
+        "title": null,
+        "rank": null,
+        "badges": []
       }
     },
     "sensor.home_fire_danger_today": {
@@ -187,7 +214,13 @@
             ],
             "detailed": true,
             "hazard": "Damaging winds and large hailstones",
-            "next_issue": "2026-11-15T04:10:00+00:00"
+            "next_issue": "2026-11-15T04:10:00+00:00",
+            "title": "Severe thunderstorm warning",
+            "rank": 2,
+            "ended": false,
+            "badges": [
+              "Detailed"
+            ]
           },
           {
             "product_id": "IDN21033",
@@ -209,7 +242,11 @@
               "hail"
             ],
             "hazard": "Large, possibly giant hailstones and damaging winds",
-            "next_issue": "2026-11-15T06:40:00+00:00"
+            "next_issue": "2026-11-15T06:40:00+00:00",
+            "title": "Severe thunderstorm warning",
+            "rank": 2,
+            "ended": false,
+            "badges": []
           }
         ]
       }
@@ -271,7 +308,11 @@
         ],
         "detailed": true,
         "hazard": "Damaging winds and large hailstones",
-        "next_issue": "2026-11-15T04:10:00+00:00"
+        "next_issue": "2026-11-15T04:10:00+00:00",
+        "title": "Severe thunderstorm warning",
+        "rank": 2,
+        "badges": [],
+        "layout": "detail"
       }
     }
   },
@@ -304,7 +345,13 @@
             ],
             "very_dangerous": true,
             "hazard": "Large, possibly giant hailstones and damaging winds",
-            "next_issue": "2026-11-15T06:40:00+00:00"
+            "next_issue": "2026-11-15T06:40:00+00:00",
+            "title": "Severe thunderstorm warning",
+            "rank": 2,
+            "ended": false,
+            "badges": [
+              "Very dangerous"
+            ]
           }
         ]
       }
@@ -348,7 +395,13 @@
         ],
         "very_dangerous": true,
         "hazard": "Large, possibly giant hailstones and damaging winds",
-        "next_issue": "2026-11-15T06:40:00+00:00"
+        "next_issue": "2026-11-15T06:40:00+00:00",
+        "title": "Severe thunderstorm warning",
+        "rank": 2,
+        "badges": [
+          "Very dangerous"
+        ],
+        "layout": "detail"
       }
     }
   }

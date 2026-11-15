@@ -20,10 +20,11 @@ from homeassistant.helpers.template import Template
 
 from custom_components.bom_warnings.active_warnings import (
     ActiveWarning,
+    display_fields,
     type_attributes,
     warning_attributes,
 )
-from custom_components.bom_warnings.cap import Severity
+from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import FIRE_DANGER_COLORS, LEVEL_COLORS
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, SensorType
 
@@ -167,6 +168,56 @@ def test_fixture_warnings_match_the_integrations_attributes() -> None:
         assert item["color"] == LEVEL_COLORS[item["severity"]]
 
 
+def warning_from(item: dict[str, Any]) -> ActiveWarning:
+    """The warning a fixture item describes, so what the integration says of it can be compared."""
+    return ActiveWarning(
+        product_id=item["product_id"],
+        event=item["event"],
+        headline=item["headline"],
+        severity=Severity(item["severity"]),
+        effective=None,
+        expires=None,
+        phase=Phase(item["phase"]),
+        very_dangerous=item.get("very_dangerous", False),
+        detailed=item.get("detailed", False),
+    )
+
+
+def event_of(entity_id: str) -> str:
+    """The CAP event a type sensor is for."""
+    return next(
+        t.event
+        for t in WARNING_TYPES
+        if isinstance(t, SensorType) and entity_id == f"sensor.home_{t.key}"
+    )
+
+
+def test_fixture_warnings_carry_the_display_fields_the_integration_computes() -> None:
+    items = [w for scenario in STATES.values() for w in scenario[COUNT]["attributes"]["warnings"]]
+    assert items
+    for item in items:
+        real = display_fields(warning_from(item))
+        assert {key: item.get(key, "<missing>") for key in real} == real, item["product_id"]
+
+
+def test_fixture_type_sensors_carry_their_top_warnings_display_fields() -> None:
+    sensors = [
+        (entity_id, entity)
+        for scenario in STATES.values()
+        for entity_id, entity in scenario.items()
+        if entity_id in TYPE_SENSORS
+    ]
+    assert sensors
+    for entity_id, entity in sensors:
+        attributes = entity["attributes"]
+        real = type_attributes(
+            event_of(entity_id), [warning_from(w) for w in attributes.get("warnings", [])]
+        )
+        for key in ("title", "rank", "badges"):
+            assert attributes.get(key, "<missing>") == real[key], (entity_id, key)
+        assert attributes.get("layout") == real.get("layout"), entity_id
+
+
 TYPE_SENSORS = {f"sensor.home_{t.key}" for t in WARNING_TYPES if isinstance(t, SensorType)}
 
 
@@ -189,7 +240,8 @@ def colours_for(entity_id: str, level: str) -> set[str | None]:
 
 
 def test_fixture_type_sensors_match_the_integrations_attributes() -> None:
-    real = type_attributes("Wind", [every_field_warning()])
+    # Wind is the sample type, and `layout` is sent only by a type that asks for the detail layout.
+    real = type_attributes("Wind", [every_field_warning()]).keys() | {"layout"}
 
     fixture = [
         (entity_id, entity)
@@ -201,7 +253,7 @@ def test_fixture_type_sensors_match_the_integrations_attributes() -> None:
     for entity_id, entity in fixture:
         attributes = entity["attributes"]
         assert {"level", "color"} <= attributes.keys(), entity_id
-        assert attributes.keys() <= real.keys(), entity_id
+        assert attributes.keys() <= real, entity_id
         assert attributes["level"] == entity["state"], entity_id
         assert attributes["color"] in colours_for(entity_id, entity["state"]), entity_id
 

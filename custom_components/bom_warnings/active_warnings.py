@@ -477,4 +477,6 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         attributes["strength"] = top.strength if top else None
     if row and row.note:
         attributes["note"] = row.note
+    if top and row and row.detail:
+        attributes["layout"] = "detail"
     return attributes

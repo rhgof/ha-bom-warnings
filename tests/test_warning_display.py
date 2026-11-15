@@ -148,3 +148,25 @@ def test_a_quiet_sensor_has_no_display_fields_to_show() -> None:
     assert attributes["title"] is None
     assert attributes["badges"] == []
     assert attributes["rank"] is None
+
+
+@pytest.mark.parametrize(
+    ("event", "warnings", "layout"),
+    [
+        pytest.param(
+            "Thunderstorm", [warning("Thunderstorm", Severity.UNKNOWN)], "detail", id="detail-type"
+        ),
+        pytest.param("Frost", [warning("Frost", Severity.MINOR)], None, id="plain-type"),
+        pytest.param("Thunderstorm", [], None, id="quiet-sensor"),
+        pytest.param(
+            "Thunderstorm",
+            [warning("Thunderstorm", Severity.UNKNOWN, phase=Phase.CANCELLED)],
+            None,
+            id="only-an-ended-warning",
+        ),
+    ],
+)
+def test_a_sensor_asks_for_the_detail_layout_only_while_its_type_has_a_current_warning(
+    event: str, warnings: list[ActiveWarning], layout: str | None
+) -> None:
+    assert type_attributes(event, warnings).get("layout") == layout
