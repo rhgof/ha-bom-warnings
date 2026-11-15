@@ -120,7 +120,7 @@ async def test_most_severe_picks_the_severe_warning_when_it_appears(
     most = state_of(hass, MOST_SEVERE)
     assert most.attributes["event"] == "Extreme Heat"
     assert most.attributes["severity"] == "severe"
-    assert most.state == most.attributes["headline"]
+    assert most.state == "severe"
     assert len(most.attributes["warnings"]) == 2
 
 

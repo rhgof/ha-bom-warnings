@@ -36,8 +36,9 @@ Bureau of Meteorology warnings as Home Assistant entities and events (domain `bo
   Each location gets its own entities.
 - **Sensors you can build on.**
   - A *warning* binary sensor that is on while any current warning covers the location.
-  - A *warning count* and a *most severe warning* sensor, with the headline, expiry and a one-line
-    summary as attributes.
+  - A *warning count* and a *most severe warning* sensor. The most severe sensor's state is the level
+    of the worst current warning of any type, like the per-type sensors, with the headline, expiry and
+    a one-line summary as attributes.
   - One sensor per warning type (thunderstorm, flood, fire weather and so on) whose state is the
     level: `none`, `minor`, `moderate`, `severe` or `extreme`. This is the one to use in
     automations, for example to close the blinds when a thunderstorm warning goes severe.

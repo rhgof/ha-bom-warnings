@@ -15,7 +15,7 @@ from typing import Any
 from .cap import CapWarning, Info, Phase, Severity
 from .const import DEFAULT_EVENT_ICON, LEVEL_COLORS
 from .type_facts import facts_for
-from .warning_types import XML_WIND_STRENGTHS, SensorType, type_of
+from .warning_types import WARNING_TYPES, XML_WIND_STRENGTHS, SensorType, type_of
 
 
 @dataclass(frozen=True, slots=True)
@@ -310,6 +310,19 @@ def level_options(event: str) -> list[str]:
     return [STATE_NONE, *dict.fromkeys("unrated" if word == "unknown" else word for word in words)]
 
 
+def all_level_options() -> list[str]:
+    """Every state a sensor over all types can take, which is the top warning's own level.
+
+    A fire weather warning at the top says one of its grades, so those are options as well as the
+    severity words. Words that two types share appear once.
+    """
+    return list(
+        dict.fromkeys(
+            [*LEVEL_OPTIONS, *(word for t in WARNING_TYPES for word in level_options(t.event))]
+        )
+    )
+
+
 def rank_warnings(warnings: Iterable[ActiveWarning]) -> list[ActiveWarning]:
     """Most severe first; ties go to the most recently issued, undated last, then product id."""
     return sorted(
@@ -342,15 +355,19 @@ def event_icon(event: str) -> str:
     return row.icon if row else DEFAULT_EVENT_ICON
 
 
-def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
-    """The attributes of one type's level sensor: its top warning's fields, then every warning.
-
-    The top warning is the highest-ranked one still in force. A type whose row has a strength rule
-    (marine wind) carries a strength, and a type whose row has a note carries that. The level and
-    its colour are there so a card can colour itself from the sensor: the colour is None while no
-    warning is in force, and the card decides how a quiet state looks.
-    """
+def _top(warnings: Iterable[ActiveWarning]) -> ActiveWarning | None:
+    """The highest-ranked warning still in force."""
     current = rank_warnings(w for w in warnings if w.is_current)
+    return current[0] if current else None
+
+
+def top_attributes(warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
+    """What a level sensor says of its top warning, whatever the sensor covers.
+
+    The level and its colour are there so a card can colour itself from the sensor: the colour is
+    None while no warning is in force, and the card decides how a quiet state looks.
+    """
+    current = [w for w in rank_warnings(w for w in warnings if w.is_current)]
     top = current[0] if current else None
     attributes: dict[str, Any] = {
         "level": highest_level(warnings),
@@ -365,13 +382,24 @@ def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, 
         "badges": list(top.badges) if top else [],
         # So a tile can say "+1 more" when a broad and a detailed warning are both current.
         "current": len(current),
-        "warnings": [warning_attributes(w) for w in warnings],
     }
     # At the top level too, because a tile can show an attribute but not reach into the list.
     if top and top.summary:
         attributes["summary"] = top.summary
     if top:
         attributes |= top.facts
+    return attributes
+
+
+def type_attributes(event: str, warnings: Sequence[ActiveWarning]) -> dict[str, Any]:
+    """The attributes of one type's level sensor: its top warning's fields, then every warning.
+
+    A type whose row has a strength rule (marine wind) carries a strength, a type whose row has a
+    note carries that, and a type that asks for the detail layout says so while it has a current
+    warning.
+    """
+    top = _top(warnings)
+    attributes = top_attributes(warnings) | {"warnings": [warning_attributes(w) for w in warnings]}
     row = type_of(event)
     if row and row.strength:
         attributes["strength"] = top.strength if top else None

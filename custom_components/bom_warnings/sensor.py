@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.const import MAX_LENGTH_STATE_STATE as MAX_STATE_LENGTH
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
@@ -16,12 +15,13 @@ from homeassistant.util import dt as dt_util
 from . import BomWarningsConfigEntry
 from .active_warnings import (
     LEVEL_OPTIONS,
-    STATE_NONE,
     ActiveWarning,
+    all_level_options,
     current_then_ended,
     event_icon,
     highest_level,
     level_options,
+    top_attributes,
     type_attributes,
     warning_attributes,
 )
@@ -135,25 +135,32 @@ class WarningCountSensor(_WarningSensor):
 
 
 class MostSevereWarningSensor(_WarningSensor):
+    """How bad the worst current warning is, of any type, as a level like the per-type sensors.
+
+    The state used to be the headline, which is free text: a history bar coloured it by first-seen
+    order and a tile had a sentence for a state. The headline is an attribute now.
+    """
+
     _attr_translation_key = "most_severe_warning"
+    _attr_device_class = SensorDeviceClass.ENUM
+
+    def __init__(self, coordinator: BomWarningsCoordinator, entry: BomWarningsConfigEntry) -> None:
+        self._attr_options = all_level_options()
+        super().__init__(coordinator, entry)
 
     @property
     def native_value(self) -> str:
-        top = self._top
-        if top is None:
-            return STATE_NONE
-        # Home Assistant turns a state over 255 characters into "unknown"; some real headlines
-        # list a dozen districts. The full text stays in the `headline` attribute.
-        headline = top.headline
-        if len(headline) > MAX_STATE_LENGTH:
-            return headline[: MAX_STATE_LENGTH - 1] + "…"
-        return headline
+        return highest_level(self.coordinator.data)
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         top = self._top
         ranked = [warning_attributes(w, ranked=True) for w in self._ranked]
-        return {**(warning_attributes(top, ranked=True) if top else {}), "warnings": ranked}
+        return {
+            **(warning_attributes(top, ranked=True) if top else {}),
+            **top_attributes(self.coordinator.data),
+            "warnings": ranked,
+        }
 
 
 # Translation key by day offset from the local date.

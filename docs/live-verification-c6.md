@@ -118,7 +118,7 @@ The entity ids are the entry title slug plus a suffix. Check each exists and has
 - [ ] `binary_sensor.<title>_warning`: `on` (Unsafe) only if a warning currently covers you,
       otherwise `off` (Safe).
 - [ ] `sensor.<title>_warning_count`: a number (0 is fine).
-- [ ] `sensor.<title>_most_severe_warning`: a headline, or `none`.
+- [ ] `sensor.<title>_most_severe_warning`: the level of the top warning (`none`, `minor` … `extreme`, or a fire weather grade), with the headline as an attribute.
 - [ ] `event.<title>_warning_event`: `unknown` until a warning changes. It must not have fired at
       startup.
 - [ ] One **level sensor** per type that is on, `sensor.<title>_<type>_warning` (for example

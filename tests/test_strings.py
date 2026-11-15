@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from custom_components.bom_warnings.active_warnings import level_options
+from custom_components.bom_warnings.active_warnings import all_level_options, level_options
 from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
 from custom_components.bom_warnings.warning_types import WarningType, sensor_types
 
@@ -72,6 +72,13 @@ def test_translation_keys_in_code_are_all_listed_above() -> None:
         "most_severe_warning",
     }
     # The per-type sensors take their translation key from the warning type table, not a literal.
+
+
+def test_the_most_severe_sensor_translates_every_level_it_can_say() -> None:
+    sensor = load(STRINGS)["entity"]["sensor"]["most_severe_warning"]
+
+    assert set(sensor["state"]) == set(all_level_options())
+    assert all(text.strip() for text in sensor["state"].values())
 
 
 @pytest.mark.parametrize("key", ["fire_danger_today", "fire_danger_tomorrow"])

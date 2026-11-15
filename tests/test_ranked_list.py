@@ -102,18 +102,6 @@ async def test_home_codes_list_only_what_covers_the_location(hass: HomeAssistant
     assert not listed & OUTSIDE_NSW
 
 
-async def test_a_headline_too_long_for_a_state_is_truncated_and_kept_whole_in_the_attribute(
-    hass: HomeAssistant,
-) -> None:
-    await setup_entry(hass, entry_with(HOME_CODES))
-
-    most = state_of(hass, MOST_SEVERE)
-    headline = most.attributes["headline"]
-    assert len(headline) > 255
-    assert headline.startswith("Extreme Fire Weather Warning for Greater Hunter")
-    assert most.state == headline[:254] + "…"
-
-
 async def test_every_severity_level_is_ranked_with_unknown_between_moderate_and_severe(
     hass: HomeAssistant,
 ) -> None:
@@ -170,7 +158,8 @@ async def test_most_severe_sensor_shows_the_top_item_with_icon_level_and_colour(
 
     most = state_of(hass, MOST_SEVERE)
     top = most.attributes["warnings"][0]
-    assert most.state == top["headline"]
+    assert most.state == "catastrophic"
+    assert most.attributes["headline"] == top["headline"]
     assert (most.attributes["icon"], most.attributes["level"], most.attributes["color"]) == (
         EVENT_ICONS["Fire Weather"],
         "catastrophic",

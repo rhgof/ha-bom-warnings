@@ -71,7 +71,17 @@
         "name": "Warning count"
       },
       "most_severe_warning": {
-        "name": "Most severe warning"
+        "name": "Most severe warning",
+        "state": {
+          "none": "None",
+          "minor": "Minor",
+          "moderate": "Moderate",
+          "unrated": "Unrated",
+          "severe": "Severe",
+          "extreme": "Extreme",
+          "high": "High",
+          "catastrophic": "Catastrophic"
+        }
       },
       "fire_danger_today": {
         "name": "Fire danger today",
