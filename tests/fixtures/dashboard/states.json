@@ -113,7 +113,8 @@
         "color": "#FEDD3A",
         "icon": "mdi:fire",
         "fire_behaviour_index": 31,
-        "district": "Greater Hunter"
+        "district": "Greater Hunter",
+        "title": "High Fire Danger Today"
       }
     },
     "sensor.home_fire_danger_tomorrow": {
@@ -123,7 +124,8 @@
         "color": "#F78100",
         "icon": "mdi:fire-alert",
         "fire_behaviour_index": 61,
-        "district": "Greater Hunter"
+        "district": "Greater Hunter",
+        "title": "Extreme Fire Danger Tomorrow"
       }
     }
   },
@@ -170,7 +172,8 @@
         "color": "#949494",
         "icon": "mdi:fire-off",
         "fire_behaviour_index": 3,
-        "district": "Greater Hunter"
+        "district": "Greater Hunter",
+        "title": "Fire Danger Today"
       }
     },
     "sensor.home_fire_danger_tomorrow": {
@@ -180,7 +183,8 @@
         "color": "#949494",
         "icon": "mdi:fire-off",
         "fire_behaviour_index": 3,
-        "district": "Greater Hunter"
+        "district": "Greater Hunter",
+        "title": "Fire Danger Tomorrow"
       }
     }
   },

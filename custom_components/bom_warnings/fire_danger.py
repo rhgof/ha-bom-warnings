@@ -35,6 +35,20 @@ PRODUCTS = {
 # Lowest first. The key is what the parser stores and what the enum sensor offers as an option.
 LEVEL_KEYS = ("no_rating", "moderate", "high", "extreme", "catastrophic")
 
+
+def danger_title(level: str | None, day_offset: int) -> str:
+    """The name a tile shows, such as "Extreme Fire Danger Today".
+
+    A rating with no level to name ("no_rating", a level this code has not seen, or no data) leaves
+    the level word out. The title says Fire Danger because the rating is a scale of its own: its
+    "moderate" is green and its "extreme" orange, unlike a warning's orange and purple.
+    """
+    day = "Today" if day_offset == 0 else "Tomorrow"
+    named = level in LEVEL_KEYS and level != "no_rating"
+    prefix = f"{level.capitalize()} " if named and level else ""
+    return f"{prefix}Fire Danger {day}"
+
+
 _DISTRICT = "fire-district"
 
 

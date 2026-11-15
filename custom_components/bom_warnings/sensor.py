@@ -34,7 +34,7 @@ from .const import (
     NO_WARNING_ICON,
 )
 from .coordinator import BomWarningsCoordinator
-from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView
+from .fire_danger import LEVEL_KEYS, FireDangerPeriod, FireDangerView, danger_title
 from .warning_types import sensor_types
 
 PARALLEL_UPDATES = 0
@@ -270,6 +270,7 @@ class FireDangerSensor(_WarningSensor):
         level = self._level
         return {
             "level": level,
+            "title": danger_title(level, self._day_offset),
             "color": FIRE_DANGER_COLORS.get(level or ""),
             "fire_behaviour_index": self._period.fire_behaviour_index if self._period else None,
             "forecast": [_period_item(p) for p in view.forecast],

@@ -51,8 +51,23 @@ so its positions differ from the other types.
 The logbook is the same palette when it is used at all. By default an enum sensor's entry uses a
 category colour, so it does not follow severity either.
 
+## Use the card's tile, not the built-in one
+
+A plain `type: tile` on one of these sensors shows the theme's default icon colour (blue in the
+default theme) at every level, because `sensor` has no state colour in the frontend. Only
+`custom:bom-warning-tile` passes the sensor's `color` to the tile. This is the usual reason a
+dashboard shows a blue icon on a moderate fire danger rating that the data says is green.
+
 ## Differences that are by design
 
+- **Two scales share words.** The fire danger rating, and the grades of the Fire Weather warning,
+  use BoM's fire danger legend: `moderate` is green `#64BF30`, `high` yellow `#FEDD3A`, `extreme`
+  orange `#F78100`, `catastrophic` dark red `#AD0909`. Every other warning type uses the severity
+  colours, where `moderate` is orange `#FB8C00` and `extreme` purple `#7B1FA2`. So "extreme" is
+  orange on a fire tile and purple elsewhere, and the Most severe sensor's state can be `extreme`
+  for either scale; its `color` attribute says which. The fire danger tiles are titled "Extreme Fire
+  Danger Today" and the like so the scale is named, and a Fire Weather warning is titled "Extreme
+  Fire weather warning".
 - **Thunderstorm and Severe weather** say `severe` but keep the orange of CAP `unknown`; a warning
   BoM marks `severe` is red (`31025b0`).
 - **Fire weather** uses the fire danger rating's colours for its grades, which differ from the

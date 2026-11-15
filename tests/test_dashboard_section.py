@@ -27,6 +27,7 @@ from custom_components.bom_warnings.active_warnings import (
 )
 from custom_components.bom_warnings.cap import Phase, Severity
 from custom_components.bom_warnings.const import FIRE_DANGER_COLORS, LEVEL_COLORS
+from custom_components.bom_warnings.fire_danger import danger_title
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, SensorType
 
 from .conftest import NOW
@@ -225,6 +226,20 @@ def test_fixture_warnings_carry_the_display_fields_the_integration_computes() ->
     for item in items:
         real = display_fields(warning_from(item))
         assert {key: item.get(key, "<missing>") for key in real} == real, item["product_id"]
+
+
+def test_fixture_fire_danger_sensors_carry_the_title_the_integration_computes() -> None:
+    sensors = [
+        (entity_id, entity)
+        for scenario in STATES.values()
+        for entity_id, entity in scenario.items()
+        if "_fire_danger_" in entity_id
+    ]
+    assert sensors
+    for entity_id, entity in sensors:
+        day = 0 if entity_id.endswith("_today") else 1
+        expected = danger_title(entity["attributes"]["level"], day)
+        assert entity["attributes"].get("title", "<missing>") == expected, entity_id
 
 
 def top_warnings(attributes: dict[str, Any]) -> list[ActiveWarning]:

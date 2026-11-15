@@ -292,9 +292,11 @@ moderate `#FB8C00`, unknown `#FF6F00` (deep amber), severe `#D32F2F`, extreme `#
 location is in a BoM fire weather district (all states publish a product; see
 `docs/architecture.md`). The state is `no_rating`, `moderate`, `high`, `extreme` or `catastrophic`
 (shown translated), or unknown when the latest issue has no period for that day or the level is
-new to the integration (the text is then in the `level` attribute). Attributes: `level`, `color`,
-`icon`, `fire_behaviour_index`, `forecast` (a list of `date`, `level`, `fire_behaviour_index`),
-`issued`, `district`, `source`.
+new to the integration (the text is then in the `level` attribute). Attributes: `level`, `title`
+("Extreme Fire Danger Today", "Moderate Fire Danger Tomorrow", or "Fire Danger Today" when there is
+no level to name), `color`, `icon`, `fire_behaviour_index`, `forecast` (a list of `date`, `level`,
+`fire_behaviour_index`), `issued`, `district`, `source`. Use `custom:bom-warning-tile` to see the
+colour and title; Home Assistant's own `tile` shows the theme's default icon colour for a sensor.
 
 Colours, from BoM's own fire danger legend (defined once in `const.py`, `FIRE_DANGER_COLORS`):
 

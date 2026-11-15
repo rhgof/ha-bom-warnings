@@ -22,7 +22,7 @@ from custom_components.bom_warnings.const import (
     FIRE_DANGER_ICONS,
 )
 from custom_components.bom_warnings.diagnostics import async_get_config_entry_diagnostics
-from custom_components.bom_warnings.fire_danger import LEVEL_KEYS
+from custom_components.bom_warnings.fire_danger import LEVEL_KEYS, danger_title
 from scripts.fake_bom import layout
 from scripts.fake_bom.server import FakeBom
 
@@ -410,3 +410,49 @@ def test_the_fixture_dates_this_file_relies_on() -> None:
     """Guards the clock constants above: they assume the capture is the 16:15 issue of 2 Nov."""
     raw = (layout.FIRE_DANGER_FIXTURES / FIRE_FILE).read_bytes()
     assert b"2026-11-02T16:15:00+11:00" in raw
+
+
+@pytest.mark.parametrize("day_offset", [0, 1], ids=["today", "tomorrow"])
+@pytest.mark.parametrize(
+    ("level", "words"),
+    [
+        pytest.param("moderate", "Moderate Fire Danger", id="moderate"),
+        pytest.param("high", "High Fire Danger", id="high"),
+        pytest.param("extreme", "Extreme Fire Danger", id="extreme"),
+        pytest.param("catastrophic", "Catastrophic Fire Danger", id="catastrophic"),
+        pytest.param("no_rating", "Fire Danger", id="no-rating-names-no-level"),
+        pytest.param("Code Red", "Fire Danger", id="an-unseen-level-names-no-level"),
+        pytest.param(None, "Fire Danger", id="no-data"),
+    ],
+)
+def test_the_title_names_the_level_and_the_day(
+    level: str | None, words: str, day_offset: int
+) -> None:
+    day = ("Today", "Tomorrow")[day_offset]
+
+    assert danger_title(level, day_offset) == f"{words} {day}"
+
+
+@pytest.mark.parametrize("area_codes", [["NSW_FW004"]])
+@pytest.mark.parametrize(
+    ("now", "today", "tomorrow"),
+    [
+        (AFTER_THE_16_15_ISSUE, "Fire Danger Today", "Moderate Fire Danger Tomorrow"),
+        (AFTER_THE_05_05_ISSUE, "Moderate Fire Danger Today", "Moderate Fire Danger Tomorrow"),
+    ],
+    ids=["today-has-no-rating-yet", "both-days-moderate"],
+)
+async def test_each_sensor_sends_its_title(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+    now: str,
+    today: str,
+    tomorrow: str,
+) -> None:
+    freezer.move_to(now)
+    await setup_entry(hass, mock_config_entry)
+
+    assert state_of(hass, TODAY).attributes["title"] == today
+    assert state_of(hass, TOMORROW).attributes["title"] == tomorrow
