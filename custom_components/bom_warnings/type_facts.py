@@ -14,7 +14,7 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from .cap import Info
-from .warning_types import THUNDERSTORM_EVENT
+from .warning_types import THUNDERSTORM_EVENT, WEATHER_EVENT
 
 # Each warning is repeated on up to 15 entities, and the recorder drops a state whose attributes
 # pass 16,384 bytes, so the summary is one short paragraph and never the whole description.
@@ -25,7 +25,16 @@ DETAILED_SUMMARY_LIMIT = 500
 _PARAGRAPH_BREAK = re.compile(r"\n\s*\n")
 _VERY_DANGEROUS = re.compile(r"very dangerous thunderstorm", re.IGNORECASE)
 # In display order. A keyword match, so an automation can test "wind" in `hazards`.
-_HAZARD_WORDS = (("wind", "wind"), ("hail", "hail"), ("rain", "rain"), ("flood", "flood"))
+_HAZARD_WORDS = (
+    ("wind", "wind"),
+    ("hail", "hail"),
+    ("rain", "rain"),
+    ("flood", "flood"),
+    ("surf", "surf"),
+)
+# BoM opens a weather warning's paragraph with the hazard in capitals: "DAMAGING WEST TO
+# NORTHWESTERLY WIND GUSTS in excess of 90 km/h are expected ...".
+_OPENING_PHRASE = re.compile(r"[A-Z]{2,}(?:[ \t]+[A-Z]{2,})*\b")
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,8 +127,24 @@ def _thunderstorm(info: Info, names: Sequence[str]) -> Facts:
     )
 
 
+def _weather(info: Info, names: Sequence[str]) -> Facts:
+    """The generic summary, with the hazards the paragraph that names the entry's area is about.
+
+    Built from BoM's two catalogue samples (a Severe Weather and a Coastal Hazard warning), not from
+    live warnings, so the keyword list is short and a paragraph with no match has no attribute.
+    """
+    paragraph = _pick(_paragraphs(info.description), names)
+    attributes: dict[str, Any] = {}
+    if hazards := _hazards_in(paragraph):
+        attributes["hazards"] = list(hazards)
+    if opening := _OPENING_PHRASE.match(paragraph):
+        attributes["hazard"] = opening[0].capitalize()
+    return Facts(summary=summary_of(info.description, areas=names), attributes=attributes)
+
+
 _READERS: Mapping[str, Callable[[Info, Sequence[str]], Facts]] = {
     THUNDERSTORM_EVENT: _thunderstorm,
+    WEATHER_EVENT: _weather,
 }
 
 

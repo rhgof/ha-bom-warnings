@@ -5,11 +5,12 @@ the end-to-end cases over real captures are in `test_thunderstorm_attributes.py`
 """
 
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
-from custom_components.bom_warnings.cap import Info, Phase, Severity
-from custom_components.bom_warnings.type_facts import Facts, facts_for
+from custom_components.bom_warnings.cap import Info, Phase, Severity, parse_cap
+from custom_components.bom_warnings.type_facts import Facts, facts_for, summary_of
 
 NOW = datetime(2026, 11, 15, 4, 0, tzinfo=UTC)
 
@@ -57,3 +58,71 @@ def test_a_thunderstorm_says_its_hazards_tier_and_badges() -> None:
 
     assert facts.attributes == {"hazards": ["wind", "hail"], "very_dangerous": True}
     assert facts.badges == ("Very dangerous",)
+
+
+SAMPLES = Path(__file__).parent / "fixtures" / "cap_samples"
+
+
+def sample_info(name: str) -> Info:
+    """The one block of a file from BoM's sample catalogue, unmodified."""
+    cap = parse_cap((SAMPLES / f"{name}.cap.xml").read_bytes())
+    assert cap is not None
+    (block,) = cap.infos
+    return block
+
+
+@pytest.mark.parametrize(
+    ("sample", "hazards", "hazard"),
+    [
+        pytest.param(
+            "IDN21037",
+            ["wind"],
+            "Damaging west to northwesterly wind gusts",
+            id="severe-weather-wind",
+        ),
+        pytest.param(
+            "IDQ21137",
+            ["surf"],
+            "Large and powerful surf conditions",
+            id="coastal-hazard-surf",
+        ),
+    ],
+)
+def test_a_weather_warning_names_its_hazard_from_the_opening_phrase(
+    sample: str, hazards: list[str], hazard: str
+) -> None:
+    facts = facts_for(sample_info(sample), [])
+
+    assert facts.attributes == {"hazards": hazards, "hazard": hazard}
+    assert facts.badges == ()
+
+
+def test_a_weather_warning_keeps_the_generic_summary() -> None:
+    block = sample_info("IDN21037")
+
+    assert facts_for(block, []).summary == summary_of(block.description)
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        pytest.param("", id="none"),
+        pytest.param("Conditions are expected to ease on Monday.", id="no-leading-phrase-or-word"),
+    ],
+)
+@pytest.mark.parametrize("event", ["Weather", "Thunderstorm"])
+def test_no_hazard_text_means_no_hazard_attribute(event: str, description: str) -> None:
+    facts = facts_for(info(event, description), [])
+
+    assert not {"hazards", "hazard"} & facts.attributes.keys()
+
+
+def test_a_weather_warning_takes_its_hazards_from_the_paragraph_that_names_the_area() -> None:
+    description = (
+        "DAMAGING WINDS are expected in the Hunter.\n\n"
+        "HEAVY RAINFALL that may lead to flash flooding is expected in Illawarra."
+    )
+
+    facts = facts_for(info("Weather", description), ["Illawarra"])
+
+    assert facts.attributes == {"hazards": ["rain", "flood"], "hazard": "Heavy rainfall"}

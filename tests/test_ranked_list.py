@@ -152,8 +152,12 @@ async def test_list_items_carry_the_documented_fields(hass: HomeAssistant) -> No
         "rank",
         "ended",
         "badges",
+        "hazards",
+        "hazard",
     }
     assert item["event"] == "Weather"
+    assert item["hazards"] == ["wind"]
+    assert item["hazard"] == "Damaging west to northwesterly wind gusts"
     assert item["severity"] == "unknown"
     assert item["phase"] == "new"
     assert item["summary"].startswith("DAMAGING WEST TO NORTHWESTERLY WIND GUSTS in excess of")

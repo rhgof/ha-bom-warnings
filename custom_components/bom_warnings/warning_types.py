@@ -41,6 +41,8 @@ _HEADLINE = re.compile(r"^(?P<class>.+?)\s+wind\s+warning\b", re.IGNORECASE)
 # come from the headline.
 # CAP's event for a Severe Thunderstorm Warning, the one type whose broadcast text is read.
 THUNDERSTORM_EVENT = "Thunderstorm"
+# Both the Severe Weather Warning and the Coastal Hazard Warning.
+WEATHER_EVENT = "Weather"
 
 XML_WIND_STRENGTHS = {"STR": "strong", "GALE": "gale"}
 
@@ -179,7 +181,7 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         label="Tropical cyclone",
     ),
     SensorType(
-        "Weather",
+        WEATHER_EVENT,
         "mdi:cloud-alert",
         key="severe_weather_warning",
         label="Severe weather",

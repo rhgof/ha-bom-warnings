@@ -205,11 +205,17 @@ list items, and the per-type sensor repeats its top warning's at the top level:
 
 | Attribute | Meaning |
 | --- | --- |
-| `hazards` | A list from `wind`, `hail`, `rain`, `flood`, read from the paragraph that names your area, so `"wind" in hazards` works in a condition |
+| `hazards` | A list from `wind`, `hail`, `rain`, `flood`, `surf`, read from the paragraph that names your area, so `"wind" in hazards` works in a condition. Severe weather has it too (see below) |
 | `very_dangerous` | `true` when that paragraph is BoM's "VERY DANGEROUS THUNDERSTORMS" tier. A neighbouring district's tier is not yours |
 | `detailed` | `true` for a Detailed warning, which tracks one storm cell and is re-issued about every 30 minutes |
 | `hazard` | BoM's hazard line, such as "Damaging winds and large hailstones" (the whole product, not your paragraph) |
 | `next_issue` | When BoM says the next warning is due (a UTC timestamp), usually well before `expires` |
+
+A Severe weather warning (the Weather event, which also carries Coastal Hazard warnings) has only
+`hazards` and `hazard`, from the paragraph that names your area. `hazard` is the capitals BoM opens
+that paragraph with, in sentence case ("Damaging west to northwesterly wind gusts"), and neither
+attribute is there when nothing matches. This was written from BoM's two catalogue samples, a Severe
+Weather and a Coastal Hazard warning, and no live one yet (#77), so the keyword list is short.
 
 For a thunderstorm `summary` is the paragraph that names your area, not always the first, and a
 Detailed warning's is kept to 500 characters so the "forecast to affect" sentence is whole. Every
