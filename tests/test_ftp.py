@@ -184,7 +184,9 @@ def test_transient_failures_are_retried(
 
 
 @pytest.mark.parametrize("operation", OPERATIONS)
-@pytest.mark.parametrize("error", [ftplib.error_temp("421 gone"), ConnectionResetError("reset")])
+@pytest.mark.parametrize(
+    "error", [ftplib.error_temp("421 gone"), ConnectionResetError("reset"), EOFError()]
+)
 def test_gives_up_after_the_attempt_limit(
     scripted: type[ScriptedFTP], tmp_path: Any, operation: str, error: Exception
 ):

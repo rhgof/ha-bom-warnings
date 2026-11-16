@@ -12,12 +12,14 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
+from custom_components.bom_warnings import ftp as ftp_module
 from custom_components.bom_warnings.const import DOMAIN
 from custom_components.bom_warnings.diagnostics import async_get_config_entry_diagnostics
 from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom.server import FakeBom
 
 from .conftest import NOW
+from .drop_server import DroppingServer
 from .test_binary_sensor import ENTITY_ID, poll, setup_entry
 
 pytestmark = pytest.mark.freeze_time(NOW)
@@ -139,6 +141,36 @@ async def test_repair_issue_appears_when_bom_is_down_at_startup(
 
     [issue] = repair_issues(hass)
     assert issue.translation_key == "refresh_failing"
+
+
+async def test_a_dropped_connection_counts_towards_the_repair_issue(
+    hass: HomeAssistant,
+    socket_enabled: None,
+    monkeypatch: pytest.MonkeyPatch,
+    mock_config_entry: MockConfigEntry,
+    freezer: Any,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    monkeypatch.setattr(ftp_module, "RETRY_DELAY", 0)
+    with (
+        DroppingServer("command") as server,
+        patch.dict("os.environ", {"BOM_WARNINGS_FTP_HOST": server.address}),
+    ):
+        mock_config_entry.add_to_hass(hass)
+        await hass.config_entries.async_setup(mock_config_entry.entry_id)
+        await hass.async_block_till_done()
+        assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
+        assert repair_issues(hass) == []
+
+        for _ in range(2):
+            freezer.tick(timedelta(minutes=2))
+            async_fire_time_changed(hass, dt_util.utcnow())
+            await hass.async_block_till_done(wait_background_tasks=True)
+
+    [issue] = repair_issues(hass)
+    assert issue.translation_key == "refresh_failing"
+    # The coordinator logs this only for an exception that is not an UpdateFailed.
+    assert "Unexpected error" not in caplog.text
 
 
 async def test_removing_an_entry_that_never_set_up_clears_the_repair_issue(

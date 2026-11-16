@@ -136,7 +136,9 @@ class BomFtp:
         except ftplib.error_perm as err:
             ftp.close()
             raise BomFtpRejectedError(str(err)) from err
-        except (OSError, ftplib.Error) as err:
+        # `all_errors`, not `(OSError, ftplib.Error)`: a server that closes the connection raises
+        # EOFError, which is neither, and every handler below needs the same set.
+        except ftplib.all_errors as err:
             ftp.close()
             raise BomFtpError(str(err)) from err
         return ftp
@@ -211,7 +213,7 @@ class BomFtp:
                 # a server rejecting the wildcard form, which the caller handles by falling back.
                 if pattern != "*" or not str(err).startswith("550"):
                     raise BomFtpRejectedError(str(err)) from err
-            except (OSError, ftplib.Error) as err:
+            except ftplib.all_errors as err:
                 raise BomFtpError(str(err)) from err
         return [entry for line in lines if (entry := parse_listing_line(line))]
 
@@ -224,7 +226,7 @@ class BomFtp:
                 if str(err).startswith("550"):
                     return None
                 raise BomFtpRejectedError(str(err)) from err
-            except (OSError, ftplib.Error) as err:
+            except ftplib.all_errors as err:
                 raise BomFtpError(str(err)) from err
         return b"".join(chunks) or None
 
@@ -236,7 +238,7 @@ class BomFtp:
                 if str(err).startswith("550"):
                     return None
                 raise BomFtpRejectedError(str(err)) from err
-            except (OSError, ftplib.Error) as err:
+            except ftplib.all_errors as err:
                 raise BomFtpError(str(err)) from err
         # Reply is "213 YYYYMMDDHHMMSS[.sss]" in UTC.
         try:
@@ -252,5 +254,5 @@ class BomFtp:
                     ftp.retrbinary(f"RETR {remote_path}", handle.write)
             except ftplib.error_perm as err:
                 raise BomFtpRejectedError(str(err)) from err
-            except (OSError, ftplib.Error) as err:
+            except ftplib.all_errors as err:
                 raise BomFtpError(str(err)) from err
