@@ -241,22 +241,28 @@ def test_a_refresh_waits_while_a_resolve_is_reading_the_cache(
     ftp.files[remote(layer)] = zip_layer(tmp_path, layer, "NEW_CODE")
     ftp.mtimes[remote(layer)] = T1
     reading = threading.Event()
-    refreshed = threading.Event()
-    refreshed_while_reading: list[bool] = []
+    refresh_started = threading.Event()
+    refresh_started_while_reading: list[bool] = []
+    server_time = ftp.modified
+
+    def modified(name: str) -> datetime | None:
+        refresh_started.set()
+        return server_time(name)
 
     def slow_read(*_: object, **__: object) -> dict[str, str]:
         reading.set()
-        refreshed_while_reading.append(refreshed.wait(timeout=0.3))
+        # Only a lock makes this wait run out: it is the refresh's first step that would set it.
+        refresh_started_while_reading.append(refresh_started.wait(timeout=0.5))
         return {}
 
     def refresh() -> None:
         reading.wait(timeout=10)
         refresh_layers(ftp, cached)
-        refreshed.set()
 
+    monkeypatch.setattr(ftp, "modified", modified)
     monkeypatch.setattr(spatial, "resolve_areas", slow_read)
     with ThreadPoolExecutor(1) as pool:
-        refresh_done = pool.submit(refresh)
+        refreshing = pool.submit(refresh)
         resolve_coordinate(ftp, cached, lat=5, lon=5)
-        refresh_done.result(timeout=10)
-    assert refreshed_while_reading == [False]
+        refreshing.result(timeout=10)
+    assert refresh_started_while_reading == [False]
