@@ -48,6 +48,39 @@ so the first six series of every chart would take the severity colours. It is a 
 most, not something to ship by default. A graded type has different options (fire weather's grades),
 so its positions differ from the other types.
 
+### An optional theme, not shipped
+
+A theme can set `--graph-color-1` to `--graph-color-6`, which would give the standard types
+severity colours in their history bars. It is documented here and **not recommended or shipped**,
+because it is only right for some of our sensors and changes every chart in Home Assistant.
+
+```yaml
+# themes/bom-warnings.yaml, loaded with `frontend: themes: !include_dir_merge_named themes`
+bom-warnings:
+  graph-color-1: "#9E9E9E"   # none
+  graph-color-2: "#FDD835"   # minor
+  graph-color-3: "#FB8C00"   # moderate
+  graph-color-4: "#FF6F00"   # unrated
+  graph-color-5: "#D32F2F"   # severe
+  graph-color-6: "#7B1FA2"   # extreme
+```
+
+The colour is taken from the state's position in the sensor's `options`, so it lines up only where
+the options are the six words above in that order:
+
+| Sensor | Options (position) | With the theme |
+| --- | --- | --- |
+| Flood, heatwave, frost, marine wind and the other standard types | none, minor, moderate, unrated, severe, extreme | Right |
+| Fire weather warning | none, minor, high, unrated, extreme, catastrophic | Right (the grades keep the order) |
+| Thunderstorm, Severe weather | none, minor, moderate, severe (4), extreme (5) | One short: `severe` gets the "unrated" colour and `extreme` gets red |
+| Fire danger today / tomorrow | no_rating, moderate, high, extreme, catastrophic | Wrong: it needs BoM's fire legend |
+| Most severe | the six above, then `high` (7) and `catastrophic` (8) | Needs `graph-color-7` and `-8` as well |
+
+The variables are the graph palette for every chart, so the first six series of every line chart and
+every other enum sensor take these colours too, and one theme cannot give the fire danger sensors a
+different mapping. Reordering a sensor's `options` to chase the palette is not an answer: it changes
+the sensor's enum for no guaranteed result.
+
 The logbook is the same palette when it is used at all. By default an enum sensor's entry uses a
 category colour, so it does not follow severity either.
 
