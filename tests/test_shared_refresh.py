@@ -1,13 +1,16 @@
 """Several locations share one FTP refresh, driven through Home Assistant against the fake FTP."""
 
+from datetime import timedelta
 from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP, STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from homeassistant.util import dt as dt_util
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
+from custom_components.bom_warnings import shared_feed
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_AREA_NAMES,
@@ -16,6 +19,7 @@ from custom_components.bom_warnings.const import (
     CONF_STATE,
     DOMAIN,
 )
+from custom_components.bom_warnings.shared_feed import FEED
 from custom_components.bom_warnings.spatial import RefreshResult
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
@@ -23,7 +27,7 @@ from scripts.fake_bom.server import FakeBom
 from .conftest import NOW
 from .test_binary_sensor import ENTITY_ID as HOME
 from .test_binary_sensor import poll, setup_entry
-from .test_options import LAYER_CHECK_DUE, layers, short_layer_interval  # noqa: F401
+from .test_options import LAYER_CHECK_DUE, layers, set_options, short_layer_interval  # noqa: F401
 from .test_reliability import repair_issues
 
 WORK = "binary_sensor.work_warning"
@@ -301,3 +305,85 @@ async def test_reloading_an_entry_does_not_re_resolve_after_an_earlier_layer_cha
     await poll(hass, freezer)
 
     resolve.assert_not_called()
+
+
+async def pass_the_grace_period(hass: HomeAssistant, freezer: Any) -> None:
+    freezer.tick(shared_feed.FEED_GRACE + timedelta(seconds=1))
+    async_fire_time_changed(hass, dt_util.utcnow())
+    await hass.async_block_till_done()
+
+
+async def test_saving_options_keeps_the_feed_and_fetches_nothing_again(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+    feed = hass.data[FEED]
+    talked = len(fake_bom.commands)
+
+    # Saving reloads the entry, which leaves the feed with no entry for a moment.
+    await set_options(hass, mock_config_entry, thunderstorm_warning=False)
+    await pass_the_grace_period(hass, freezer)
+
+    assert hass.data[FEED] is feed
+    assert len(fake_bom.commands) == talked
+    assert state_of(hass, HOME) == STATE_OFF
+
+
+async def test_the_feed_is_shut_down_when_no_entry_returns_within_the_grace_period(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert FEED in hass.data
+
+    await pass_the_grace_period(hass, freezer)
+
+    assert FEED not in hass.data
+
+
+async def test_removing_the_last_entry_shuts_the_feed_down_at_once(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+    fake_bom.stop()
+    for _ in range(3):
+        await poll(hass, freezer)
+    assert len(repair_issues(hass)) == 1
+
+    await hass.config_entries.async_remove(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert FEED not in hass.data
+    assert repair_issues(hass) == []
+
+
+async def test_home_assistant_stop_cancels_a_pending_shutdown(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    layers: MagicMock,  # noqa: F811
+    freezer: Any,
+) -> None:
+    await setup_entry(hass, mock_config_entry)
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    hass.bus.async_fire(EVENT_HOMEASSISTANT_STOP)
+    await hass.async_block_till_done()
+    await pass_the_grace_period(hass, freezer)
+
+    # The timer was cancelled by the stop, so the grace period ending changed nothing.
+    assert FEED in hass.data

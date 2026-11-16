@@ -14,11 +14,11 @@ import pytest
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.bom_warnings.const import CONF_AREA_CODES, SPATIAL_CACHE_DIR
 from custom_components.bom_warnings.ftp import BomFtpError
-from custom_components.bom_warnings.shared_feed import FEED
+from custom_components.bom_warnings.shared_feed import FEED, FEED_GRACE
 from custom_components.bom_warnings.spatial import LAYERS, RefreshResult
 from scripts.fake_bom.server import FakeBom
 
@@ -184,6 +184,7 @@ async def test_unloading_the_last_entry_does_not_wait_for_a_running_check(
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
+    freezer: Any,
 ) -> None:
     release = threading.Event()
     layers.side_effect = lambda *_: release.wait(10) and RefreshResult()
@@ -192,6 +193,11 @@ async def test_unloading_the_last_entry_does_not_wait_for_a_running_check(
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
         assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+        await hass.async_block_till_done()
+        # The feed outlives the unload by the grace period, and its shutdown then cancels the
+        # running check instead of waiting for it.
+        freezer.tick(FEED_GRACE + timedelta(seconds=1))
+        async_fire_time_changed(hass, dt_util.utcnow())
         await hass.async_block_till_done()
         assert FEED not in hass.data
     finally:

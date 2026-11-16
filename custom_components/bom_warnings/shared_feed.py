@@ -12,9 +12,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.core import HomeAssistant
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP
+from homeassistant.core import CALLBACK_TYPE, Event, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
@@ -54,6 +56,9 @@ UPDATE_INTERVAL = timedelta(minutes=10)
 FAILURES_BEFORE_REPAIR = 3
 # One issue for the whole integration: the refresh is shared, so its failure is too.
 REFRESH_ISSUE_ID = "refresh_failing"
+# How long a feed with no entry is kept. Saving options reloads the only entry, and a feed that
+# survives the reload keeps everything it has already read instead of fetching it all again.
+FEED_GRACE = timedelta(minutes=1)
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +104,8 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
         # Entries using this feed, so the last one to leave can shut it down.
         self.entry_ids: set[str] = set()
         self.lock = asyncio.Lock()
+        # Set while the feed waits for an entry to come back after the last one left.
+        self.cancel_deferred_shutdown: CALLBACK_TYPE | None = None
 
     def _cache_dir(self) -> Path:
         return Path(self.hass.config.path(SPATIAL_CACHE_DIR))
@@ -200,6 +207,8 @@ async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
         # The only place the runtime's client is built, so the dev-only host override applies once.
         feed = hass.data[FEED] = SharedFeed(hass, client_from_env(os.environ))
         await feed.async_load_layer_record()
+    if feed.cancel_deferred_shutdown:
+        feed.cancel_deferred_shutdown()
     feed.entry_ids.add(entry.entry_id)
     async with feed.lock:
         if feed.data is None or not feed.last_update_success:
@@ -223,14 +232,39 @@ async def async_abandon_setup(hass: HomeAssistant, entry: BomWarningsConfigEntry
 
 
 async def async_release_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
-    """Leave the shared feed; the last entry out shuts it down and clears its repair issue."""
+    """Leave the shared feed; once the last entry is out, it is shut down after a grace period."""
     feed = hass.data.get(FEED)
     if feed is None:
         return
     feed.entry_ids.discard(entry.entry_id)
     if feed.entry_ids:
         return
-    await _async_shutdown_feed(hass, feed)
+    _defer_shutdown(hass, feed)
+
+
+def _defer_shutdown(hass: HomeAssistant, feed: SharedFeed) -> None:
+    """Shut the feed down after the grace period unless an entry joins it first."""
+
+    async def shut_down(_now: object) -> None:
+        feed.cancel_deferred_shutdown = None
+        cancel_stop()
+        if not feed.entry_ids and hass.data.get(FEED) is feed:
+            await _async_shutdown_feed(hass, feed)
+
+    @callback
+    def stopping(_event: Event) -> None:
+        # Nothing is left to tidy when Home Assistant itself stops, and a timer must not outlive it.
+        cancel_timer()
+        feed.cancel_deferred_shutdown = None
+
+    def cancel() -> None:
+        cancel_timer()
+        cancel_stop()
+        feed.cancel_deferred_shutdown = None
+
+    cancel_timer = async_call_later(hass, FEED_GRACE, shut_down)
+    cancel_stop = hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, stopping)
+    feed.cancel_deferred_shutdown = cancel
 
 
 async def async_release_removed_entry(hass: HomeAssistant, entry: BomWarningsConfigEntry) -> None:
@@ -249,6 +283,8 @@ async def async_release_removed_entry(hass: HomeAssistant, entry: BomWarningsCon
 
 
 async def _async_shutdown_feed(hass: HomeAssistant, feed: SharedFeed) -> None:
+    if feed.cancel_deferred_shutdown:
+        feed.cancel_deferred_shutdown()
     del hass.data[FEED]
     await feed.async_shutdown()
     ir.async_delete_issue(hass, DOMAIN, REFRESH_ISSUE_ID)
