@@ -17,6 +17,7 @@ from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.bom_warnings.const import (
+    CONF_AREA_CODES,
     DEFAULT_FIRE_DANGER_ICON,
     FIRE_DANGER_COLORS,
     FIRE_DANGER_ICONS,
@@ -203,6 +204,27 @@ async def test_an_entry_without_a_fire_weather_code_never_asks_for_the_product(
     await setup_entry(hass, mock_config_entry)
 
     assert [arg for _, arg in fake_bom.commands if FIRE_FILE in arg] == []
+
+
+@pytest.mark.parametrize("area_codes", [["QLD_PW001"]])
+async def test_a_reload_onto_a_fire_district_fetches_its_product_at_once(
+    hass: HomeAssistant, fake_bom: FakeBom, mock_config_entry: MockConfigEntry, freeze: Any
+) -> None:
+    def fetched() -> int:
+        return sum(1 for c, arg in fake_bom.commands if c == "RETR" and arg == FIRE_FILE)
+
+    await setup_entry(hass, mock_config_entry)
+    assert fetched() == 0
+
+    # Moving the location reloads the entry while the feed is kept for the reload.
+    assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+    hass.config_entries.async_update_entry(
+        mock_config_entry, data={**mock_config_entry.data, CONF_AREA_CODES: ["NSW_FW004"]}
+    )
+    assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert fetched() == 1
 
 
 @pytest.mark.parametrize("area_codes", [["NSW_FW004"]])

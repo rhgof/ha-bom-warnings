@@ -128,6 +128,12 @@ class SharedFeed(DataUpdateCoordinator[FeedSnapshot]):
                 warnings = sibling.enrich(warnings, dt_util.utcnow())
             return warnings, self._fire_reader.refresh(fire_products)
 
+    def lacks_wanted_products(self) -> bool:
+        """Whether some entry now wants a fire product that the last refresh did not read."""
+        return self.data is not None and bool(
+            self._wanted_fire_products() - self.data.fire_danger.keys()
+        )
+
     def _wanted_fire_products(self) -> set[str]:
         return fire_product_ids(
             code
@@ -207,11 +213,18 @@ async def async_acquire_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
         # The only place the runtime's client is built, so the dev-only host override applies once.
         feed = hass.data[FEED] = SharedFeed(hass, client_from_env(os.environ))
         await feed.async_load_layer_record()
+    # A feed kept across a reload has not read what a moved location needs, such as its fire
+    # product, so that is fetched now as a new feed would have.
+    rejoined = feed.cancel_deferred_shutdown is not None
     if feed.cancel_deferred_shutdown:
         feed.cancel_deferred_shutdown()
     feed.entry_ids.add(entry.entry_id)
     async with feed.lock:
-        if feed.data is None or not feed.last_update_success:
+        if (
+            feed.data is None
+            or not feed.last_update_success
+            or (rejoined and feed.lacks_wanted_products())
+        ):
             await feed.async_refresh()
     if not feed.last_update_success:
         # The feed stays, so its failure count survives Home Assistant's setup retries and the
@@ -244,6 +257,8 @@ async def async_release_feed(hass: HomeAssistant, entry: BomWarningsConfigEntry)
 
 def _defer_shutdown(hass: HomeAssistant, feed: SharedFeed) -> None:
     """Shut the feed down after the grace period unless an entry joins it first."""
+    if feed.cancel_deferred_shutdown:
+        feed.cancel_deferred_shutdown()
 
     async def shut_down(_now: object) -> None:
         feed.cancel_deferred_shutdown = None

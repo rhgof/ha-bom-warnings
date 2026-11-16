@@ -154,7 +154,8 @@ Home Assistant layer:
 - **Shared feed lifecycle.** Created by the first entry, kept in `hass.data[FEED]`, polls only
   while an entry listens. When the last entry unloads the feed waits `FEED_GRACE` (a minute) before
   shutting down, so an options save, which reloads the entry, keeps everything it has read
-  instead of fetching it all again; removing the last entry shuts it down at once. A failed setup
+  instead of fetching it all again, unless the entry now wants a fire product it has not read (a
+  moved location), which is fetched at once; removing the last entry shuts it down at once. A failed setup
   keeps the feed so its failure count survives Home Assistant's setup retries.
 - **Matching is per `<info>` block, not per file.** One CAP file can mix areas and blocks; a
   file-level match could report an inactive block.
