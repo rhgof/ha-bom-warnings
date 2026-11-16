@@ -5,6 +5,8 @@ repo. Everything else is real, against the fake BoM server.
 """
 
 import threading
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
@@ -62,16 +64,31 @@ async def test_first_check_runs_after_the_first_refresh_on_the_feeds_client(
     assert hass.states.get(ENTITY_ID).state == STATE_OFF  # type: ignore[union-attr]
 
 
+@contextmanager
+def blocked_layer_check(refresh: MagicMock) -> Iterator[None]:
+    """Hold the layer check, which runs on an executor thread, until the block ends."""
+    release = threading.Event()
+
+    def held(*_: object) -> RefreshResult:
+        # Only a cap, so a hung test cannot strand the thread; the block's end releases it.
+        release.wait(10)
+        return RefreshResult()
+
+    refresh.side_effect = held
+    try:
+        yield
+    finally:
+        release.set()
+
+
 async def test_the_warnings_refresh_does_not_wait_for_the_layer_check_nor_repeat_it(
     hass: HomeAssistant,
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
 ) -> None:
-    release = threading.Event()
-    layers.side_effect = lambda *_: release.wait(10) and RefreshResult()
     mock_config_entry.add_to_hass(hass)
-    try:
+    with blocked_layer_check(layers):
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
         # Set up and showing data while the check is still blocked.
@@ -80,8 +97,6 @@ async def test_the_warnings_refresh_does_not_wait_for_the_layer_check_nor_repeat
         feed = hass.data[FEED]
         await feed.async_refresh()
         await feed.async_refresh()
-    finally:
-        release.set()
     await hass.async_block_till_done(wait_background_tasks=True)
     assert layers.call_count == 1
 
@@ -186,10 +201,8 @@ async def test_unloading_the_last_entry_does_not_wait_for_a_running_check(
     layers: MagicMock,  # noqa: F811
     freezer: Any,
 ) -> None:
-    release = threading.Event()
-    layers.side_effect = lambda *_: release.wait(10) and RefreshResult()
     mock_config_entry.add_to_hass(hass)
-    try:
+    with blocked_layer_check(layers):
         assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
         await hass.async_block_till_done()
         assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
@@ -200,5 +213,3 @@ async def test_unloading_the_last_entry_does_not_wait_for_a_running_check(
         async_fire_time_changed(hass, dt_util.utcnow())
         await hass.async_block_till_done()
         assert FEED not in hass.data
-    finally:
-        release.set()

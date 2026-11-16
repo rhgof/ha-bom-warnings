@@ -15,7 +15,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_AREA_NAMES,
@@ -27,7 +26,7 @@ from custom_components.bom_warnings.const import (
     DOMAIN,
     OTHER_WARNINGS,
 )
-from custom_components.bom_warnings.warning_types import WARNING_TYPES, label_of, sensor_types
+from custom_components.bom_warnings.warning_types import label_of, sensor_types
 from scripts.fake_bom import scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -202,11 +201,9 @@ async def test_other_warnings_covers_a_type_with_no_row(
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     layers: MagicMock,  # noqa: F811
-    monkeypatch: pytest.MonkeyPatch,
+    without_surf: None,
 ) -> None:
     """Surf stands in for a type BoM adds later: it has no row, so the Other toggle governs it."""
-    without_surf = tuple(t for t in WARNING_TYPES if t.event != "Large Coastal Surf")
-    monkeypatch.setattr(warning_types, "WARNING_TYPES", without_surf)
     scenarios.apply("all_types", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
     assert "Large Coastal Surf" in events_listed(hass)

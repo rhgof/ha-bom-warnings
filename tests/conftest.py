@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_AREA_NAMES,
@@ -133,3 +134,10 @@ def resolve(
         "custom_components.bom_warnings.location.resolve_location", return_value=found
     ) as mock:
         yield mock
+
+
+@pytest.fixture
+def without_surf(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Large Coastal Surf has no row in the table, as if BoM had added a type after this shipped."""
+    table = tuple(t for t in warning_types.WARNING_TYPES if t.event != "Large Coastal Surf")
+    monkeypatch.setattr(warning_types, "WARNING_TYPES", table)

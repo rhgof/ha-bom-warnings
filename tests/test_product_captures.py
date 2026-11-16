@@ -28,6 +28,11 @@ def products() -> list[tuple[Path, str]]:
     ]
 
 
+def products_with(suffix: str) -> list[tuple[Path, str]]:
+    """The products that have a sibling file with this suffix."""
+    return [(s, p) for s, p in products() if (s / f"{p}{suffix}").exists()]
+
+
 def saved_files(snapshot: Path) -> list[dict[str, Any]]:
     return [f for f in manifest(snapshot)["files"] if f["status"] == "saved"]
 
@@ -54,24 +59,31 @@ def test_the_cap_file_parses_to_its_own_product(snapshot: Path, product: str) ->
     assert warning.infos
 
 
-@pytest.mark.parametrize(("snapshot", "product"), products(), ids=lambda v: getattr(v, "name", v))
-def test_the_product_xml_is_well_formed_where_it_exists(snapshot: Path, product: str) -> None:
-    path = snapshot / f"{product}.xml"
-    if not path.exists():
-        pytest.skip("BoM publishes no product XML for this product (heatwave)")
-
-    root = parse_xml(path.read_bytes())
+@pytest.mark.parametrize(
+    ("snapshot", "product"), products_with(".xml"), ids=lambda v: getattr(v, "name", v)
+)
+def test_the_product_xml_is_well_formed(snapshot: Path, product: str) -> None:
+    root = parse_xml((snapshot / f"{product}.xml").read_bytes())
 
     assert root is not None
     assert root.tag == PRODUCT_XML_ROOT
 
 
-@pytest.mark.parametrize(("snapshot", "product"), products(), ids=lambda v: getattr(v, "name", v))
-def test_the_text_file_starts_with_the_product_id_where_it_exists(
-    snapshot: Path, product: str
-) -> None:
-    path = snapshot / f"{product}.txt"
-    if not path.exists():
-        pytest.skip("BoM publishes no text file for this product (heatwave)")
+@pytest.mark.parametrize(
+    ("snapshot", "product"), products_with(".txt"), ids=lambda v: getattr(v, "name", v)
+)
+def test_the_text_file_starts_with_the_product_id(snapshot: Path, product: str) -> None:
+    assert (snapshot / f"{product}.txt").read_text().splitlines()[0] == product
 
-    assert path.read_text().splitlines()[0] == product
+
+@pytest.mark.parametrize("suffix", [".xml", ".txt"])
+def test_only_heatwave_products_lack_a_sibling_file(suffix: str) -> None:
+    # The filter above leaves these out, so this is what keeps "BoM publishes none for a heatwave
+    # warning" (whose CAP event is Extreme Heat) a checked fact and not a silent hole.
+    lacking = [(s, p) for s, p in products() if (s, p) not in products_with(suffix)]
+    events = {
+        info.event.lower()
+        for snapshot, product in lacking
+        for info in parse_cap((snapshot / f"{product}.cap.xml").read_bytes()).infos  # type: ignore[union-attr]
+    }
+    assert events <= {"extreme heat"}

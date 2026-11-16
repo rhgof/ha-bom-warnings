@@ -53,6 +53,9 @@ def test_connection_errors_surface_as_one_type():
     [
         ("-rw-r--r--  1 ftp ftp  2229 Nov  2 10:14 IDQ21013.cap.xml", ("IDQ21013.cap.xml", 2229)),
         ("-rw-r--r--  1 ftp ftp     0 Nov  2 10:14 IDQ20000.cap.xml", ("IDQ20000.cap.xml", 0)),
+        # `ls -l` shows the year in place of the time for a file older than about six months. Not
+        # captured from BoM: its warnings directory only holds current files.
+        ("-rw-r--r--  1 ftp ftp  2229 Nov  2  2025 IDQ21013.cap.xml", ("IDQ21013.cap.xml", 2229)),
     ],
 )
 def test_parse_listing_line(line: str, expected: tuple[str, int]):

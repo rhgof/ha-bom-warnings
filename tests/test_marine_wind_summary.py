@@ -7,7 +7,7 @@ The reader's own rules are in `test_product_xml.py`; this checks the whole path 
 import pytest
 from homeassistant.core import HomeAssistant
 
-from custom_components.bom_warnings.ftp import BomFtp, BomFtpError
+from custom_components.bom_warnings import ftp as ftp_module
 from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom import layout
 from scripts.fake_bom.server import FakeBom
@@ -71,15 +71,9 @@ async def test_without_the_xml_the_warning_is_still_there_with_no_summary(
 async def test_a_failing_xml_fetch_leaves_the_summary_out_and_the_refresh_healthy(
     hass: HomeAssistant, fake_bom: FakeBom, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    monkeypatch.setattr(ftp_module, "RETRY_DELAY", 0)
     layout.put_captured_product(fake_bom.root, "IDN20400")
-    fetch = BomFtp.fetch
-
-    def failing_fetch(self: BomFtp, name: str) -> bytes | None:
-        if name == "IDN20400.xml":
-            raise BomFtpError("transfer stalled")
-        return fetch(self, name)
-
-    monkeypatch.setattr(BomFtp, "fetch", failing_fetch)
+    fake_bom.fail_retrieving("IDN20400.xml")
 
     await setup_entry(hass, entry_at("NSW_MW004"))
 

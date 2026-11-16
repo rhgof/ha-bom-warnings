@@ -20,6 +20,14 @@ class BomHandler(FTPHandler):
 
     # Every command received, for tests that count how often the integration talks to the server.
     commands: list[tuple[str, str]]
+    # File names whose download is refused with a transient error, as a stalled transfer is.
+    failing_retrievals: set[str]
+
+    def ftp_RETR(self, file: str) -> str | None:
+        if os.path.basename(file) in self.failing_retrievals:
+            self.respond("426 Transfer aborted.")
+            return None
+        return super().ftp_RETR(file)
 
     def pre_process_command(self, line: str, cmd: str, arg: str | None) -> None:
         self.commands.append((cmd, arg or ""))
@@ -48,12 +56,23 @@ class FakeBom:
         authorizer = DummyAuthorizer()
         authorizer.add_anonymous(str(root), perm="elr")
         self.commands: list[tuple[str, str]] = []
+        self.failing_retrievals: set[str] = set()
         handler = type(
-            "Handler", (BomHandler,), {"authorizer": authorizer, "commands": self.commands}
+            "Handler",
+            (BomHandler,),
+            {
+                "authorizer": authorizer,
+                "commands": self.commands,
+                "failing_retrievals": self.failing_retrievals,
+            },
         )
         self._server = FTPServer(("127.0.0.1", port), handler)
         self._stopping = threading.Event()
         self._thread = threading.Thread(target=self._run, daemon=True)
+
+    def fail_retrieving(self, name: str) -> None:
+        """Refuse every download of this file name from now on."""
+        self.failing_retrievals.add(name)
 
     @property
     def address(self) -> str:

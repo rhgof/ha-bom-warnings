@@ -2,7 +2,6 @@
 
 import pytest
 
-from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.const import (
     CONF_EVENT_TYPES,
     CONF_INCLUDE_MARINE,
@@ -104,11 +103,9 @@ def test_an_event_is_on_when_its_toggle_is(event: str, enabled: frozenset[str], 
 
 
 def test_patching_the_one_table_changes_every_derived_view(
-    monkeypatch: pytest.MonkeyPatch,
+    without_surf: None,
 ) -> None:
     # This is how a test makes a type disappear, as if BoM had added it after this code shipped.
-    without_surf = tuple(t for t in WARNING_TYPES if t.event != "Large Coastal Surf")
-    monkeypatch.setattr(warning_types, "WARNING_TYPES", without_surf)
 
     assert len(sensor_types()) == 11
     assert "hazardous_surf_warning" not in type_keys()

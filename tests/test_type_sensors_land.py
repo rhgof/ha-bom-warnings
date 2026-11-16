@@ -11,7 +11,6 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings import warning_types
 from custom_components.bom_warnings.active_warnings import level_options
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, sensor_types
 from scripts.fake_bom import scenarios
@@ -175,11 +174,9 @@ async def test_an_event_without_a_row_has_no_sensor_but_is_still_listed(
     fake_bom: FakeBom,
     mock_config_entry: MockConfigEntry,
     freezer: Any,
-    monkeypatch: pytest.MonkeyPatch,
+    without_surf: None,
 ) -> None:
     """A type with no row (surf here, as if it were new) is in the list, count and event entity."""
-    without_surf = tuple(t for t in WARNING_TYPES if t.event != "Large Coastal Surf")
-    monkeypatch.setattr(warning_types, "WARNING_TYPES", without_surf)
     scenarios.apply("baseline", fake_bom.root)
     await setup_entry(hass, mock_config_entry)
 

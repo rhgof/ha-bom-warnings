@@ -206,7 +206,11 @@ def test_real_shapefiles_through_cache(
 
 
 class SlowFtp(FakeFtp):
-    """Downloads take long enough for a second thread to arrive at the same layer."""
+    """Downloads take long enough for a second thread to arrive at the same layer.
+
+    A sleep is inherent here: the test asserts two threads are kept apart, and the overlap it would
+    otherwise catch needs a window to happen in. Without the lock the window is always open.
+    """
 
     def download(self, remote_path: str, local_path: str) -> None:
         time.sleep(0.05)
@@ -252,6 +256,8 @@ def test_a_refresh_waits_while_a_resolve_is_reading_the_cache(
     def slow_read(*_: object, **__: object) -> dict[str, str]:
         reading.set()
         # Only a lock makes this wait run out: it is the refresh's first step that would set it.
+        # The wait must expire to show the refresh stayed out; under heavy load that could pass
+        # without a lock, but it can never fail with one.
         refresh_started_while_reading.append(refresh_started.wait(timeout=0.5))
         return {}
 

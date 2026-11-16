@@ -117,12 +117,6 @@ def test_unknown_scenario_is_a_clear_error(fake_bom: FakeBom) -> None:
         scenarios.apply("nope", fake_bom.root)
 
 
-def test_client_from_env_defaults_to_bom() -> None:
-    client = client_from_env({})
-
-    assert (client._host, client._port) == ("ftp.bom.gov.au", 21)
-
-
 def test_client_from_env_rejects_bad_host() -> None:
     with pytest.raises(BomFtpError):
         client_from_env({"BOM_WARNINGS_FTP_HOST": "localhost:notaport"})

@@ -289,6 +289,21 @@ Home Assistant layer:
     builds the `ResolvedLocation` a test wants. Zone edits,
     deletion and the marine toggles are tested through Home Assistant in `tests/test_zones.py`, and the
     checklist and its migration in `tests/test_type_checklist.py`.
+- Tests go through Home Assistant and the fake FTP server where they can. A few patch an internal
+  on purpose, and each has a reason:
+  - `resolve` patches `location.resolve_location`: the shapefiles are not in the repo (see above).
+  - The `layers` fixture in `tests/test_options.py` patches `shared_feed.refresh_layers` and
+    `LAYER_CHECK_INTERVAL`: it says "a layer changed" without shipping shapefiles, and keeps the
+    recorded warnings, which expire at 09:03, inside the shortened check interval.
+  - `tests/test_reliability.py` patches the coordinator's first refresh to raise: it stands in for
+    an unexpected bug in setup, which no input through Home Assistant produces.
+  - `tests/test_ftp.py` replaces the client module's own `ftplib` name, never the standard
+    library's. `tests/test_ftp_connection_drop.py` uses a real socket for what a scripted `ftplib`
+    cannot show, and `FakeBom.fail_retrieving` fails a transfer for the Home Assistant tests.
+  - The #94 cache-lock tests widen the window with a short sleep and wait out a short timeout.
+    That is inherent: they assert that two threads are kept apart, and proving something did not
+    happen needs a window to look in. They can pass under heavy load without the lock, never fail
+    with it.
 - Module boundaries are declared in `docs/architecture.json` and checked by
   `tests/test_architecture.py`, so they hold on every test run. The model has domains that own
   file-name patterns, four layers (`platforms`, `runtime`, `readers`, `foundation`, a module may
