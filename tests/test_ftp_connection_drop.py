@@ -1,5 +1,6 @@
 """A server closing the control connection, against the real client over a real socket."""
 
+import threading
 from collections.abc import Callable
 from pathlib import Path
 
@@ -58,3 +59,12 @@ def test_a_dropped_connection_is_a_connection_failure_and_is_retried(
     assert str(raised.value)
     # A session opens its connection once; every other call reconnects for each attempt.
     assert server.accepted == (1 if operation == "session" else ATTEMPTS)
+
+
+def test_the_drop_server_leaves_no_thread_behind(socket_enabled: None) -> None:
+    before = {thread.ident for thread in threading.enumerate()}
+
+    with DroppingServer("connect"):
+        pass
+
+    assert {thread.ident for thread in threading.enumerate()} <= before

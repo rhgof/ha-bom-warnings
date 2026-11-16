@@ -30,6 +30,10 @@ class DroppingServer:
         self._listener = socket.socket()
         self._listener.bind(("127.0.0.1", 0))
         self._listener.listen(8)
+        # Closing a listening socket does not wake a blocked accept on Linux, so the loop polls a
+        # stop flag instead, and the thread is gone when the block ends on every platform.
+        self._listener.settimeout(0.05)
+        self._stopping = threading.Event()
         self.accepted = 0
         self._thread = threading.Thread(target=self._serve, daemon=True)
 
@@ -48,13 +52,16 @@ class DroppingServer:
         exc: BaseException | None,
         tb: TracebackType | None,
     ) -> None:
-        self._listener.close()
+        self._stopping.set()
         self._thread.join(timeout=5)
+        self._listener.close()
 
     def _serve(self) -> None:
-        while True:
+        while not self._stopping.is_set():
             try:
                 connection, _ = self._listener.accept()
+            except TimeoutError:
+                continue
             except OSError:
                 return
             self.accepted += 1
