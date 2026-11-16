@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import shutil
 import tempfile
+import threading
 import zipfile
 import zlib
 from dataclasses import dataclass, field
@@ -22,6 +23,11 @@ SPATIAL_DIR = "/anon/home/adfd/spatial/"
 # and coastal waters (a land point is never inside one, so only a radius reaches them).
 LAYERS = ("IDM00001", "IDM00014", "IDM00017", "IDM00020", "IDM00007", "IDM00003")
 _MTIME_FILE = ".server_mtime"
+# The resolver, the weekly layer check and the config flow all run in executor threads over the one
+# cache. A layer is swapped in by two renames, so without this two threads install the same layer
+# and one fails, or a reader finds it half swapped. `_ensure_layer` and `_install_layer` rely on
+# the caller holding it. One lock is enough because there is one cache per process.
+_CACHE_LOCK = threading.Lock()
 _REQUIRED_SUFFIXES = (".shp", ".shx", ".dbf")
 
 
@@ -116,13 +122,16 @@ def refresh_layers(ftp: BomFtpClient, cache_dir: Path) -> RefreshResult:
     result = RefreshResult()
     for layer in LAYERS:
         try:
-            remote = ftp.modified(_remote(layer))
-            if remote is None:
-                raise SpatialDataError(f"{layer}: not found on server")
-            usable = (cache_dir / layer / f"{layer}.shp").exists()
-            if usable and _cached_mtime(cache_dir, layer) == remote:
-                continue
-            _install_layer(ftp, cache_dir, layer, remote)
+            # Per layer, so a resolve waits for at most one. The comparison is made under the lock
+            # so a layer the resolver just installed, which stores the server time, is skipped.
+            with _CACHE_LOCK:
+                remote = ftp.modified(_remote(layer))
+                if remote is None:
+                    raise SpatialDataError(f"{layer}: not found on server")
+                usable = (cache_dir / layer / f"{layer}.shp").exists()
+                if usable and _cached_mtime(cache_dir, layer) == remote:
+                    continue
+                _install_layer(ftp, cache_dir, layer, remote)
         except (BomFtpError, SpatialDataError, OSError) as err:
             result.failed[layer] = str(err)
         else:
@@ -137,5 +146,7 @@ def resolve_coordinate(
     empty string), downloading any layer not cached."""
     cache_dir = Path(cache_dir)
     cache_dir.mkdir(parents=True, exist_ok=True)
-    layers = [_ensure_layer(ftp, cache_dir, layer) for layer in LAYERS]
-    return resolve_areas(layers, lat=lat, lon=lon, radius_m=radius_m)
+    # Held through the read too, so a layer is never swapped while its files are open.
+    with _CACHE_LOCK:
+        layers = [_ensure_layer(ftp, cache_dir, layer) for layer in LAYERS]
+        return resolve_areas(layers, lat=lat, lon=lon, radius_m=radius_m)

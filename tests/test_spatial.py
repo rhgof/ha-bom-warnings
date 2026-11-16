@@ -2,12 +2,16 @@
 
 import io
 import os
+import threading
+import time
 import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
+from custom_components.bom_warnings import spatial
 from custom_components.bom_warnings.areas import resolve_area_codes
 from custom_components.bom_warnings.ftp import BomFtpError
 from custom_components.bom_warnings.spatial import (
@@ -199,3 +203,60 @@ def test_real_shapefiles_through_cache(
     assert set(codes) == resolve_area_codes(
         [base / layer / f"{layer}.shp" for layer in LAYERS], lat=lat, lon=lon
     )
+
+
+class SlowFtp(FakeFtp):
+    """Downloads take long enough for a second thread to arrive at the same layer."""
+
+    def download(self, remote_path: str, local_path: str) -> None:
+        time.sleep(0.05)
+        super().download(remote_path, local_path)
+
+
+def test_a_resolve_and_a_refresh_on_an_empty_cache_install_each_layer_once(tmp_path: Path) -> None:
+    ftp = SlowFtp({remote(layer): zip_layer(tmp_path, layer, f"T_{layer}") for layer in LAYERS})
+    ftp.mtimes = {remote(layer): T0 for layer in LAYERS}
+    cache = tmp_path / "cache"
+    start = threading.Barrier(2)
+
+    def resolve() -> dict[str, str]:
+        start.wait()
+        return resolve_coordinate(ftp, cache, lat=5, lon=5)
+
+    def refresh() -> spatial.RefreshResult:
+        start.wait()
+        return refresh_layers(ftp, cache)
+
+    with ThreadPoolExecutor(2) as pool:
+        resolved, refreshed = pool.submit(resolve), pool.submit(refresh)
+        assert resolved.result(timeout=10)
+        assert refreshed.result(timeout=10).failed == {}
+    assert len(ftp.downloads) == len(LAYERS)
+
+
+def test_a_refresh_waits_while_a_resolve_is_reading_the_cache(
+    ftp: FakeFtp, cached: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    layer = LAYERS[1]
+    ftp.files[remote(layer)] = zip_layer(tmp_path, layer, "NEW_CODE")
+    ftp.mtimes[remote(layer)] = T1
+    reading = threading.Event()
+    refreshed = threading.Event()
+    refreshed_while_reading: list[bool] = []
+
+    def slow_read(*_: object, **__: object) -> dict[str, str]:
+        reading.set()
+        refreshed_while_reading.append(refreshed.wait(timeout=0.3))
+        return {}
+
+    def refresh() -> None:
+        reading.wait(timeout=10)
+        refresh_layers(ftp, cached)
+        refreshed.set()
+
+    monkeypatch.setattr(spatial, "resolve_areas", slow_read)
+    with ThreadPoolExecutor(1) as pool:
+        refresh_done = pool.submit(refresh)
+        resolve_coordinate(ftp, cached, lat=5, lon=5)
+        refresh_done.result(timeout=10)
+    assert refreshed_while_reading == [False]
