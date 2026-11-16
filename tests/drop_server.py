@@ -6,6 +6,7 @@ close, which is not an `OSError` or an `ftplib.Error`.
 
 from __future__ import annotations
 
+import contextlib
 import socket
 import threading
 from types import TracebackType
@@ -66,17 +67,21 @@ class DroppingServer:
                 stream.write(b"220 ready\r\n")
                 stream.flush()
                 for line in stream:
-                    command = line.split()[0].upper()
+                    if not (words := line.split()):
+                        continue
+                    command = words[0].upper()
                     if self._at == "cwd":
                         drops = command == b"CWD"
                     else:
                         drops = command not in _SETUP_REPLIES
                     if drops:
                         break
-                    stream.write(_SETUP_REPLIES[command] + b"\r\n")
+                    stream.write(_SETUP_REPLIES.get(command, b"200 ok") + b"\r\n")
                     stream.flush()
         finally:
             # An orderly close, so the client reads end-of-file, not a timeout.
-            stream.close()
-            connection.shutdown(socket.SHUT_RDWR)
+            # The client may have closed first, which must not end the server thread.
+            with contextlib.suppress(OSError):
+                stream.close()
+                connection.shutdown(socket.SHUT_RDWR)
             connection.close()

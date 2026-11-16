@@ -55,6 +55,11 @@ class BomFtpClient(Protocol):
         ...
 
 
+def _describe(err: Exception) -> str:
+    """The error's text; a dropped connection raises a bare EOFError, which has none."""
+    return str(err) or type(err).__name__
+
+
 def parse_listing_line(line: str) -> FileEntry | None:
     """Parse one Unix-style LIST line; return None for anything that is not a plain file."""
     parts = line.split(None, 8)
@@ -140,7 +145,7 @@ class BomFtp:
         # EOFError, which is neither, and every handler below needs the same set.
         except ftplib.all_errors as err:
             ftp.close()
-            raise BomFtpError(str(err)) from err
+            raise BomFtpError(_describe(err)) from err
         return ftp
 
     @contextmanager
@@ -214,7 +219,7 @@ class BomFtp:
                 if pattern != "*" or not str(err).startswith("550"):
                     raise BomFtpRejectedError(str(err)) from err
             except ftplib.all_errors as err:
-                raise BomFtpError(str(err)) from err
+                raise BomFtpError(_describe(err)) from err
         return [entry for line in lines if (entry := parse_listing_line(line))]
 
     def _fetch(self, name: str) -> bytes | None:
@@ -227,7 +232,7 @@ class BomFtp:
                     return None
                 raise BomFtpRejectedError(str(err)) from err
             except ftplib.all_errors as err:
-                raise BomFtpError(str(err)) from err
+                raise BomFtpError(_describe(err)) from err
         return b"".join(chunks) or None
 
     def _modified(self, name: str) -> datetime | None:
@@ -239,7 +244,7 @@ class BomFtp:
                     return None
                 raise BomFtpRejectedError(str(err)) from err
             except ftplib.all_errors as err:
-                raise BomFtpError(str(err)) from err
+                raise BomFtpError(_describe(err)) from err
         # Reply is "213 YYYYMMDDHHMMSS[.sss]" in UTC.
         try:
             stamp = reply.split()[1].split(".")[0]
@@ -255,4 +260,4 @@ class BomFtp:
             except ftplib.error_perm as err:
                 raise BomFtpRejectedError(str(err)) from err
             except ftplib.all_errors as err:
-                raise BomFtpError(str(err)) from err
+                raise BomFtpError(_describe(err)) from err
