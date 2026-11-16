@@ -271,7 +271,9 @@ Home Assistant layer:
     holes, multipart shapes, a radius reaching a neighbour, and the 0 m radius equalling the point
     test.
   - Real-shapefile tests (in `tests/test_spatial.py`, `tests/test_areas.py` and, for
-    `resolve_location`, `tests/test_location.py`) are skipped unless `BOM_SPATIAL_DIR` is set. It needs all six layers
+    `resolve_location`, `tests/test_location.py`) are skipped unless `BOM_SPATIAL_DIR` is set. CI does not set it, on
+    purpose: the zips are large and live on an external server, and the synthetic and generated
+    layers cover the logic. Run them locally before changing matching. It needs all six layers
     (`IDM00001`, `IDM00003`, `IDM00007`, `IDM00014`, `IDM00017`, `IDM00020`), each unzipped into
     its own folder. Fetch the zips read-only from `ftp://ftp.bom.gov.au/anon/home/adfd/spatial/`
     into an empty directory outside the repo. They use central Sydney: 100 m equals the point
