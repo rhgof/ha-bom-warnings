@@ -4,6 +4,7 @@ The `.txt` file carries three things the CAP file does not: whether the warning 
 kind, the hazard line (`for DAMAGING WINDS and LARGE HAILSTONES`) and when the next warning is due.
 """
 
+import logging
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -146,3 +147,16 @@ def test_an_unreadable_date_or_time_is_left_out_and_the_rest_is_kept(
     parsed = parse_text(data.replace(original, corrupted, 1))
 
     assert parsed == replace(good, issued=good.issued if keeps_issued else None, next_issue=None)
+
+
+def test_an_unreadable_date_is_logged_for_whoever_has_to_find_out_why(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.DEBUG, logger="custom_components.bom_warnings.product_text")
+    data = text("2026-11-15T0343Z-thunderstorm", "IDN21033").replace(
+        b"15 November 2026", b"15 Sept 2026", 1
+    )
+
+    parse_text(data)
+
+    assert "15 Sept 2026" in caplog.text

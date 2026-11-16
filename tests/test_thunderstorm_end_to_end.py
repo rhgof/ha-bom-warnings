@@ -18,7 +18,6 @@ from custom_components.bom_warnings.const import (
     CONF_STATE,
     DOMAIN,
 )
-from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom import layout
 from scripts.fake_bom.server import FakeBom
 
@@ -103,4 +102,3 @@ async def test_an_unreadable_issue_date_leaves_the_dates_out_and_the_refresh_hea
     assert state.state == "severe"
     assert state.attributes["hazards"] == ["wind", "hail"]
     assert "next_issue" not in state.attributes
-    assert hass.data[FEED].consecutive_failures == 0

@@ -70,6 +70,8 @@ def _strptime(value: str, fmt: str) -> datetime | None:
     try:
         return datetime.strptime(value, fmt)
     except ValueError:
+        # Debug, since the warning still works; this is the only trace of a changed template.
+        _LOGGER.debug("Could not read %r as a date or time in a product text", value)
         return None
 
 
@@ -89,9 +91,12 @@ def parse_text(data: bytes) -> ProductText | None:
     detailed = title.removeprefix(_CANCELLATION).startswith(_DETAILED)
 
     issued = next_issue = None
-    if match := _ISSUED.search("\n".join(lines)):
+    body = "\n".join(lines)
+    if match := _ISSUED.search(body):
         issued = _strptime(f"{match[1]} {match[2]}", "%I:%M %p %d %B %Y")
-    if issued and (match := _NEXT.search("\n".join(lines))):
+    # Without the issue time the next one cannot be placed: the zone's offset from UTC comes from
+    # the issue time, so an unreadable one takes the next-issue time with it.
+    if issued and (match := _NEXT.search(body)):
         next_issue = _when(match[1], issued)
         if next_issue and next_issue < issued:
             # Past midnight: "issued by 12:30 am" after an evening issue.
