@@ -20,7 +20,8 @@ class BomHandler(FTPHandler):
 
     # Every command received, for tests that count how often the integration talks to the server.
     commands: list[tuple[str, str]]
-    # File names whose download is refused with a transient error, as a stalled transfer is.
+    # File names whose download is refused with a transient 4xx before any data moves. It is not
+    # a transfer cut part-way, which this server cannot script.
     failing_retrievals: set[str]
 
     def ftp_RETR(self, file: str) -> str | None:

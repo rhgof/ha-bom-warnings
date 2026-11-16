@@ -28,9 +28,12 @@ def products() -> list[tuple[Path, str]]:
     ]
 
 
+PRODUCTS = products()
+
+
 def products_with(suffix: str) -> list[tuple[Path, str]]:
     """The products that have a sibling file with this suffix."""
-    return [(s, p) for s, p in products() if (s / f"{p}{suffix}").exists()]
+    return [(s, p) for s, p in PRODUCTS if (s / f"{p}{suffix}").exists()]
 
 
 def saved_files(snapshot: Path) -> list[dict[str, Any]]:
@@ -50,7 +53,7 @@ def test_every_saved_file_is_on_disk_at_its_listed_size(snapshot: Path) -> None:
     }
 
 
-@pytest.mark.parametrize(("snapshot", "product"), products(), ids=lambda v: getattr(v, "name", v))
+@pytest.mark.parametrize(("snapshot", "product"), PRODUCTS, ids=lambda v: getattr(v, "name", v))
 def test_the_cap_file_parses_to_its_own_product(snapshot: Path, product: str) -> None:
     warning = parse_cap((snapshot / f"{product}.cap.xml").read_bytes())
 
@@ -79,11 +82,13 @@ def test_the_text_file_starts_with_the_product_id(snapshot: Path, product: str) 
 @pytest.mark.parametrize("suffix", [".xml", ".txt"])
 def test_only_heatwave_products_lack_a_sibling_file(suffix: str) -> None:
     # The filter above leaves these out, so this is what keeps "BoM publishes none for a heatwave
-    # warning" (whose CAP event is Extreme Heat) a checked fact and not a silent hole.
-    lacking = [(s, p) for s, p in products() if (s, p) not in products_with(suffix)]
+    # warning" (whose CAP event is Extreme Heat) a checked fact and not a silent hole. The exact
+    # set also fails if the heatwave captures go, or if one of them gains the file.
+    having = set(products_with(suffix))
+    lacking = [(s, p) for s, p in PRODUCTS if (s, p) not in having]
     events = {
         info.event.lower()
         for snapshot, product in lacking
         for info in parse_cap((snapshot / f"{product}.cap.xml").read_bytes()).infos  # type: ignore[union-attr]
     }
-    assert events <= {"extreme heat"}
+    assert events == {"extreme heat"}

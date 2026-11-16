@@ -4,7 +4,6 @@ import ftplib
 import threading
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
-from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -38,6 +37,10 @@ class Script:
         # Connections on different threads share one script.
         self._lock = threading.Lock()
 
+    def record_connect(self, host: str, port: int) -> None:
+        with self._lock:
+            self.connected.append((host, port))
+
     def next_failure(self) -> Exception | None:
         with self._lock:
             self.attempts += 1
@@ -57,7 +60,7 @@ class ScriptedFTP:
         self.logins = 0
 
     def connect(self, host: str, port: int) -> None:
-        self.script.connected.append((host, port))
+        self.script.record_connect(host, port)
 
     def login(self) -> None:
         self.logins += 1
@@ -96,22 +99,30 @@ class ScriptedFTP:
         callback(b"data")
 
 
+class ScriptedFtplib:
+    """The `ftplib` module as the client sees it, with `FTP` swapped for the script's fake.
+
+    Everything else falls through to the real module, so a new `ftplib` name in the client does
+    not need adding here.
+    """
+
+    def __init__(self, script: Script) -> None:
+        self._script = script
+
+    def FTP(self, timeout: float | None = None) -> ScriptedFTP:  # noqa: N802
+        return self._script.connection()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(ftplib, name)
+
+
 @pytest.fixture(autouse=True)
 def scripted(monkeypatch: pytest.MonkeyPatch) -> Script:
     script = Script()
     monkeypatch.setattr(ftp_module, "RETRY_DELAY", 0)
     # The client's own name for the module, not the stdlib's attribute, so nothing else in the
     # process (another test, another thread) ever sees the fake.
-    monkeypatch.setattr(
-        ftp_module,
-        "ftplib",
-        SimpleNamespace(
-            FTP=lambda timeout=None: script.connection(),
-            error_perm=ftplib.error_perm,
-            Error=ftplib.Error,
-            all_errors=ftplib.all_errors,
-        ),
-    )
+    monkeypatch.setattr(ftp_module, "ftplib", ScriptedFtplib(script))
     return script
 
 
