@@ -18,6 +18,7 @@ from custom_components.bom_warnings.const import (
     CONF_STATE,
     DOMAIN,
 )
+from custom_components.bom_warnings.shared_feed import FEED
 from scripts.fake_bom import layout
 from scripts.fake_bom.server import FakeBom
 
@@ -84,3 +85,22 @@ async def test_a_detailed_warning_is_marked_and_keeps_its_whole_forecast_sentenc
     assert state.attributes["detailed"] is True
     assert state.attributes["next_issue"] == "2026-11-15T04:10:00+00:00"
     assert state.attributes["summary"].endswith("Hexham by 3:10 pm.")
+
+
+async def test_an_unreadable_issue_date_leaves_the_dates_out_and_the_refresh_healthy(
+    hass: HomeAssistant, fake_bom: FakeBom
+) -> None:
+    layout.put_captured_product(
+        fake_bom.root, "IDN21033", with_text=True, with_xml=False, source=SNAPSHOT
+    )
+    served = fake_bom.root / layout.WARNINGS / "IDN21033.txt"
+    served.write_bytes(served.read_bytes().replace(b"15 November 2026", b"15 Sept 2026", 1))
+
+    await setup_entry(hass, entry_named("NSW_PW003", "Hunter"))
+
+    state = hass.states.get(THUNDERSTORM)
+    assert state is not None
+    assert state.state == "severe"
+    assert state.attributes["hazards"] == ["wind", "hail"]
+    assert "next_issue" not in state.attributes
+    assert hass.data[FEED].consecutive_failures == 0

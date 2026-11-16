@@ -64,9 +64,18 @@ def _sentence(line: str) -> str:
     return phrase[:1].upper() + phrase[1:]
 
 
-def _when(clock: str, day: datetime) -> datetime:
-    parsed = datetime.strptime(clock, "%I:%M %p")
-    return day.replace(hour=parsed.hour, minute=parsed.minute)
+def _strptime(value: str, fmt: str) -> datetime | None:
+    # The template is fixed, but a change to it, or a month spelled another way, must leave the
+    # date out and not raise: the reader runs inside the refresh and may never fail it.
+    try:
+        return datetime.strptime(value, fmt)
+    except ValueError:
+        return None
+
+
+def _when(clock: str, day: datetime) -> datetime | None:
+    parsed = _strptime(clock, "%I:%M %p")
+    return day.replace(hour=parsed.hour, minute=parsed.minute) if parsed else None
 
 
 def parse_text(data: bytes) -> ProductText | None:
@@ -81,10 +90,10 @@ def parse_text(data: bytes) -> ProductText | None:
 
     issued = next_issue = None
     if match := _ISSUED.search("\n".join(lines)):
-        issued = datetime.strptime(f"{match[1]} {match[2]}", "%I:%M %p %d %B %Y")
+        issued = _strptime(f"{match[1]} {match[2]}", "%I:%M %p %d %B %Y")
     if issued and (match := _NEXT.search("\n".join(lines))):
         next_issue = _when(match[1], issued)
-        if next_issue < issued:
+        if next_issue and next_issue < issued:
             # Past midnight: "issued by 12:30 am" after an evening issue.
             next_issue += timedelta(days=1)
 

@@ -4,6 +4,7 @@ The `.txt` file carries three things the CAP file does not: whether the warning 
 kind, the hazard line (`for DAMAGING WINDS and LARGE HAILSTONES`) and when the next warning is due.
 """
 
+from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
 
@@ -120,3 +121,28 @@ def test_a_next_issue_after_midnight_is_the_next_day() -> None:
 
     assert parsed is not None
     assert parsed.next_issue == datetime(2026, 11, 16, 0, 30)
+
+
+# The recorded text, with one date or time changed to what BoM's template should never send.
+@pytest.mark.parametrize(
+    ("original", "corrupted", "keeps_issued"),
+    [
+        (b"15 November 2026", b"15 Sept 2026", False),
+        (b"2:38 pm Sunday", b"14:38 pm Sunday", False),
+        (b"15 November 2026", b"31 November 2026", False),
+        (b"issued by 5:40 pm.", b"issued by 25:99 pm.", True),
+    ],
+    ids=["unknown month", "impossible hour", "no such date", "impossible next issue"],
+)
+def test_an_unreadable_date_or_time_is_left_out_and_the_rest_is_kept(
+    original: bytes, corrupted: bytes, keeps_issued: bool
+) -> None:
+    snapshot = "2026-11-15T0343Z-thunderstorm"
+    good = parse_text(text(snapshot, "IDN21033"))
+    assert good is not None
+    data = text(snapshot, "IDN21033")
+    assert original in data
+
+    parsed = parse_text(data.replace(original, corrupted, 1))
+
+    assert parsed == replace(good, issued=good.issued if keeps_issued else None, next_issue=None)
