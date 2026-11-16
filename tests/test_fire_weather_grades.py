@@ -19,7 +19,7 @@ from custom_components.bom_warnings.active_warnings import (
     warning_attributes,
 )
 from custom_components.bom_warnings.cap import Phase, Severity
-from custom_components.bom_warnings.const import FIRE_DANGER_COLORS, LEVEL_COLORS
+from custom_components.bom_warnings.const import LEVEL_COLORS
 
 
 def warning(event: str, severity: Severity, *, phase: Phase = Phase.NEW) -> ActiveWarning:
@@ -38,15 +38,17 @@ def fire(severity: Severity) -> ActiveWarning:
     return warning("Fire Weather", severity)
 
 
+# The grade is one step off the CAP severity, and the colour follows the severity like every other
+# warning type's, so a fire warning is the same colour as any warning of equal urgency.
 FIRE_GRADES = [
-    (Severity.MODERATE, "high", FIRE_DANGER_COLORS["high"]),
-    (Severity.SEVERE, "extreme", FIRE_DANGER_COLORS["extreme"]),
-    (Severity.EXTREME, "catastrophic", FIRE_DANGER_COLORS["catastrophic"]),
+    (Severity.MODERATE, "high", LEVEL_COLORS["moderate"]),
+    (Severity.SEVERE, "extreme", LEVEL_COLORS["severe"]),
+    (Severity.EXTREME, "catastrophic", LEVEL_COLORS["extreme"]),
 ]
 
 
 @pytest.mark.parametrize(("severity", "grade", "colour"), FIRE_GRADES)
-def test_a_fire_weather_warning_shows_the_bureaus_grade_and_the_rating_colour(
+def test_a_fire_weather_warning_shows_the_bureaus_grade_in_its_severity_colour(
     severity: Severity, grade: str, colour: str
 ) -> None:
     item = warning_attributes(fire(severity), ranked=True)

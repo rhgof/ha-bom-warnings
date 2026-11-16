@@ -26,7 +26,7 @@ from custom_components.bom_warnings.active_warnings import (
     warning_attributes,
 )
 from custom_components.bom_warnings.cap import Phase, Severity
-from custom_components.bom_warnings.const import FIRE_DANGER_COLORS, LEVEL_COLORS
+from custom_components.bom_warnings.const import LEVEL_COLORS
 from custom_components.bom_warnings.fire_danger import danger_title
 from custom_components.bom_warnings.warning_types import WARNING_TYPES, SensorType
 
@@ -272,6 +272,10 @@ def test_fixture_type_sensors_carry_their_top_warnings_display_fields() -> None:
 TYPE_SENSORS = {f"sensor.home_{t.key}" for t in WARNING_TYPES if isinstance(t, SensorType)}
 
 
+# A fire weather grade is one step off the CAP severity that sets its colour.
+FIRE_GRADE_SEVERITY = {"high": "moderate", "extreme": "severe", "catastrophic": "extreme"}
+
+
 def colour_for(level: str) -> str | None:
     """The colour a per-type sensor shows for a level: none while no warning is in force."""
     if level == "none":
@@ -320,9 +324,10 @@ async def test_every_type_sensor_says_its_level_and_colour(
         state = hass.states.get(entity_id)
         assert state is not None, entity_id
         assert state.attributes["level"] == state.state, entity_id
-        # Fire weather shows the Bureau's grade, in the colours of the fire danger rating.
-        fire = entity_id.endswith("fire_weather_warning") and state.state in FIRE_DANGER_COLORS
-        expected = FIRE_DANGER_COLORS[state.state] if fire else colour_for(state.state)
+        # Fire weather shows the Bureau's grade, one step off CAP, in the severity's colour.
+        fire = entity_id.endswith("fire_weather_warning")
+        level = FIRE_GRADE_SEVERITY.get(state.state, state.state) if fire else state.state
+        expected = colour_for(level)
         if entity_id in SEVERE_BY_NAME and state.state == "severe":
             assert state.attributes["color"] in colours_for(entity_id, state.state), entity_id
         else:

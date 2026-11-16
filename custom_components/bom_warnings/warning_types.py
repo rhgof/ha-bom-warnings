@@ -20,7 +20,6 @@ from .const import (
     CONF_EVENT_TYPES,
     CONF_INCLUDE_MARINE,
     CONF_WARNING_TYPES,
-    FIRE_DANGER_COLORS,
     OTHER_WARNINGS,
 )
 
@@ -51,7 +50,8 @@ XML_WIND_STRENGTHS = {"STR": "strong", "GALE": "gale"}
 # (Table 24) pairs them: High is CAP Moderate, Extreme is CAP Severe and Catastrophic is CAP
 # Extreme, while the headline and the product XML (`HIGH`, `EXT`, `CAT`) carry the grade itself.
 # That makes the grade recoverable from the CAP severity alone, with no extra request. The words
-# are the fire danger rating's, so they take its colours (`FIRE_DANGER_COLORS`).
+# are the fire danger rating's, but the colour stays the CAP severity's, so a fire warning matches
+# any other warning of equal urgency; the fire danger rating cards keep BoM's own legend.
 FIRE_WEATHER_GRADES = {"moderate": "high", "severe": "extreme", "extreme": "catastrophic"}
 
 # BoM sends CAP severity `Unknown` for a Severe Thunderstorm or Severe Weather Warning, and its
@@ -92,9 +92,6 @@ class WarningType:
     # The type's own grade for each CAP severity, where the Bureau grades a warning in words that
     # CAP's do not match. A severity with no entry keeps CAP's word.
     grades: Mapping[str, str] | None = None
-    # The colour of each grade, where the grades have colours of their own (the fire danger
-    # rating's). A graded type with none keeps the colour of its CAP severity.
-    grade_colors: Mapping[str, str] | None = None
     # Whether a card should draw this type's current warning with the detail layout (hazards,
     # badges, when the next update is due) and not the plain tile. The sensor says so in `layout`.
     detail: bool = False
@@ -150,7 +147,6 @@ WARNING_TYPES: tuple[WarningType, ...] = (
         key="fire_weather_warning",
         label="Fire weather",
         grades=FIRE_WEATHER_GRADES,
-        grade_colors=FIRE_DANGER_COLORS,
     ),
     # BoM's product is the Heatwave Warning. "Extreme Heat" is only the CAP event, and "extreme"
     # in a name reads as a level beside a sensor whose state may be `severe`.

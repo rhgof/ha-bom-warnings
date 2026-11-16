@@ -289,16 +289,13 @@ def level_of(warning: ActiveWarning) -> str:
 
 
 def color_of(warning: ActiveWarning) -> str:
-    """A grade with a colour of its own (fire weather's) takes it, else the CAP severity's colour.
+    """The colour of the warning's CAP severity, the same for every type.
 
-    The CAP severity and not the level word, so a thunderstorm BoM leaves `unknown` is orange and
-    one it marks `severe` is red, though both say `severe`.
+    The CAP severity and not the level word, so a warning of equal urgency is the same colour
+    whatever its type calls it: a thunderstorm BoM leaves `unknown` is orange and one it marks
+    `severe` is red though both say `severe`, and a fire weather warning's grade is one step off
+    its severity but takes the severity's colour.
     """
-    row = type_of(warning.event)
-    colors = row.grade_colors if row else None
-    level = level_of(warning)
-    if colors and level in colors:
-        return colors[level]
     return LEVEL_COLORS[warning.severity.value]
 
 

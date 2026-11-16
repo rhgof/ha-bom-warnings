@@ -179,9 +179,10 @@ Home Assistant layer:
   `docs/warning-products.md`). `WarningType.grades` maps a CAP severity to a type's own word, and
   the Fire Weather row (`FIRE_WEATHER_GRADES`) and the Thunderstorm and Weather rows
   (`SEVERE_BY_NAME_GRADES`, CAP `unknown` to `severe`: severe by name) set it. `level_of` returns the
-  grade, so the `level` attribute and the type sensor's state use it. `color_of` takes a grade's own
-  colour from the row's `grade_colors` (the fire danger rating's) and otherwise the colour of the CAP
-  severity (`LEVEL_COLORS`), so an unknown thunderstorm stays orange and a real `severe` is red.
+  grade, so the `level` attribute and the type sensor's state use it. `color_of` is the colour of the CAP
+  severity (`LEVEL_COLORS`) for every type, so an unknown thunderstorm stays orange, a real `severe`
+  is red, and a fire weather grade takes the colour of the severity it is one step off. Only the fire
+  danger rating sensors use BoM's fire legend (`FIRE_DANGER_COLORS`).
   `level_options(event)` is the sensor's enum, so the fire sensor offers `none`, `minor`, `high`,
   `unrated`, `extreme`, `catastrophic`. Ranking, the event entity and each item's `severity`
   stay on CAP severity, because the grades rank the same. The grade is read from CAP severity

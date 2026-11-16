@@ -7,9 +7,9 @@ dev instance (`home_assistant_frontend` 20261028.5, HA 2026.11.1). The file name
 ## What the integration sends
 
 Every warning has one colour, in the `color` attribute of a ranked-list entry and of each per-type
-sensor (`None` while no warning of the type is in force). It is `LEVEL_COLORS[CAP severity]`, or the
-fire danger rating's colour for a Fire Weather grade (`color_of` in `active_warnings.py`). Every
-surface that can read an attribute uses it, so those agree by construction.
+sensor (`None` while no warning of the type is in force). It is `LEVEL_COLORS[CAP severity]` for every type, a Fire Weather
+warning included (`color_of` in `active_warnings.py`). Only the fire danger rating sensors use BoM's
+own fire legend. Every surface that can read an attribute uses it, so those agree by construction.
 
 ## The table
 
@@ -60,18 +60,21 @@ dashboard shows a blue icon on a moderate fire danger rating that the data says 
 
 ## Differences that are by design
 
-- **Two scales share words.** The fire danger rating, and the grades of the Fire Weather warning,
-  use BoM's fire danger legend: `moderate` is green `#64BF30`, `high` yellow `#FEDD3A`, `extreme`
-  orange `#F78100`, `catastrophic` dark red `#AD0909`. Every other warning type uses the severity
-  colours, where `moderate` is orange `#FB8C00` and `extreme` purple `#7B1FA2`. So "extreme" is
-  orange on a fire tile and purple elsewhere, and the Most severe sensor's state can be `extreme`
-  for either scale; its `color` attribute says which. The fire danger tiles are titled "Extreme Fire
-  Danger Today" and the like so the scale is named, and a Fire Weather warning is titled "Extreme
-  Fire weather warning".
+- **Two scales share words.** The fire danger rating sensors use BoM's fire danger legend:
+  `moderate` is green `#64BF30`, `high` yellow `#FEDD3A`, `extreme` orange `#F78100`, `catastrophic`
+  dark red `#AD0909`. Every warning, the Fire Weather warning included, uses the severity colours,
+  where `moderate` is orange `#FB8C00`, `severe` red `#D32F2F` and `extreme` purple `#7B1FA2`. A
+  Fire Weather grade is one step off its CAP severity, so a "High" fire warning is orange, an
+  "Extreme" one red and a "Catastrophic" one purple: the same colour as any warning of equal
+  urgency, which is what the Most severe tile ranks by. The fire danger tiles are titled "Extreme
+  Fire Danger Today" and the like so the scale is named, and a Fire Weather warning is titled
+  "Extreme Fire weather warning".
 - **Thunderstorm and Severe weather** say `severe` but keep the orange of CAP `unknown`; a warning
   BoM marks `severe` is red (`31025b0`).
-- **Fire weather** uses the fire danger rating's colours for its grades, which differ from the
-  severity colours (BoM's own legend).
+- **Fire weather** grades (High, Extreme, Catastrophic) take the colour of the CAP severity they are
+  one step off, so they differ from the fire danger rating cards, which keep BoM's own legend. This
+  was the other way until 16 Nov 2026, when the warning moved onto the severity colours so colour
+  follows urgency across every warning tile.
 
 ## Verdict
 

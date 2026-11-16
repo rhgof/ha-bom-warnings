@@ -17,7 +17,6 @@ from custom_components.bom_warnings.const import (
     CONF_AREA_CODES,
     CONF_HIDE_FINAL,
     DEFAULT_EVENT_ICON,
-    FIRE_DANGER_COLORS,
     LEVEL_COLORS,
     NO_WARNING_ICON,
 )
@@ -85,9 +84,14 @@ def row(
     return (product_id, level, icon, colour or LEVEL_COLORS[level])
 
 
+# The CAP severity each fire grade is one step off, which is what the colour follows.
+FIRE_GRADE_SEVERITY = {"high": "moderate", "extreme": "severe", "catastrophic": "extreme"}
+
+
 def fire_row(grade: str) -> tuple[str, str, str, str]:
-    """A Fire Weather row, which shows the Bureau's grade in the fire danger rating's colour."""
-    return row("IDN22000", grade, EVENT_ICONS["Fire Weather"], FIRE_DANGER_COLORS[grade])
+    """A Fire Weather row: the Bureau's grade, in the colour of the CAP severity behind it."""
+    colour = LEVEL_COLORS[FIRE_GRADE_SEVERITY[grade]]
+    return row("IDN22000", grade, EVENT_ICONS["Fire Weather"], colour)
 
 
 async def test_home_codes_list_only_what_covers_the_location(hass: HomeAssistant) -> None:
@@ -163,7 +167,7 @@ async def test_most_severe_sensor_shows_the_top_item_with_icon_level_and_colour(
     assert (most.attributes["icon"], most.attributes["level"], most.attributes["color"]) == (
         EVENT_ICONS["Fire Weather"],
         "catastrophic",
-        FIRE_DANGER_COLORS["catastrophic"],
+        LEVEL_COLORS["extreme"],
     )
     assert most.attributes["product_id"] == "IDN22000"
     assert most.attributes["severity"] == "extreme"

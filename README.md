@@ -279,14 +279,16 @@ their original form, which is why `sensor.<title>_extreme_heat_warning` is the H
 **Fire weather warning uses the Bureau's fire grades, not the levels above.** The Bureau grades a
 Fire Weather Warning High, Extreme or Catastrophic, the same words as the fire danger rating, but
 its CAP severity is one step lower: an "Extreme Fire Weather Warning" is CAP `Severe`. So this
-sensor's state is the grade, and its colour is the fire danger rating's:
+sensor's state is the grade, and its colour is that of the CAP severity it comes from, like every other
+warning, so it matches any warning of equal urgency. (The fire danger rating sensors keep the Bureau's
+own fire danger legend.)
 
-| State | Fire danger colour | CAP severity it comes from |
+| State | Colour | CAP severity it comes from |
 | --- | --- | --- |
 | `none` | no colour | no current warning |
-| `high` | yellow | Moderate |
-| `extreme` | orange | Severe |
-| `catastrophic` | red | Extreme |
+| `high` | orange | Moderate |
+| `extreme` | red | Severe |
+| `catastrophic` | purple | Extreme |
 
 A warning with no grade keeps the level words above (`minor` for a cancellation, `unrated` when the
 Bureau sends `unknown`, except thunderstorm and severe weather, which say `severe`). The `severity` attribute of each warning still shows what CAP said, and
