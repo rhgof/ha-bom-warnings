@@ -42,13 +42,23 @@ async def async_setup_entry(
     async_add_entities([WarningEvent(entry.runtime_data.coordinator, entry)])
 
 
-def _transition(previous: WarningState | None, current: WarningState) -> str | None:
-    """The event type for one product between two refreshes, or None if nothing happened."""
+_ENDED = (Phase.CANCELLED, Phase.FINAL)
+
+
+def _transition(
+    previous: WarningState | None, current: WarningState, seen_current: bool
+) -> str | None:
+    """The event type for one product between two refreshes, or None if nothing happened.
+
+    `seen_current` is whether this entity has ever seen the product as current, which is what a
+    cancellation or an end gives news of.
+    """
     if previous == current:
         return None
-    if previous is None and current.phase in (Phase.CANCELLED, Phase.FINAL):
+    if previous is None and current.phase in _ENDED and not seen_current:
         # Nothing to end: this entry never saw the warning as current. A move, or a layer change,
-        # can bring a cancel file that is still served into its area for the first time.
+        # can bring a cancel file that is still served into its area for the first time. A
+        # warning that dropped out of the feed and came back ended was seen, so it still reports.
         return None
     if current.phase is Phase.CANCELLED:
         return EVENT_CANCELLED
@@ -73,9 +83,16 @@ class WarningEvent(CoordinatorEntity[BomWarningsCoordinator], EventEntity):
         )
         # Set in async_added_to_hass: nothing present at that point counts as a transition.
         self._previous: dict[str, WarningState] = {}
+        # Every product this entity has seen as current since it was added.
+        self._seen_current: set[str] = set()
 
     async def async_added_to_hass(self) -> None:
         self._previous = dict(self.coordinator.states)
+        self._seen_current = {
+            product_id
+            for product_id, state in self.coordinator.states.items()
+            if state.phase not in _ENDED
+        }
         await super().async_added_to_hass()
 
     @callback
@@ -83,7 +100,12 @@ class WarningEvent(CoordinatorEntity[BomWarningsCoordinator], EventEntity):
         if self.coordinator.last_update_success:
             current = self.coordinator.states
             for product_id, state in current.items():
-                if (event_type := _transition(self._previous.get(product_id), state)) is None:
+                event_type = _transition(
+                    self._previous.get(product_id), state, product_id in self._seen_current
+                )
+                if state.phase not in _ENDED:
+                    self._seen_current.add(product_id)
+                if event_type is None:
                     continue
                 self._trigger_event(
                     event_type,

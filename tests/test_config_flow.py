@@ -334,6 +334,19 @@ async def test_a_clash_takes_the_next_free_suffix(hass: HomeAssistant, resolve: 
     assert result["result"].unique_id == "zone.home_3"
 
 
+async def test_a_real_zone_named_like_a_suffixed_id_still_gets_its_own(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    entry_made_from("zone.home", follows="zone.work").add_to_hass(hass)
+    entry_made_from("zone.home_2", follows="zone.home").add_to_hass(hass)
+    set_zone(hass, entity_id="zone.home_2", name="Home two")
+
+    result = await start_zone(hass, "zone.home_2")
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == "zone.home_2_2"
+
+
 async def test_two_zones_at_the_same_place_are_allowed(
     hass: HomeAssistant, resolve: MagicMock
 ) -> None:

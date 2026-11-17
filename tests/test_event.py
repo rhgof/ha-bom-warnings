@@ -7,10 +7,11 @@ from unittest.mock import MagicMock
 
 import pytest
 from homeassistant.const import EVENT_STATE_CHANGED, STATE_UNAVAILABLE, STATE_UNKNOWN
-from homeassistant.core import Event, EventStateChangedData, HomeAssistant, callback
+from homeassistant.core import Event, EventStateChangedData, HomeAssistant, State, callback
+from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.bom_warnings.const import CONF_AREA_CODES, CONF_WARNING_TYPES
+from custom_components.bom_warnings.const import CONF_AREA_CODES, CONF_WARNING_TYPES, DOMAIN
 from scripts.fake_bom import layout, scenarios
 from scripts.fake_bom.server import FakeBom
 
@@ -231,6 +232,16 @@ async def test_the_type_checklist_decides_which_events_fire(
     assert [e["event_type"] for e in fired] == expected
 
 
+def event_state(hass: HomeAssistant, entry: MockConfigEntry) -> State:
+    """The event entity's state, found by its unique id and not by a guessed entity id."""
+    registry = er.async_get(hass)
+    entity_id = registry.async_get_entity_id("event", DOMAIN, f"{entry.unique_id}_warning_event")
+    assert entity_id is not None
+    state = hass.states.get(entity_id)
+    assert state is not None
+    return state
+
+
 async def test_a_cancelled_product_first_covered_by_a_move_fires_nothing(
     hass: HomeAssistant,
     fake_bom: FakeBom,
@@ -250,7 +261,50 @@ async def test_a_cancelled_product_first_covered_by_a_move_fires_nothing(
     # anything but already cancelled, so there is nothing to report. Read the entity itself: the
     # `fired` recorder above missed an event the entity had fired.
     assert zone_entry.data[CONF_AREA_CODES] == ["NSW_MW001", "QLD_PW001"]
-    state = hass.states.get("event.holiday_house_warning_event")
-    assert state is not None
+    state = event_state(hass, zone_entry)
     assert state.state == STATE_UNKNOWN
     assert state.attributes.get("event_type") is None
+
+
+async def test_a_current_warning_first_covered_by_a_move_still_fires_new(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    zone_entry: MockConfigEntry,  # noqa: F811
+    layers: MagicMock,  # noqa: F811
+    resolve: MagicMock,
+) -> None:
+    set_zone(hass)
+    await setup_entry(hass, zone_entry)
+
+    # The baseline thunderstorm warning covers this district, and it is current.
+    resolve.return_value = location_of("QLD_PW001", "QLD_ME008")
+    await change_zone(hass, lat=-28.0)
+
+    state = event_state(hass, zone_entry)
+    assert state.attributes["event_type"] == "new"
+    assert state.attributes["product_id"] == "IDQ21035"
+
+
+async def test_a_warning_that_drops_out_of_the_feed_still_reports_its_cancellation(
+    hass: HomeAssistant,
+    fake_bom: FakeBom,
+    mock_config_entry: MockConfigEntry,
+    fired: list[dict[str, Any]],
+    freezer: Any,
+) -> None:
+    path = fake_bom.root / layout.WARNINGS / THUNDERSTORM
+    seen = path.read_text()
+    await setup_entry(hass, mock_config_entry)
+
+    # The file is missing for one refresh, then served again as the cancellation of a warning
+    # this entry had seen as current. It was reported then, and its end is still owed.
+    path.unlink()
+    await poll(hass, freezer)
+    path.write_text(cancelled(seen))
+    later = layout.BASE_TIME + 3600
+    os.utime(path, (later, later))
+    await poll(hass, freezer)
+    await poll(hass, freezer)
+
+    assert [e["event_type"] for e in fired] == ["cancelled"]
+    assert {e["product_id"] for e in fired} == {"IDQ21035"}

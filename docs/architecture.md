@@ -194,9 +194,10 @@ Home Assistant layer:
   product, represented by its most severe block) against the previous refresh. Baseline is taken
   when the entity is added, so startup and reload fire nothing. A type that is off in the
   checklist raises no events; `hide_final` deliberately does not, because final/cancelled are the events. A product that
-  vanishes from the feed or expires without a cancel fires nothing, and so does a product first seen
-  already cancelled or final (a move or layer change can bring a still-served cancel file into the
-  area), since this entry had nothing to end. Chosen over bus events because
+  vanishes from the feed or expires without a cancel fires nothing, and so does a cancelled or
+  final product this entity never saw as current (a move or layer change can bring a
+  still-served cancel file into the area): it had nothing to end. One that was seen current and
+  returns ended after a gap still fires. Chosen over bus events because
   HA guidance models momentary occurrences as `event` entities.
 - **Ranking.** Both sensors read only warnings covering the location (never the whole state, which
   would list, say, a western NSW sheep graziers alert for a Sydney home). `rank_warnings` in
