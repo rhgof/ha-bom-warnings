@@ -237,8 +237,10 @@ Home Assistant layer:
   Polling intervals are not configurable.
 - **Identity.** For Home and typed locations `unique_id` is the rounded coordinates and the title
   is the home location name, or `lat, lon`; a second entry for the same place is rejected. For a
-  zone, `unique_id` is the zone entity id and the title is the zone's name. Users cannot name
-  entries.
+  zone, `unique_id` is the zone entity id, with the first free `_2`, `_3` suffix when another entry
+  already has it (reconfigure keeps an entry's id when it follows another zone), and the title is
+  the zone's name. A zone another entry follows is rejected whatever that entry's id. Users
+  cannot name entries.
 - **Zones.** `coordinator.attach()` starts a `ZoneFollower` for entries with a `zone` key. It
   compares the zone state with the stored centre and radius at start and on every state change of
   that entity (a person entering the zone changes the state but not the shape, so nothing happens).

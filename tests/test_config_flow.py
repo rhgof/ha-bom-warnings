@@ -280,6 +280,60 @@ async def test_the_same_zone_cannot_be_added_twice(hass: HomeAssistant, resolve:
     assert result["reason"] == "already_configured"
 
 
+def entry_made_from(unique_id: str, follows: str) -> MockConfigEntry:
+    """A zone entry as reconfigure leaves it: it keeps the id of the zone it was made from."""
+    return MockConfigEntry(
+        domain=DOMAIN,
+        version=4,
+        unique_id=unique_id,
+        title=unique_id,
+        data={
+            CONF_ZONE: follows,
+            CONF_LATITUDE: -27.4,
+            CONF_LONGITUDE: 153.0,
+            CONF_STATE: "QLD",
+            CONF_AREA_CODES: ["QLD_PW001"],
+            CONF_AREA_NAMES: {},
+        },
+    )
+
+
+async def test_a_zone_another_entry_follows_cannot_be_added_even_after_a_reconfigure(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    entry_made_from("zone.home", follows="zone.work").add_to_hass(hass)
+    set_zone(hass, entity_id="zone.work", name="Work")
+
+    result = await start_zone(hass, "zone.work")
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+
+
+async def test_a_zone_nothing_follows_gets_its_own_unique_id_when_another_entry_has_its_id(
+    hass: HomeAssistant, resolve: MagicMock
+) -> None:
+    entry_made_from("zone.home", follows="zone.work").add_to_hass(hass)
+    set_zone(hass, entity_id="zone.home", name="Home")
+
+    result = await start_zone(hass, "zone.home")
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == "zone.home_2"
+    assert result["data"][CONF_ZONE] == "zone.home"
+
+
+async def test_a_clash_takes_the_next_free_suffix(hass: HomeAssistant, resolve: MagicMock) -> None:
+    entry_made_from("zone.home", follows="zone.work").add_to_hass(hass)
+    entry_made_from("zone.home_2", follows="zone.garden").add_to_hass(hass)
+    set_zone(hass, entity_id="zone.home", name="Home")
+
+    result = await start_zone(hass, "zone.home")
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["result"].unique_id == "zone.home_3"
+
+
 async def test_two_zones_at_the_same_place_are_allowed(
     hass: HomeAssistant, resolve: MagicMock
 ) -> None:

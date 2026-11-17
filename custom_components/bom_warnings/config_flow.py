@@ -131,10 +131,16 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
             state = self.hass.states.get(zone_id)
             if state is None:
                 errors["base"] = "zone_not_found"
+            elif any(
+                entry.data.get(CONF_ZONE) == zone_id for entry in self._async_current_entries()
+            ):
+                # By the zone an entry follows, which reconfigure can change, and not by its
+                # unique id, which stays the zone it was made from.
+                return self.async_abort(reason="already_configured")
             else:
                 try:
                     return await self._async_create(
-                        zone_id,
+                        self._free_unique_id(zone_id),
                         state.name,
                         state.attributes["latitude"],
                         state.attributes["longitude"],
@@ -156,6 +162,21 @@ class BomWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
             errors=errors,
         )
+
+    def _free_unique_id(self, zone_id: str) -> str:
+        """The zone's id for a new entry, or that id with the first free suffix.
+
+        The unique id is an identity, used only for entity unique ids and the device identifier,
+        never for a name or an entity id. Reconfigure keeps an entry's id when it follows another
+        zone, so a zone nothing follows can have its id taken by another entry.
+        """
+        taken = {entry.unique_id for entry in self._async_current_entries()}
+        if zone_id not in taken:
+            return zone_id
+        suffix = 2
+        while f"{zone_id}_{suffix}" in taken:
+            suffix += 1
+        return f"{zone_id}_{suffix}"
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
