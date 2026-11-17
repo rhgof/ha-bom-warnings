@@ -301,33 +301,50 @@ def test_a_rejected_login_at_session_start_is_not_retried(scripted: Script):
     assert len(scripted.instances) == 1
 
 
-def test_a_download_to_a_path_that_cannot_be_opened_makes_no_connection(
-    scripted: Script, tmp_path: Any
-):
+def test_a_download_to_a_path_that_cannot_be_opened_is_not_retried(scripted: Script, tmp_path: Any):
     with pytest.raises(OSError) as raised:
         BomFtp().download("/x.zip", str(tmp_path / "missing" / "x.zip"))
     assert not isinstance(raised.value, BomFtpError)
-    assert scripted.instances == []
+    assert len(scripted.instances) == 1
+    assert scripted.instances[0].closed
+
+
+def test_a_failed_connection_leaves_an_existing_file_alone(scripted: Script, tmp_path: Any):
+    kept = tmp_path / "x.zip"
+    kept.write_bytes(b"good copy")
+    scripted.connect_failures = [TimeoutError("timed out")] * (ATTEMPTS + 1)
+
+    with pytest.raises(BomFtpError):
+        BomFtp().download("/x.zip", str(kept))
+
+    assert kept.read_bytes() == b"good copy"
 
 
 class FullDisk:
-    """A file object whose first write fails, as a full disk does part-way through a transfer."""
+    """A file object on a full disk: the write fails part-way through, or the flush at close."""
+
+    def __init__(self, fails_at: str) -> None:
+        self.fails_at = fails_at
 
     def __enter__(self) -> FullDisk:
         return self
 
     def __exit__(self, *_: object) -> None:
-        pass
+        if self.fails_at == "close":
+            raise OSError(errno.ENOSPC, "No space left on device")
 
     def write(self, chunk: bytes) -> int:
-        raise OSError(errno.ENOSPC, "No space left on device")
+        if self.fails_at == "write":
+            raise OSError(errno.ENOSPC, "No space left on device")
+        return len(chunk)
 
 
-def test_a_write_that_fails_part_way_is_a_local_error_and_is_not_retried(
-    scripted: Script, monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+@pytest.mark.parametrize("fails_at", ["write", "close"])
+def test_a_write_that_fails_is_a_local_error_and_is_not_retried(
+    scripted: Script, monkeypatch: pytest.MonkeyPatch, tmp_path: Any, fails_at: str
 ):
     # The client module's own name for `open`, so nothing else sees the fake.
-    monkeypatch.setattr(ftp_module, "open", lambda *_, **__: FullDisk(), raising=False)
+    monkeypatch.setattr(ftp_module, "open", lambda *_, **__: FullDisk(fails_at), raising=False)
     with pytest.raises(OSError) as raised:
         BomFtp().download("/x.zip", str(tmp_path / "x.zip"))
     assert not isinstance(raised.value, BomFtpError)
