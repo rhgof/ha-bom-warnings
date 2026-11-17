@@ -46,6 +46,10 @@ def _transition(previous: WarningState | None, current: WarningState) -> str | N
     """The event type for one product between two refreshes, or None if nothing happened."""
     if previous == current:
         return None
+    if previous is None and current.phase in (Phase.CANCELLED, Phase.FINAL):
+        # Nothing to end: this entry never saw the warning as current. A move, or a layer change,
+        # can bring a cancel file that is still served into its area for the first time.
+        return None
     if current.phase is Phase.CANCELLED:
         return EVENT_CANCELLED
     if current.phase is Phase.FINAL:
