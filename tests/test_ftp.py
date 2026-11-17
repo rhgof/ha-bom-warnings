@@ -1,5 +1,6 @@
 """Tests for BomFtp and parse_host against a scripted ftplib.FTP, never the network."""
 
+import errno
 import ftplib
 import threading
 from collections.abc import Callable
@@ -34,12 +35,23 @@ class Script:
         self.attempts = 0
         self.mdtm_reply = "213 20261101080000"
         self.connected: list[tuple[str, int]] = []
+        # Consumed one per connection attempt, at connect and at login.
+        self.connect_failures: list[Exception] = []
+        self.login_failures: list[Exception] = []
         # Connections on different threads share one script.
         self._lock = threading.Lock()
 
     def record_connect(self, host: str, port: int) -> None:
         with self._lock:
             self.connected.append((host, port))
+
+    def next_connect_failure(self) -> Exception | None:
+        with self._lock:
+            return self.connect_failures.pop(0) if self.connect_failures else None
+
+    def next_login_failure(self) -> Exception | None:
+        with self._lock:
+            return self.login_failures.pop(0) if self.login_failures else None
 
     def next_failure(self) -> Exception | None:
         with self._lock:
@@ -61,8 +73,12 @@ class ScriptedFTP:
 
     def connect(self, host: str, port: int) -> None:
         self.script.record_connect(host, port)
+        if (failure := self.script.next_connect_failure()) is not None:
+            raise failure
 
     def login(self) -> None:
+        if (failure := self.script.next_login_failure()) is not None:
+            raise failure
         self.logins += 1
 
     def set_pasv(self, flag: bool) -> None:
@@ -257,6 +273,67 @@ def test_a_bad_mdtm_reply_is_a_connection_failure_after_the_retries(scripted: Sc
 def test_the_client_from_env_connects_to_bom_by_default(scripted: Script):
     client_from_env({}).list_files("*")
     assert scripted.connected == [(DEFAULT_HOST, 21)]
+
+
+def test_a_session_start_that_times_out_once_is_retried(scripted: Script):
+    scripted.connect_failures = [TimeoutError("timed out")]
+    client = BomFtp()
+    with client.session():
+        client.fetch("a")
+    assert len(scripted.instances) == 2
+    assert scripted.instances[1].logins == 1
+
+
+def test_a_session_start_that_never_connects_gives_up_after_the_attempt_limit(scripted: Script):
+    scripted.connect_failures = [TimeoutError("timed out")] * (ATTEMPTS + 1)
+    with pytest.raises(BomFtpError) as raised:
+        with BomFtp().session():
+            pass
+    assert not isinstance(raised.value, BomFtpRejectedError)
+    assert len(scripted.instances) == ATTEMPTS
+
+
+def test_a_rejected_login_at_session_start_is_not_retried(scripted: Script):
+    scripted.login_failures = [ftplib.error_perm("530 Login incorrect")] * 2
+    with pytest.raises(BomFtpRejectedError):
+        with BomFtp().session():
+            pass
+    assert len(scripted.instances) == 1
+
+
+def test_a_download_to_a_path_that_cannot_be_opened_makes_no_connection(
+    scripted: Script, tmp_path: Any
+):
+    with pytest.raises(OSError) as raised:
+        BomFtp().download("/x.zip", str(tmp_path / "missing" / "x.zip"))
+    assert not isinstance(raised.value, BomFtpError)
+    assert scripted.instances == []
+
+
+class FullDisk:
+    """A file object whose first write fails, as a full disk does part-way through a transfer."""
+
+    def __enter__(self) -> FullDisk:
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        pass
+
+    def write(self, chunk: bytes) -> int:
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+
+def test_a_write_that_fails_part_way_is_a_local_error_and_is_not_retried(
+    scripted: Script, monkeypatch: pytest.MonkeyPatch, tmp_path: Any
+):
+    # The client module's own name for `open`, so nothing else sees the fake.
+    monkeypatch.setattr(ftp_module, "open", lambda *_, **__: FullDisk(), raising=False)
+    with pytest.raises(OSError) as raised:
+        BomFtp().download("/x.zip", str(tmp_path / "x.zip"))
+    assert not isinstance(raised.value, BomFtpError)
+    assert raised.value.errno == errno.ENOSPC
+    assert scripted.attempts == 1
+    assert all(i.closed for i in scripted.instances)
 
 
 def test_wildcard_550_is_a_rejection_not_retried(scripted: Script):

@@ -55,6 +55,14 @@ class BomFtpClient(Protocol):
         ...
 
 
+class _LocalWriteFailed(Exception):
+    """A write to the local file failed during a transfer, carried through ftplib unchanged."""
+
+    def __init__(self, error: OSError) -> None:
+        super().__init__(str(error))
+        self.error = error
+
+
 def _describe(err: Exception) -> str:
     """The error's text; a dropped connection raises a bare EOFError, which has none."""
     return str(err) or type(err).__name__
@@ -156,7 +164,8 @@ class BomFtp:
         belongs to the calling thread: calls from any other thread open their own connections.
         """
         state = self._state
-        state.shared = self._connect()
+        # Retried like a call: one dropped connection at the start must not fail the whole refresh.
+        state.shared = self._retrying(self._connect)
         state.in_session = True
         try:
             yield self
@@ -206,6 +215,8 @@ class BomFtp:
         return self._retrying(lambda: self._modified(name))
 
     def download(self, remote_path: str, local_path: str) -> None:
+        """Save a file. A fault on this side (the file cannot be opened or written) raises the
+        `OSError` as it is, once; a server or network fault raises `BomFtpError`, after retries."""
         self._retrying(lambda: self._download(remote_path, local_path))
 
     def _list_files(self, pattern: str) -> list[FileEntry]:
@@ -253,11 +264,23 @@ class BomFtp:
             raise BomFtpError(f"bad MDTM reply: {reply}") from err
 
     def _download(self, remote_path: str, local_path: str) -> None:
-        with self._conn() as ftp:
+        # Opened before connecting, so a path that cannot be opened fails without a connection.
+        with open(local_path, "wb") as handle:
+
+            def write(chunk: bytes) -> None:
+                try:
+                    handle.write(chunk)
+                except OSError as err:
+                    # ftplib must not take a local fault for a network one, which would be retried.
+                    raise _LocalWriteFailed(err) from err
+
             try:
-                with open(local_path, "wb") as handle:
-                    ftp.retrbinary(f"RETR {remote_path}", handle.write)
-            except ftplib.error_perm as err:
-                raise BomFtpRejectedError(str(err)) from err
-            except ftplib.all_errors as err:
-                raise BomFtpError(_describe(err)) from err
+                with self._conn() as ftp:
+                    try:
+                        ftp.retrbinary(f"RETR {remote_path}", write)
+                    except ftplib.error_perm as err:
+                        raise BomFtpRejectedError(str(err)) from err
+                    except ftplib.all_errors as err:
+                        raise BomFtpError(_describe(err)) from err
+            except _LocalWriteFailed as failed:
+                raise failed.error from None

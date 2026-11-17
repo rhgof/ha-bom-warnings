@@ -57,8 +57,8 @@ def test_a_dropped_connection_is_a_connection_failure_and_is_retried(
     assert not isinstance(raised.value, BomFtpRejectedError)
     # A bare EOFError has no text, and the repair issue and logs show this.
     assert str(raised.value)
-    # A session opens its connection once; every other call reconnects for each attempt.
-    assert server.accepted == (1 if operation == "session" else ATTEMPTS)
+    # Every call, a session's start included, reconnects for each attempt.
+    assert server.accepted == ATTEMPTS
 
 
 def test_the_drop_server_leaves_no_thread_behind(socket_enabled: None) -> None:
